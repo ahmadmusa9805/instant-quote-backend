@@ -1,0 +1,33 @@
+import { Router } from 'express';
+import { AdminRoutes } from '../modules/Admin/admin.route';
+import { AuthRoutes } from '../modules/Auth/auth.route';
+
+import { ActorRoutes } from '../modules/Client/actor.route';
+
+import { UserRoutes } from '../modules/User/user.route';
+
+const router = Router();
+
+const moduleRoutes = [
+  {
+    path: '/users',
+    route: UserRoutes,
+  },
+  {
+    path: '/actors',
+    route: ActorRoutes,
+  },
+  {
+    path: '/admins',
+    route: AdminRoutes,
+  },
+
+  {
+    path: '/auth',
+    route: AuthRoutes,
+  },
+];
+
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
+
+export default router;

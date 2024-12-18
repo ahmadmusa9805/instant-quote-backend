@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  performance-room-server:
+    container_name: performance-room-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"   # Expose port 5002 of the container to the host
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://localhost:27017/performance-room-server # MongoDB connection URL
+    volumes:
+      - .:/app          # Mount your project directory to the container
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
