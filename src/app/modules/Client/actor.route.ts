@@ -49,4 +49,4 @@ router.get('/:id/comments',
   ActorControllers.getAllComments,
 );
 
-export const ActorRoutes = router;
+export const ClientRoutes = router;

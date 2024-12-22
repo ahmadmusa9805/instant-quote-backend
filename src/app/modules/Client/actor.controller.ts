@@ -18,7 +18,7 @@ const getSingleActor = catchAsync(async (req, res) => {
 });
 
 const getAllActors: RequestHandler = catchAsync(async (req, res) => {
-  const result = await ActorServices.getAllActorsFromDB(req.query);
+  const result = await ActorServices.getAllActorsFromDB(req.query); 
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

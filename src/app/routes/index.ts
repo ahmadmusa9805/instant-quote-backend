@@ -2,9 +2,10 @@ import { Router } from 'express';
 import { AdminRoutes } from '../modules/Admin/admin.route';
 import { AuthRoutes } from '../modules/Auth/auth.route';
 
-import { ActorRoutes } from '../modules/Client/actor.route';
+import { ClientRoutes } from '../modules/Client/actor.route';
 
 import { UserRoutes } from '../modules/User/user.route';
+import { QuoteRoutes } from '../modules/Quote/quote.route';
 
 const router = Router();
 
@@ -14,17 +15,20 @@ const moduleRoutes = [
     route: UserRoutes,
   },
   {
-    path: '/actors',
-    route: ActorRoutes,
+    path: '/clients',
+    route: ClientRoutes,
   },
   {
     path: '/admins',
     route: AdminRoutes,
   },
-
   {
     path: '/auth',
     route: AuthRoutes,
+  },
+  {
+    path: '/quotes',
+    route: QuoteRoutes,
   },
 ];
 
