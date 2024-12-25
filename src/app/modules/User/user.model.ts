@@ -7,6 +7,20 @@ import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser, UserModel>(
   {
+    name: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+    },
+    contactNo: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -22,8 +36,8 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['superAdmin', 'actor', 'judge', 'admin'],
-      default: 'actor',
+      enum: ['superAdmin', 'client', 'admin'],
+      default: 'client',
     },
     status: {
       type: String,
@@ -57,7 +71,7 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-userSchema.statics.isUserExistsByCustomId = async function (email: string) {
+userSchema.statics.isUserExistsByCustomEmail = async function (email: string) {
   return await User.findOne({ email }).select('+password');
 };
 

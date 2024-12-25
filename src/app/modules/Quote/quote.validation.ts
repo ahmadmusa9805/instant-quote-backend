@@ -9,9 +9,9 @@ export const createQuoteValidationSchema = z.object({
       }),
       email: z.string().email('Invalid email format'),
       contactNo: z.string(),
-      address: z.string(),
-      postCode: z.string(),
-      userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format for userId"), // MongoDB ObjectId validation
+      propertyAddress: z.string(),
+      propertyPostCode: z.string(),
+      // userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format for userId"), // MongoDB ObjectId validation
       property: z.string().min(1, "Property is required"),
       propertyPart: z.string().min(1, "Property part is required"),
       refurbishType: z.string().min(1, "Refurbish type is required"),
@@ -20,7 +20,7 @@ export const createQuoteValidationSchema = z.object({
       finishLevel: z.string().min(1, "Finish level is required"),
       bathrooms: z.number().nonnegative("Bathrooms must be a non-negative number"),
       windowSize: z.number().nonnegative("Window size must be a non-negative number"),
-      startTime: z.date().refine(date => date >= new Date(), "Start time must be in the future"),
+      startTime: z.string().min(1, "Start time is required"),
       service: z.string().min(1, "Service is required"),
       designIdea: z.string().min(1, "Design idea is required"),
       file: z.string().optional(), // Optional field for file

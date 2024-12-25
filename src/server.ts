@@ -11,7 +11,7 @@ async function main() {
     // const port = config.port || 3000;  // Default to 3000 if undefined
 
     await seedSuperAdmin();
-    server = httpServer.listen(5002, () => {
+    server = httpServer.listen(config.port, () => {
       // server = app.listen(5000, () => {
       console.log(`app is listening on port ${config.port}`);
     });
