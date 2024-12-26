@@ -1,3 +1,4 @@
+
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 import { USER_ROLE } from './user.constant';
@@ -6,28 +7,31 @@ export interface TUser {
   name: {
     firstName: string;
     lastName: string;
-  }
+  };
   email: string;
   password: string;
   passwordChangedAt?: Date;
   contactNo: string;
-  role: 'superAdmin' | 'admin' | 'client';
+  profileImg?: string;
+  role: 'client' | 'superAdmin' | 'admin';
   status?: 'active' | 'blocked';
   isDeleted: boolean;
 }
-
 export interface UserModel extends Model<TUser> {
-  //instance methods for checking if the user exist
-  isUserExistsByCustomEmail(email: string): Promise<TUser>;
-  //instance methods for checking if passwords are matched
+  // Static methods for checking if the user exists
+    // isUserExistsByCustomEmail(email: string): Promise<TUser>;
+  isUserExistsByCustomEmail(email: string): Promise<Pick<TUser, 'email' | 'password' | 'role'> | null>;
+
+  // Static method for password comparison
   isPasswordMatched(
     plainTextPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
+
+  // Static method to check JWT issuance timing
   isJWTIssuedBeforePasswordChanged(
     passwordChangedTimestamp: Date,
     jwtIssuedTimestamp: number,
   ): boolean;
 }
-
 export type TUserRole = keyof typeof USER_ROLE;

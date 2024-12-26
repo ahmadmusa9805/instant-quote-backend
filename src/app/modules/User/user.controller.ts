@@ -4,17 +4,17 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 
-const createActor = catchAsync(async (req, res) => {
-  const { actor: actorData } = req.body;
-  const result = await UserServices.createActorIntoDB(actorData);
+// const createActor = catchAsync(async (req, res) => {
+//   const { actor: actorData } = req.body;
+//   const result = await UserServices.createActorIntoDB(actorData);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Actor is created successfully',
-    data: result,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Actor is created successfully',
+//     data: result,
+//   });
+// });
 
 // const createJudge = catchAsync(async (req, res) => {
 //   const { judge: judgeData } = req.body;
@@ -78,7 +78,7 @@ const changeStatus = catchAsync(async (req, res) => {
   });
 });
 export const UserControllers = {
-  createActor,
+//   createActor,
   // createJudge,
   createAdmin,
   getMe,

@@ -1,23 +1,23 @@
 import { z } from 'zod';
-import { UserStatus } from './user.constant';
 
-const userValidationSchema = z.object({
-  pasword: z
-    .string({
-      invalid_type_error: 'Password must be string',
-    })
-    .max(20, { message: 'Password can not be more than 20 characters' })
-    .optional(),
-});
-
-const changeStatusValidationSchema = z.object({
+export const createAdminValidationSchema = z.object({
   body: z.object({
-    status: z.enum([...UserStatus] as [string, ...string[]]),
+    admin: z.object({
+      name: z.object({
+        firstName: z.string().nonempty('First Name is required'),
+        lastName: z.string().nonempty('Last Name is required'),
+      }),
+      email: z.string().email('Invalid email format'),
+      contactNo: z.string(),
+      profileImg: z.string().optional(), // Optional field for file
+      isDeleted: z.boolean().optional(), // Optional field with default value
+    }),
   }),
 });
+
 export const UserValidation = {
-  userValidationSchema,
-  changeStatusValidationSchema,
+  createAdminValidationSchema,
 };
+
 
 

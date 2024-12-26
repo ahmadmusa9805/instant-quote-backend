@@ -6,8 +6,4 @@ export const AdminStatus = ['active', 'blocked'];
 export const AdminSearchableFields = [
   'email',
   'id',
-  'contactNo',
-  'name.firstName',
-  'name.lastName',
-  'name.middleName',
 ];

@@ -1,14 +1,12 @@
 export const USER_ROLE = {
   superAdmin: 'superAdmin',
-  actor: 'client',
+  client: 'client',
   admin: 'admin',
 } as const;
 
 
 export const usersSearchableFields = [
   'email',
-  'name.firstName',
-  'name.lastName',
   'address',
 ];
 

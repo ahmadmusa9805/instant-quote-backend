@@ -29,19 +29,23 @@ const userSchema = new Schema<TUser, UserModel>(
     password: {
       type: String,
       required: true,
-      select: 0,
+      select: false, // Prevent password from being returned in queries
     },
     passwordChangedAt: {
       type: Date,
     },
     role: {
       type: String,
-      enum: ['superAdmin', 'client', 'admin'],
+      enum: ['client', 'superAdmin', 'admin'],
       default: 'client',
+    },
+    profileImg : {
+      type: String,
+      default: '',
     },
     status: {
       type: String,
-      enum: UserStatus,
+      enum: Object.values(UserStatus),
       default: 'active',
     },
     isDeleted: {
@@ -50,7 +54,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically add createdAt and updatedAt fields
   },
 );
 

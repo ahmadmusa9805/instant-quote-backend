@@ -8,8 +8,6 @@ export const USER_ROLE = {
 
 export const usersSearchableFields = [
   'email',
-  'name.firstName',
-  'name.lastName',
   'address',
 ];
 
