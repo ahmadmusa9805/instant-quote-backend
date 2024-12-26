@@ -6,7 +6,6 @@ import { UserServices } from './user.service';
 
 const createActor = catchAsync(async (req, res) => {
   const { actor: actorData } = req.body;
-  console.log(actorData, 'actorData');
   const result = await UserServices.createActorIntoDB(actorData);
 
   sendResponse(res, {
@@ -17,17 +16,17 @@ const createActor = catchAsync(async (req, res) => {
   });
 });
 
-const createJudge = catchAsync(async (req, res) => {
-  const { judge: judgeData } = req.body;
-  const result = await UserServices.createJudgeIntoDB(judgeData);
+// const createJudge = catchAsync(async (req, res) => {
+//   const { judge: judgeData } = req.body;
+//   const result = await UserServices.createJudgeIntoDB(judgeData);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Judge is created succesfully',
-    data: result,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Judge is created succesfully',
+//     data: result,
+//   });
+// });
 
 const createAdmin = catchAsync(async (req, res) => {
   const { admin: adminData } = req.body;
@@ -80,7 +79,7 @@ const changeStatus = catchAsync(async (req, res) => {
 });
 export const UserControllers = {
   createActor,
-  createJudge,
+  // createJudge,
   createAdmin,
   getMe,
   changeStatus,

@@ -15,6 +15,8 @@ export type  TQuote = {
   service: string;
   designIdea: string;
   file: string;
+  propertyAddress: string;
+  propertyPostCode: string;
   isDeleted: boolean;
 }
 
@@ -23,8 +25,3 @@ export interface QuoteModel extends Model<TQuote> {
   isQuoteExistById(id: string): Promise<TQuote>;
 
 }
-
-  // password: string;
-  // passwordChangedAt?: Date;
-  // role: 'superAdmin' | 'admin' | 'actor' | 'judge';
-  // status?: 'active' | 'blocked';

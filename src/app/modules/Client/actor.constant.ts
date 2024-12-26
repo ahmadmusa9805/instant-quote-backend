@@ -5,4 +5,4 @@ export const actorsSearchableFields = [
   'address',
 ];
 
-export const ActorStatus = ['active', 'blocked'];
+export const ClientStatus = ['active', 'blocked'];
