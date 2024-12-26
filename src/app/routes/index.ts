@@ -4,8 +4,9 @@ import { AuthRoutes } from '../modules/Auth/auth.route';
 
 import { ClientRoutes } from '../modules/Client/actor.route';
 
-import { UserRoutes } from '../modules/User/user.route';
+// import { UserRoutes } from '../modules/User/user.route';
 import { QuoteRoutes } from '../modules/Quote/quote.route';
+import { UserRoutes } from '../modules/User/user.route';
 
 const router = Router();
 

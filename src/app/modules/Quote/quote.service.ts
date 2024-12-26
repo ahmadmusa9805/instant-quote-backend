@@ -12,14 +12,12 @@ import { usersSearchableFields } from './quote.constant';
 import { Quote } from './quote.model';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-
   const userData: Partial<TUser> = {
     password: payload.password || 'client12345',
     role: 'client',
     email: payload.email,
     contactNo: payload.contactNo,
     name: payload.name,
-
   };
 
   const session = await mongoose.startSession();

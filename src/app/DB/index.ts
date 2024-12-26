@@ -3,10 +3,14 @@ import { USER_ROLE } from '../modules/User/user.constant';
 import { User } from '../modules/User/user.model';
 
 const superUser = {
-  id: '0001',
+  name: {
+    firstName: 'Super',
+    lastName: 'Admin',
+  },
   email: 'ahmadmusa9805@gmail.com',
   password: config.super_admin_password || 'superAdmin12345',
   needsPasswordChange: false,
+  contactNo: "01624869805",
   role: USER_ROLE.superAdmin,
   status: 'active',
   isDeleted: false,

@@ -1,7 +1,5 @@
 export const actorsSearchableFields = [
   'email',
-  'name.firstName',
-  'name.lastName',
   'address',
 ];
 
