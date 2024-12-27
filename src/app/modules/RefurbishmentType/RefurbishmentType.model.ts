@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose';
       import { TRefurbishmentType, RefurbishmentTypeModel } from './RefurbishmentType.interface';
-      
+
       const RefurbishmentTypeSchema = new Schema<TRefurbishmentType, RefurbishmentTypeModel>({
-        name: { type: String, required: true },
-        description: { type: String },
-        atcCodes: { type: String, required: true },
+        title: { type: String, required: true },
+        subtitle: { type: String },
+        price: { type: Number, required: true },
         isDeleted: { type: Boolean, default: false },
       });
       

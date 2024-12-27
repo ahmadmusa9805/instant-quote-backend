@@ -1,13 +1,13 @@
 import express from 'express';
 import { RefurbishmentTypeControllers } from './RefurbishmentType.controller';
-import validateRequest from '../../middlewares/validateRequest';
-import { createRefurbishmentTypeValidationSchema, updateRefurbishmentTypeValidationSchema } from './RefurbishmentType.validation';
+// import validateRequest from '../../middlewares/validateRequest';
+// import { createRefurbishmentTypeValidationSchema, updateRefurbishmentTypeValidationSchema } from './RefurbishmentType.validation';
 
 const router = express.Router();
 
 router.post(
-  '/create-RefurbishmentType',
-  validateRequest(createRefurbishmentTypeValidationSchema),
+  '/create-refurbishment-type',
+  // validateRequest(createRefurbishmentTypeValidationSchema),
   RefurbishmentTypeControllers.createRefurbishmentType,
 );
 
@@ -18,7 +18,7 @@ router.get(
 
 router.patch(
   '/:id',
-  validateRequest(updateRefurbishmentTypeValidationSchema),
+  // validateRequest(updateRefurbishmentTypeValidationSchema),
   RefurbishmentTypeControllers.updateRefurbishmentType,
 );
 

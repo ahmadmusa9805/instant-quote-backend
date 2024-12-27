@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type TRefurbishmentType = {
-  name: string;
-  description?: string;
-  atcCodes: string;
+  title: string;
+  subtitle: string;
+  price: number;
   isDeleted: boolean;
 };
 
