@@ -1,4 +1,3 @@
-
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 import { USER_ROLE } from './user.constant';
@@ -20,7 +19,7 @@ export interface TUser {
 export interface UserModel extends Model<TUser> {
   // Static methods for checking if the user exists
     // isUserExistsByCustomEmail(email: string): Promise<TUser>;
-  isUserExistsByCustomEmail(email: string): Promise<Pick<TUser, 'email' | 'password' | 'role'> | null>;
+  isUserExistsByCustomEmail(email: string): Promise<TUser | null>;
 
   // Static method for password comparison
   isPasswordMatched(

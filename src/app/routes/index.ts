@@ -7,6 +7,7 @@ import { ClientRoutes } from '../modules/Client/actor.route';
 // import { UserRoutes } from '../modules/User/user.route';
 import { QuoteRoutes } from '../modules/Quote/quote.route';
 import { UserRoutes } from '../modules/User/user.route';
+import { PropertyRoutes } from '../modules/Property/Property.route';
 
 const router = Router();
 
@@ -30,6 +31,10 @@ const moduleRoutes = [
   {
     path: '/quotes',
     route: QuoteRoutes,
+  },
+  {
+    path: '/properties',
+    route: PropertyRoutes,
   },
 ];
 

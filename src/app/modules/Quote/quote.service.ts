@@ -12,6 +12,7 @@ import { usersSearchableFields } from './quote.constant';
 import { Quote } from './quote.model';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
+
   const userData: Partial<TUser> = {
     password: payload.password || 'client12345',
     role: 'client',
@@ -21,16 +22,12 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   };
 
   const session = await mongoose.startSession();
-
   try {
     session.startTransaction();
-
     if (file) {
       const imageName = `${file.originalname}`;
       const path = file.path;
-
       const { secure_url } = await sendImageToCloudinary(imageName, path);
-
       payload.file = secure_url;
     }
 
@@ -60,6 +57,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     throw new Error(err?.message);
   }
 };
+
 export const createAdminIntoDB = async (payload: TUser) => {
   // export const createAdminIntoDB = async (file: any, payload: TAdmin) => {
   // const userData: Partial<TQuote> = {

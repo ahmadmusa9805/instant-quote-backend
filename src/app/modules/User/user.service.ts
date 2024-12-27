@@ -10,6 +10,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
 import { Client } from '../Client/actor.model';
 import mongoose from 'mongoose';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 // export const createActorIntoDB = async (payload: TActor) => {
 //   const userData: Partial<TUser> = {
@@ -66,7 +67,7 @@ export const createAdminIntoDB = async (payload: TUser) => {
     // if (!newUser.length) throw new Error('Failed to create user');
 
     // payload.id = newUser[0].id;
-    payload.userId = newUser._id;
+    // payload.userId = newUser._id;
     // payload.userId = newUser[0]._id;
 
     const newAdmin = await Admin.create(payload);
@@ -148,10 +149,41 @@ const changeStatus = async (id: string, payload: { status: string }) => {
 };
 
 
+const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any) => {
+  const { name, ...userData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = { ...userData };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  // Handle file upload if present
+  if (file) {
+    const imageName = `${file.originalname}`;
+    const path = file.path;
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+    modifiedUpdatedData.profileImg = secure_url;
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).select('-password');
+
+  return result;
+};
+
 export const UserServices = {
-//   createActorIntoDB,
   createAdminIntoDB,
   getMe,
   changeStatus,
-  getAllUsersFromDB
+  getAllUsersFromDB,
+  updateUserIntoDB
 };
