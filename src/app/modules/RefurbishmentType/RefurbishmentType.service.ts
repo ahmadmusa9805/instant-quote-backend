@@ -2,10 +2,10 @@
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
-import { RefurbishmentTypeSearchableFields } from './RefurbishmentType.constant';
 import mongoose from 'mongoose';
 import { TRefurbishmentType } from './RefurbishmentType.interface';
 import { RefurbishmentType } from './RefurbishmentType.model';
+import { REFURBISHMENTTYPE_SEARCHABLE_FIELDS } from './RefurbishmentType.constant';
 
 const createRefurbishmentTypeIntoDB = async (
   payload: TRefurbishmentType,
@@ -24,7 +24,7 @@ const getAllRefurbishmentTypesFromDB = async (query: Record<string, unknown>) =>
     RefurbishmentType.find(),
     query,
   )
-    .search(RefurbishmentTypeSearchableFields)
+    .search(REFURBISHMENTTYPE_SEARCHABLE_FIELDS)
     .filter()
     .sort()
     .paginate()
@@ -45,20 +45,24 @@ const getSingleRefurbishmentTypeFromDB = async (id: string) => {
 };
 
 const updateRefurbishmentTypeIntoDB = async (id: string, payload: any) => {
+
+
   const isDeletedService = await mongoose.connection
     .collection('refurbishmenttypes')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, name: 1 } },
+      { projection: { isDeleted: 1, title: 1 } },
     );
 
-  if (!isDeletedService?.name) {
+  if (!isDeletedService?.title) {
     throw new Error('RefurbishmentType not found');
   }
 
   if (isDeletedService.isDeleted) {
     throw new Error('Cannot update a deleted RefurbishmentType');
   }
+
+
 
   const updatedData = await RefurbishmentType.findByIdAndUpdate(
     { _id: id },

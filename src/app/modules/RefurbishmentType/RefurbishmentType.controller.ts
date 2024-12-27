@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { RefurbishmentTypeServices } from './RefurbishmentType.service';
 
 const createRefurbishmentType = catchAsync(async (req, res) => {
-  const { RefurbishmentType: RefurbishmentTypeData } = req.body;
+  const { refurbishmentType: RefurbishmentTypeData } = req.body;
   const result = await RefurbishmentTypeServices.createRefurbishmentTypeIntoDB(RefurbishmentTypeData);
 
   sendResponse(res, {
@@ -41,7 +41,7 @@ const getAllRefurbishmentTypes = catchAsync(async (req, res) => {
 
 const updateRefurbishmentType = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { RefurbishmentType } = req.body;
+  const { refurbishmentType: RefurbishmentType } = req.body;
   const result = await RefurbishmentTypeServices.updateRefurbishmentTypeIntoDB(id, RefurbishmentType);
 
   sendResponse(res, {

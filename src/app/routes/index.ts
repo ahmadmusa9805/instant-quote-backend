@@ -8,7 +8,8 @@ import { ClientRoutes } from '../modules/Client/actor.route';
 import { QuoteRoutes } from '../modules/Quote/quote.route';
 import { UserRoutes } from '../modules/User/user.route';
 import { PropertyRoutes } from '../modules/Property/Property.route';
-
+import { PropertyPartRoutes } from '../modules/PropertyPart/PropertyPart.route';
+import { RefurbishmentTypeRoutes } from '../modules/RefurbishmentType/RefurbishmentType.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -35,6 +36,14 @@ const moduleRoutes = [
   {
     path: '/properties',
     route: PropertyRoutes,
+  },
+  {
+    path: '/propertyParts',
+    route: PropertyPartRoutes,
+  },
+  {
+    path: '/refurbishment-types',
+    route: RefurbishmentTypeRoutes,
   },
 ];
 
