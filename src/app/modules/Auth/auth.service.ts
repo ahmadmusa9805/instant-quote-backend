@@ -4,21 +4,23 @@ import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-import { sendEmail } from '../../utils/sendEmail';
+// import { sendEmail } from '../../utils/sendEmail';
 import { User } from '../User/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
+import { SendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
+
   // checking if the user is exist
-  const user = await User.isUserExistsByCustomId(payload.email);
+  const user = await User.isUserExistsByCustomEmail(payload.email);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
   // checking if the user is already deleted
 
-  const isDeleted = user?.isDeleted;
+  const isDeleted = user.isDeleted;
 
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
@@ -38,7 +40,6 @@ const loginUser = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
   //create token and sent to the  client
-
   const jwtPayload:any = {
     userEmail: user.email,
     role: user.role,
@@ -68,7 +69,7 @@ const changePassword = async (
   payload: { oldPassword: string; newPassword: string },
 ) => {
   // checking if the user is exist
-  const user = await User.isUserExistsByCustomId(userData.userEmail);
+  const user = await User.isUserExistsByCustomEmail(userData.userEmail);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -108,7 +109,7 @@ const refreshToken = async (token: string) => {
   const { userEmail, iat } = decoded;
 
   // checking if the user is exist
-  const user = await User.isUserExistsByCustomId(userEmail);
+  const user = await User.isUserExistsByCustomEmail(userEmail);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -152,7 +153,7 @@ const refreshToken = async (token: string) => {
 
 const forgetPassword = async (userEmail: string) => {
   // checking if the user is exist
-  const user = await User.isUserExistsByCustomId(userEmail);
+  const user = await User.isUserExistsByCustomEmail(userEmail);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -170,7 +171,7 @@ const forgetPassword = async (userEmail: string) => {
   if (userStatus === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   }
-
+  
   const jwtPayload = {
     userEmail: user.email,
     role: user.role,
@@ -183,17 +184,18 @@ const forgetPassword = async (userEmail: string) => {
   );
 
   const resetUILink = `${config.reset_pass_ui_link}?email=${user.email}&token=${resetToken} `;
+  // console.log(resetUILink, 'resetUILink');
 
-  sendEmail(user.email, resetUILink);
+  SendEmail.sendResetLinkToEmail(user.email, resetUILink);
+
 };
 
 const resetPassword = async (
   payload: { email: string; newPassword: string },
   token: string,
 ) => {
-
   // checking if the user is exist
-  const user = await User.isUserExistsByCustomId(payload?.email);
+  const user = await User.isUserExistsByCustomEmail(payload?.email);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -201,7 +203,7 @@ const resetPassword = async (
   // checking if the user is already deleted
   const isDeleted = user?.isDeleted;
 
-  if (isDeleted) {
+  if ( isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 

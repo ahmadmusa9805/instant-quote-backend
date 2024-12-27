@@ -19,6 +19,8 @@ export default {
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
   stripe_secret_key: process.env.STRIPE_SECRET_KEY,
+  email_app_password: process.env.EMAIL_APP_PASSWORD,
+  admin_email_user: process.env.ADMIN_EMAIL_USER, 
   s3: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

@@ -23,5 +23,4 @@ export type  TQuote = {
 export interface QuoteModel extends Model<TQuote> {
   //instance methods for checking if the user exist
   isQuoteExistById(id: string): Promise<TQuote>;
-
 }

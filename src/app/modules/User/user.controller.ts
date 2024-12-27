@@ -3,30 +3,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
-
-// const createActor = catchAsync(async (req, res) => {
-//   const { actor: actorData } = req.body;
-//   const result = await UserServices.createActorIntoDB(actorData);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Actor is created successfully',
-//     data: result,
-//   });
-// });
-
-// const createJudge = catchAsync(async (req, res) => {
-//   const { judge: judgeData } = req.body;
-//   const result = await UserServices.createJudgeIntoDB(judgeData);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Judge is created succesfully',
-//     data: result,
-//   });
-// });
+// import sendImageToCloudinary from '../../utils/cloudinary';
 
 const createAdmin = catchAsync(async (req, res) => {
   const { admin: adminData } = req.body;
@@ -77,9 +54,23 @@ const changeStatus = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+const updateUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.updateUserIntoDB(id, req.body, req.file);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: req.file ? 'User data and profile image updated successfully' : 'User data updated successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
 //   createActor,
   // createJudge,
+  updateUser,
   createAdmin,
   getMe,
   changeStatus,
