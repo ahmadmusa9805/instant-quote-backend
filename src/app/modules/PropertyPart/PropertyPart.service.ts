@@ -33,7 +33,7 @@ const createPropertyPartIntoDB = async (
 
 const getAllPropertyPartsFromDB = async (query: Record<string, unknown>) => {
   const PropertyPartQuery = new QueryBuilder(
-    PropertyPart.find(),
+    PropertyPart.find({isDeleted: false}),
     query,
   )
     .search(PROPERTYPART_SEARCHABLE_FIELDS)
@@ -51,6 +51,23 @@ const getAllPropertyPartsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSinglePropertyPartFromDB = async (id: string) => {
+
+  const isDeletedCart = await mongoose.connection
+  .collection('propertyparts')
+  .findOne(
+    { _id: new mongoose.Types.ObjectId(id) }, // Query
+    { projection: { isDeleted: 1 } } // Projection
+  );
+ 
+ if (!isDeletedCart) {
+   throw new Error('PropertyPart not found');
+ }
+
+ if (isDeletedCart.isDeleted) {
+   throw new Error('Cannot retrieve a deleted PropertyPart');
+ }
+
+
   const result = await PropertyPart.findById(id);
 
   return result;
@@ -86,6 +103,23 @@ const updatePropertyPartIntoDB = async (id: string, payload: any) => {
 };
 
 const deletePropertyPartFromDB = async (id: string) => {
+
+  const isDeletedCart = await mongoose.connection
+  .collection('propertyparts')
+  .findOne(
+    { _id: new mongoose.Types.ObjectId(id) }, // Query
+    { projection: { isDeleted: 1 } } // Projection
+  );
+ 
+ if (!isDeletedCart) {
+   throw new Error('PropertyPart not found');
+ }
+
+ if (isDeletedCart.isDeleted) {
+   throw new Error('Cannot retrieve a deleted PropertyPart');
+ }
+
+
   const deletedService = await PropertyPart.findByIdAndUpdate(
     id,
     { isDeleted: true },
