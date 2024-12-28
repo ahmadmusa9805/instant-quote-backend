@@ -11,6 +11,8 @@ import { PropertyRoutes } from '../modules/Property/Property.route';
 import { PropertyPartRoutes } from '../modules/PropertyPart/PropertyPart.route';
 import { RefurbishmentTypeRoutes } from '../modules/RefurbishmentType/RefurbishmentType.route';
 import { RefurbishmentSizeRoutes } from '../modules/RefurbishmentSize/RefurbishmentSize.route';
+import { ExtendSizeRoutes } from '../modules/ExtendSize/ExtendSize.route';
+import { FinishLevelRoutes } from '../modules/FinishLevel/FinishLevel.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -49,6 +51,14 @@ const moduleRoutes = [
   {
     path: '/refurbishment-sizes',
     route: RefurbishmentSizeRoutes,
+  },
+  {
+    path: '/extend-sizes',
+    route: ExtendSizeRoutes,
+  },
+  {
+    path: '/finish-levels',
+    route: FinishLevelRoutes,
   },
 ];
 
