@@ -3,8 +3,8 @@ import { TRefurbishmentSize, RefurbishmentSizeModel } from './RefurbishmentSize.
 
 const RefurbishmentSizeSchema = new Schema<TRefurbishmentSize, RefurbishmentSizeModel>({
   name: { type: String, required: true },
-  description: { type: String },
-  atcCodes: { type: String, required: true },
+  squareMeterSize: { type: String },
+  price: { type: Number, required: true },
   isDeleted: { type: Boolean, default: false },
 });
 

@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "start:prod": "node ./dist/server.js",
-    "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "start:dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "create:module": "node create-module.js",
     "build": "tsc",
     "lint": "eslint src --ignore-path .eslintignore --ext .ts",
@@ -58,7 +58,7 @@
     "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.0",
     "prettier": "^3.1.0",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.2.2"
   }
 }

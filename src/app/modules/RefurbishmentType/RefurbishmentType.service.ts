@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from 'http-status';
+// import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
 import mongoose from 'mongoose';
 import { TRefurbishmentType } from './RefurbishmentType.interface';
 import { RefurbishmentType } from './RefurbishmentType.model';
 import { REFURBISHMENTTYPE_SEARCHABLE_FIELDS } from './RefurbishmentType.constant';
+import httpStatus from 'http-status';
 
 const createRefurbishmentTypeIntoDB = async (
   payload: TRefurbishmentType,
@@ -21,7 +22,7 @@ const createRefurbishmentTypeIntoDB = async (
 
 const getAllRefurbishmentTypesFromDB = async (query: Record<string, unknown>) => {
   const RefurbishmentTypeQuery = new QueryBuilder(
-    RefurbishmentType.find(),
+    RefurbishmentType.find({isDeleted: false}),
     query,
   )
     .search(REFURBISHMENTTYPE_SEARCHABLE_FIELDS)
@@ -39,7 +40,11 @@ const getAllRefurbishmentTypesFromDB = async (query: Record<string, unknown>) =>
 };
 
 const getSingleRefurbishmentTypeFromDB = async (id: string) => {
-  const result = await RefurbishmentType.findById(id);
+  const result = await RefurbishmentType.findOne({ _id: id, isDeleted: false });
+  
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'RefurbishmentType not found!');
+  }
 
   return result;
 };

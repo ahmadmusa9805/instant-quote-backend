@@ -8,46 +8,10 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
-import { Client } from '../Client/actor.model';
 import mongoose from 'mongoose';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-// export const createActorIntoDB = async (payload: TActor) => {
-//   const userData: Partial<TUser> = {
-//     password: payload.password,
-//     role: 'actor',
-//     email: payload.email,
-//   };
 
-//   // const session = await mongoose.startSession();
-
-//   try {
-//     // session.startTransaction();
-
-//     const newUser = await User.create(userData);
-//     // const newUser = await User.create([userData], { session });
-
-//     if (!newUser) throw new Error('Failed to create user');
-//     // if (!newUser.length) throw new Error('Failed to create user');
-
-//     payload.userId = newUser._id;
-//     // payload.userId = newUser[0]._id;
-
-//     const newActor = await Actor.create(payload);
-//     // const newActor = await Actor.create([payload], { session });
-//     if (!newActor) throw new Error('Failed to create actor');
-//     // if (!newActor.length) throw new Error('Failed to create actor');
-
-//     // await session.commitTransaction();
-//     // await session.endSession();
-
-//     return newActor;
-//   } catch (err: any) {
-//     // await session.abortTransaction();
-//     // await session.endSession();
-//     throw new Error(err?.message);
-//   }
-// };
 export const createAdminIntoDB = async (payload: TUser) => {
 
   payload.role = 'admin';
@@ -86,14 +50,17 @@ export const createAdminIntoDB = async (payload: TUser) => {
   }
 };
 
-const getMe = async (userEmail: string, role: string) => {
-  let result = null;
-  if (role === 'actor') {
-    result = await Client.findOne({ email: userEmail }).populate('userId');
-  }
-  if (role === 'admin') {
-    result = await Admin.findOne({ email: userEmail }).populate('userId');
-  }
+const getMe = async (userEmail: string) => {
+// const getMe = async (userEmail: string, role: string) => {
+  // let result = null;
+  // if (role === 'client') {
+  //   result = await User.findOne({ email: userEmail });
+  // }
+  // if (role === 'admin') {
+  //   result = await Admin.findOne({ email: userEmail }).populate('userId');
+  // }
+
+  const result = await User.findOne({ email: userEmail });
 
   return result;
 };
@@ -118,29 +85,29 @@ const changeStatus = async (id: string, payload: { status: string }) => {
   const result = await User.findByIdAndUpdate(id, payload, {
     new: true,
   });
-    if(result?.status === 'blocked'){
-      if(result?.role === 'client'){
-         await Client.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-       }
+    // if(result?.status === 'blocked'){
+    //   if(result?.role === 'client'){
+    //      await Client.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
+    //    }
        
-       if(result?.role === 'admin'){
-        await Admin.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-      }
+    //    if(result?.role === 'admin'){
+    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
+    //   }
 
      
-    }
+    // }
 
-    if(result?.status === 'active'){
-      if(result?.role === 'client'){
-         await Client.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-       }
+    // if(result?.status === 'active'){
+    //   if(result?.role === 'client'){
+    //      await Client.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
+    //    }
        
-       if(result?.role === 'admin'){
-        await Admin.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-      }
+    //    if(result?.role === 'admin'){
+    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
+    //   }
 
      
-    }
+    // }
 
 
 
