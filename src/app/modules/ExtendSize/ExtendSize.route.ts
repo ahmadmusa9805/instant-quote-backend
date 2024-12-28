@@ -6,7 +6,7 @@ import { createExtendSizeValidationSchema, updateExtendSizeValidationSchema } fr
 const router = express.Router();
 
 router.post(
-  '/create-ExtendSize',
+  '/create-extend-size',
   validateRequest(createExtendSizeValidationSchema),
   ExtendSizeControllers.createExtendSize,
 );

@@ -39,7 +39,11 @@ const getAllFinishLevelsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleFinishLevelFromDB = async (id: string) => {
-  const result = await FinishLevel.findOne({ _id: new mongoose.Types.ObjectId(id) });
+  const result = await FinishLevel.findOne({ _id:id, isDeleted: false});
+
+ if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'FinishLevel not found!');
+  }
 
   return result;
 };

@@ -6,7 +6,7 @@ import { createFinishLevelValidationSchema, updateFinishLevelValidationSchema } 
 const router = express.Router();
 
 router.post(
-  '/create-FinishLevel',
+  '/create-finish-level',
   validateRequest(createFinishLevelValidationSchema),
   FinishLevelControllers.createFinishLevel,
 );
