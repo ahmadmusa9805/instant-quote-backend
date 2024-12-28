@@ -66,7 +66,6 @@ const updateRefurbishmentSizeIntoDB = async (id: string, payload: any) => {
     throw new Error('Cannot update a deleted RefurbishmentSize');
   }
 
-  console.log(payload, 'payload');
   
   const updatedData = await RefurbishmentSize.findByIdAndUpdate(
       id ,
@@ -74,7 +73,6 @@ const updateRefurbishmentSizeIntoDB = async (id: string, payload: any) => {
       { new: true, runValidators: true },
     );
     
-    console.log(updatedData, 'test');
   if (!updatedData) {
     throw new Error('RefurbishmentSize not found after update');
   }
