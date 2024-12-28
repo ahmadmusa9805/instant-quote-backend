@@ -1,6 +1,6 @@
-export const actorsSearchableFields = [
-  'email',
-  'address',
-];
+// export const actorsSearchableFields = [
+//   'email',
+//   'address',
+// ];
 
-export const ClientStatus = ['active', 'blocked'];
+// export const ClientStatus = ['active', 'blocked'];

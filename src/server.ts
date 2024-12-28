@@ -1,9 +1,8 @@
-
-import { Server } from 'http';
+import { Server } from 'node:http';
 import mongoose from 'mongoose';
-import httpServer from './app';  // Import HTTP server from app.ts
-import seedSuperAdmin from './app/DB';
-import config from './app/config';
+import httpServer from './app.js';  // Import HTTP server from app.ts
+import config from './app/config/index.js';
+import seedSuperAdmin from './app/DB/index.js';
 let server: Server;
 async function main() {
   try {
@@ -39,10 +38,3 @@ process.on('uncaughtException', () => {
   console.log(`😈 uncaughtException is detected , shutting down ...`);
   process.exit(1);
 });
-
-
-
-
-
-
-

@@ -1,14 +1,37 @@
 import express from 'express';
-import { RefurbishmentSizeControllers } from './RefurbishmentSize.controller';
 import validateRequest from '../../middlewares/validateRequest';
-import { createRefurbishmentSizeValidationSchema, updateRefurbishmentSizeValidationSchema } from './RefurbishmentSize.validation';
+import { createRefurbishmentSizeValidationSchema } from './RefurbishmentSize.validation';
+import { RefurbishmentSizeControllers } from './RefurbishmentSize.controller';
+// import validateRequest from '../../middlewares/validateRequest';
+// import { createRefurbishmentTypeValidationSchema, updateRefurbishmentTypeValidationSchema } from './RefurbishmentType.validation';
 
 const router = express.Router();
 
 router.post(
-  '/create-RefurbishmentSize',
+  '/create-refurbishment-size',
   validateRequest(createRefurbishmentSizeValidationSchema),
   RefurbishmentSizeControllers.createRefurbishmentSize,
 );
 
-// Other route methods...
+router.get(
+  '/:id',
+  RefurbishmentSizeControllers.getSingleRefurbishmentSize,
+);
+
+router.patch(
+  '/:id',
+  // validateRequest(updateRefurbishmentTypeValidationSchema),
+  RefurbishmentSizeControllers.updateRefurbishmentSize,
+);
+
+router.delete(
+  '/:id',
+  RefurbishmentSizeControllers.deleteRefurbishmentSize,
+);
+
+router.get(
+  '/',
+  RefurbishmentSizeControllers.getAllRefurbishmentSizes,
+);
+
+export const RefurbishmentSizeRoutes = router;

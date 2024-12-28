@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type TRefurbishmentSize = {
   name: string;
-  description?: string;
-  atcCodes: string;
+  squareMeterSize: string;
+  price: number;
   isDeleted: boolean;
 };
 

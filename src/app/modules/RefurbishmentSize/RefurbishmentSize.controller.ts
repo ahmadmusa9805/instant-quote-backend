@@ -4,15 +4,70 @@ import sendResponse from '../../utils/sendResponse';
 import { RefurbishmentSizeServices } from './RefurbishmentSize.service';
 
 const createRefurbishmentSize = catchAsync(async (req, res) => {
-  const { RefurbishmentSize: RefurbishmentSizeData } = req.body;
+  const { refurbishmentSize: RefurbishmentSizeData } = req.body;
   const result = await RefurbishmentSizeServices.createRefurbishmentSizeIntoDB(RefurbishmentSizeData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'RefurbishmentSize is created successfully',
+    message: 'RefurbishmentType is created successfully',
     data: result,
   });
 });
 
-// Other controller methods...
+const getSingleRefurbishmentSize = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await RefurbishmentSizeServices.getSingleRefurbishmentSizeFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'RefurbishmentType is retrieved successfully',
+    data: result,
+  });
+});
+
+const getAllRefurbishmentSizes = catchAsync(async (req, res) => {
+  const result = await RefurbishmentSizeServices.getAllRefurbishmentSizesFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'RefurbishmentTypes are retrieved successfully',
+    meta: result.meta,
+    data: result.result,
+  });
+});
+
+const updateRefurbishmentSize = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { refurbishmentSize: RefurbishmentSize } = req.body;
+  const result = await RefurbishmentSizeServices.updateRefurbishmentSizeIntoDB(id, RefurbishmentSize);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'RefurbishmentType is updated successfully',
+    data: result,
+  });
+});
+
+const deleteRefurbishmentSize = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await RefurbishmentSizeServices.deleteRefurbishmentSizeFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'RefurbishmentType is deleted successfully',
+    data: result,
+  });
+});
+
+export const RefurbishmentSizeControllers = {
+  createRefurbishmentSize,
+getSingleRefurbishmentSize,
+getAllRefurbishmentSizes,
+updateRefurbishmentSize,
+deleteRefurbishmentSize,
+};
