@@ -13,6 +13,8 @@ import { RefurbishmentTypeRoutes } from '../modules/RefurbishmentType/Refurbishm
 import { RefurbishmentSizeRoutes } from '../modules/RefurbishmentSize/RefurbishmentSize.route';
 import { ExtendSizeRoutes } from '../modules/ExtendSize/ExtendSize.route';
 import { FinishLevelRoutes } from '../modules/FinishLevel/FinishLevel.route';
+import { BathroomRoutes } from '../modules/Bathroom/Bathroom.route';
+import { WindowRoutes } from '../modules/Window/Window.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -59,6 +61,14 @@ const moduleRoutes = [
   {
     path: '/finish-levels',
     route: FinishLevelRoutes,
+  },
+  {
+    path: '/bathrooms',
+    route: BathroomRoutes,
+  },
+  {
+    path: '/windows',
+    route: WindowRoutes,
   },
 ];
 
