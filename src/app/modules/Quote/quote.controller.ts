@@ -16,72 +16,31 @@ const createQuote = catchAsync(async (req, res) => {
   });
 });
 
-const createJudge = catchAsync(async (req, res) => {
-  // const { judge: judgeData } = req.body;
-  // const result = await QuoteServices.createJudgeIntoDB(judgeData);
+const getSingleStartTime = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await QuoteServices.getSingleQuoteFromDB(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Judge is created succesfully',
-    data: "",
-  });
-});
-
-const createAdmin = catchAsync(async (req, res) => {
-  // const { admin: adminData } = req.body;
-  // const result = await QuoteServices.createAdminIntoDB(adminData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Admin is created succesfully',
-    data: '',
-  });
-});
-
-const getMe = catchAsync(async (req, res) => {
-  const { userEmail, role } = req.user;
-
-  const result = await QuoteServices.getMe(userEmail, role);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User is retrieved succesfully',
+    message: 'Quote is retrieved successfully',
     data: result,
   });
 });
 
-const getAllUsers = catchAsync(async (req, res) => {
-  const result = await QuoteServices.getAllUsersFromDB(req.query);
+const getAllStartTimes = catchAsync(async (req, res) => {
+  const result = await QuoteServices.getAllQuotesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Users are retrieved succesfully',
+    message: 'Quote are retrieved successfully',
     meta: result.meta,
     data: result.result,
   });
 });
-
-const changeStatus = catchAsync(async (req, res) => {
-  const id = req.params.id;
-
-  const result = await QuoteServices.changeStatus(id, req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Status is updated succesfully',
-    data: result,
-  });
-});
 export const QuoteControllers = {
   createQuote,
-  createJudge,
-  createAdmin,
-  getMe,
-  changeStatus,
-  getAllUsers
+  getSingleStartTime,
+  getAllStartTimes,
 };

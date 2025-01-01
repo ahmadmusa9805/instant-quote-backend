@@ -8,7 +8,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { TUser } from '../User/user.interface';
 import { User } from '../User/user.model';
-import { usersSearchableFields } from './quote.constant';
+import { QUOTE_SEARCHABLE_FIELDS } from './quote.constant';
 import { Quote } from './quote.model';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
@@ -58,111 +58,33 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   }
 };
 
-export const createAdminIntoDB = async (payload: TUser) => {
-  // export const createAdminIntoDB = async (file: any, payload: TAdmin) => {
-  // const userData: Partial<TQuote> = {
-  //   password: payload?.password,
-  //   role: 'admin',
-  //   email: payload.email,
-  // };
-
-  // const session = await mongoose.startSession();
-
-  try {
-    // session.startTransaction();
-
-
-    const newUser = await Quote.create(payload);
-    // const newUser = await User.create([userData], { session });
-    if (!newUser) throw new Error('Failed to create user');
-    // if (!newUser.length) throw new Error('Failed to create user');
-
-    // payload.id = newUser[0].id;
-    // payload.userId = newUser._id;
-    // payload.userId = newUser[0]._id;
-
-    const newAdmin = await Quote.create(payload);
-    // const newAdmin = await Admin.create([payload], { session });
-    if (!newAdmin) throw new Error('Failed to create admin');
-    // if (!newAdmin.length) throw new Error('Failed to create admin');
-
-    // await session.commitTransaction();
-    // await session.endSession();
-
-    return newAdmin;
-  } catch (err: any) {
-    // await session.abortTransaction();
-    // await session.endSession();
-    throw new Error(err.message);
-  }
-};
-
-const getMe = async (userEmail: string, role: string) => {
-  let result = null;
-  if (role === 'actor') {
-    result = await Quote.findOne({ email: userEmail }).populate('userId');
-  }
-  if (role === 'admin') {
-    result = await Quote.findOne({ email: userEmail }).populate('userId');
-  }
-
-  return result;
-};
-const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(Quote.find({status: 'active'}), query)
-    .search(usersSearchableFields)
+const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
+  const QuoteQuery = new QueryBuilder(
+    Quote.find({isDeleted: false}),
+    query,
+  )
+    .search(QUOTE_SEARCHABLE_FIELDS)
     .filter()
     .sort()
     .paginate()
     .fields();
 
-  const meta = await studentQuery.countTotal();
-  const result = await studentQuery.modelQuery;
-
+  const result = await QuoteQuery.modelQuery;
+  const meta = await QuoteQuery.countTotal();
   return {
-    meta,
     result,
+    meta,
   };
 };
 
-const changeStatus = async (id: string, payload: { status: string }) => {
-  const result = await Quote.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
-    // if(result?.status === 'blocked'){
-    //   if(result?.role === 'actor'){
-    //      await Actor.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-    //    }
-       
-    //    if(result?.role === 'admin'){
-    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-    //   }
-
-     
-    // }
-
-    // if(result?.status === 'active'){
-    //   if(result?.role === 'actor'){
-    //      await Actor.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-    //    }
-       
-    //    if(result?.role === 'admin'){
-    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-    //   }
-
-     
-    // }
-
-
-
+const getSingleQuoteFromDB = async (id: string) => {
+  const result = await Quote.findOne({ _id: id, isDeleted: false });
 
   return result;
 };
 
-
 export const QuoteServices = {
   createQuoteIntoDB,
-  getMe,
-  changeStatus,
-  getAllUsersFromDB
+  getAllQuotesFromDB,
+  getSingleQuoteFromDB,
 };

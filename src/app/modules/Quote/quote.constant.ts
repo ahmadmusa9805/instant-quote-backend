@@ -6,9 +6,9 @@ export const USER_ROLE = {
 } as const;
 
 
-export const usersSearchableFields = [
+export const QUOTE_SEARCHABLE_FIELDS = [
   'email',
   'address',
 ];
 
-export const UserStatus = ['active', 'blocked'];
+export const QUOTE_STATUS = ['active', 'blocked'];
