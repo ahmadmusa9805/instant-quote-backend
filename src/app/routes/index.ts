@@ -15,6 +15,8 @@ import { ExtendSizeRoutes } from '../modules/ExtendSize/ExtendSize.route';
 import { FinishLevelRoutes } from '../modules/FinishLevel/FinishLevel.route';
 import { BathroomRoutes } from '../modules/Bathroom/Bathroom.route';
 import { WindowRoutes } from '../modules/Window/Window.route';
+import { StartTimeRoutes } from '../modules/StartTime/StartTime.route';
+import { ServiceRoutes } from '../modules/Service/Service.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -69,6 +71,14 @@ const moduleRoutes = [
   {
     path: '/windows',
     route: WindowRoutes,
+  },
+  {
+    path: '/start-times',
+    route: StartTimeRoutes,
+  },
+  {
+    path: '/services',
+    route: ServiceRoutes,
   },
 ];
 

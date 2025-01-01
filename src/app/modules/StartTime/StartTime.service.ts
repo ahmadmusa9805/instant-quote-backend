@@ -39,7 +39,7 @@ const getAllStartTimesFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleStartTimeFromDB = async (id: string) => {
-  const result = await StartTime.findOne({ _id: id, isDeleted: false }).populate(id);
+  const result = await StartTime.findOne({ _id: id, isDeleted: false });
 
   return result;
 };
@@ -49,10 +49,10 @@ const updateStartTimeIntoDB = async (id: string, payload: any) => {
     .collection('starttimes')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, name: 1 } },
+      { projection: { isDeleted: 1, startTime: 1 } },
     );
 
-  if (!isDeletedService?.name) {
+  if (!isDeletedService?.startTime) {
     throw new Error('StartTime not found');
   }
 

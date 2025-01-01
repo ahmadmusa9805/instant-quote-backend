@@ -1,9 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type TService = {
   name: string;
-  description?: string;
-  atcCodes: string;
+  price: number;
   isDeleted: boolean;
 };
 

@@ -2,10 +2,11 @@
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
-import { ServiceSearchableFields } from './Service.constant';
+// import { ServiceSearchableFields } from './Service.constant';
 import mongoose from 'mongoose';
 import { TService } from './Service.interface';
 import { Service } from './Service.model';
+import { SERVICE_SEARCHABLE_FIELDS } from './Service.constant';
 
 const createServiceIntoDB = async (
   payload: TService,
@@ -21,10 +22,10 @@ const createServiceIntoDB = async (
 
 const getAllServicesFromDB = async (query: Record<string, unknown>) => {
   const ServiceQuery = new QueryBuilder(
-    Service.find(),
+    Service.find({isDeleted: false}),
     query,
   )
-    .search(ServiceSearchableFields)
+    .search(SERVICE_SEARCHABLE_FIELDS)
     .filter()
     .sort()
     .paginate()

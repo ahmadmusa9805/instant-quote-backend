@@ -3,8 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const ServiceSchema = new Schema<TService, ServiceModel>({
         name: { type: String, required: true },
-        description: { type: String },
-        atcCodes: { type: String, required: true },
+        price: { type: Number, required: true },
         isDeleted: { type: Boolean, default: false },
       });
       

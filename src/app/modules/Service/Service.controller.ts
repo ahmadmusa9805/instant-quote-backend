@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { ServiceServices } from './Service.service';
 
 const createService = catchAsync(async (req, res) => {
-  const { Service: ServiceData } = req.body;
+  const { service: ServiceData } = req.body;
   const result = await ServiceServices.createServiceIntoDB(ServiceData);
 
   sendResponse(res, {
@@ -41,8 +41,8 @@ const getAllServices = catchAsync(async (req, res) => {
 
 const updateService = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { Service } = req.body;
-  const result = await ServiceServices.updateServiceIntoDB(id, Service);
+  const { service: ServiceData } = req.body;
+  const result = await ServiceServices.updateServiceIntoDB(id, ServiceData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
