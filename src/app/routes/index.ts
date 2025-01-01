@@ -17,6 +17,7 @@ import { BathroomRoutes } from '../modules/Bathroom/Bathroom.route';
 import { WindowRoutes } from '../modules/Window/Window.route';
 import { StartTimeRoutes } from '../modules/StartTime/StartTime.route';
 import { ServiceRoutes } from '../modules/Service/Service.route';
+import { DesignIdeaRoutes } from '../modules/DesignIdea/DesignIdea.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -79,6 +80,10 @@ const moduleRoutes = [
   {
     path: '/services',
     route: ServiceRoutes,
+  },
+  {
+    path: '/design-ideas',
+    route: DesignIdeaRoutes,
   },
 ];
 
