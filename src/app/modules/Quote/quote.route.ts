@@ -26,30 +26,16 @@ router.post(
   QuoteControllers.createQuote,
 );
 
-// router.post(
-//   '/create-admin',
-//   auth(USER_ROLE.superAdmin),
-//   validateRequest(createAdminValidationSchema),
-//   UserControllers.createAdmin,
-// );
+router.get(
+  '/:id',
+  QuoteControllers.getSingleStartTime,
+);
 
-// router.get(
-//   '/me',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.actor, USER_ROLE.judge),
-//   UserControllers.getMe,
-// );
+router.get(
+  '/',
+  QuoteControllers.getAllStartTimes,
+);
 
-// router.post(
-//   '/change-status/:id',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-//   validateRequest(UserValidation.changeStatusValidationSchema),
-//   UserControllers.changeStatus,
-// );
 
-// router.get(
-//   '/',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.actor, USER_ROLE.judge),
-//   UserControllers.getAllUsers,
-// );
 
 export const QuoteRoutes = router;

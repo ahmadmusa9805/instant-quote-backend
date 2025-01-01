@@ -18,6 +18,9 @@ import { WindowRoutes } from '../modules/Window/Window.route';
 import { StartTimeRoutes } from '../modules/StartTime/StartTime.route';
 import { ServiceRoutes } from '../modules/Service/Service.route';
 import { DesignIdeaRoutes } from '../modules/DesignIdea/DesignIdea.route';
+import { InclusionRoutes } from '../modules/Inclusion/Inclusion.route';
+import { ExclusionRoutes } from '../modules/Exclusion/Exclusion.route';
+import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -84,6 +87,18 @@ const moduleRoutes = [
   {
     path: '/design-ideas',
     route: DesignIdeaRoutes,
+  },
+  {
+    path: '/inclusions',
+    route: InclusionRoutes,
+  },
+  {
+    path: '/exclusions',
+    route: ExclusionRoutes,
+  },
+  {
+    path: '/call-availabilities',
+    route: CallAvailabilityRoutes,
   },
 ];
 
