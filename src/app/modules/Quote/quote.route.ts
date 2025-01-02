@@ -28,13 +28,26 @@ router.post(
 
 router.get(
   '/:id',
-  QuoteControllers.getSingleStartTime,
+  QuoteControllers.getSingleQuote,
 );
+
+router.patch(
+  '/:id',
+  // validateRequest(QuoteValidation.updateQuoteValidationSchema),
+  QuoteControllers.updateQuote,
+);
+
+router.delete(
+  '/:id',
+  QuoteControllers.deleteQuote,);
 
 router.get(
   '/',
-  QuoteControllers.getAllStartTimes,
-);
+  QuoteControllers.getAllQuotes,);
+
+router.get(
+  '/user/:id',
+  QuoteControllers.getAllQuotesByUser,);
 
 
 

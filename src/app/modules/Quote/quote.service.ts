@@ -10,9 +10,10 @@ import { TUser } from '../User/user.interface';
 import { User } from '../User/user.model';
 import { QUOTE_SEARCHABLE_FIELDS } from './quote.constant';
 import { Quote } from './quote.model';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-
   const userData: Partial<TUser> = {
     password: payload.password || 'client12345',
     role: 'client',
@@ -33,6 +34,16 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
 
 
+
+   if(payload.userId){
+    const user = await User.findOne({ _id: payload.userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+   }
+
+   
+   if(!payload.userId){
     // const newUser = await User.create(userData);
     const newUser = await User.create([userData], { session });
 
@@ -41,6 +52,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
     // payload.userId = newUser._id;
     payload.userId = newUser[0]._id;
+}
 
     // const newClient = await Quote.create(payload);
     const newClient = await Quote.create([payload], { session });
@@ -76,15 +88,76 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
     meta,
   };
 };
+const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
+  const QuoteQuery = new QueryBuilder(
+    Quote.find({isDeleted: false, userId}),
+    query,
+  )
+    .search(QUOTE_SEARCHABLE_FIELDS)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await QuoteQuery.modelQuery;
+  const meta = await QuoteQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
+};
 
 const getSingleQuoteFromDB = async (id: string) => {
   const result = await Quote.findOne({ _id: id, isDeleted: false });
-
   return result;
 };
+
+const updateQuoteIntoDB = async (id: string, payload: any) => {
+  const isDeletedService = await mongoose.connection
+    .collection('quotes')
+    .findOne(
+      { _id: new mongoose.Types.ObjectId(id) },
+      { projection: { isDeleted: 1, title: 1 } },
+    );
+
+  if (!isDeletedService?.title) {
+    throw new Error('Quote not found');  }
+
+  if (isDeletedService.isDeleted) {
+    throw new Error('Cannot update a deleted Quote');
+  }
+
+  const updatedData = await Quote.findByIdAndUpdate(    { _id: id },
+    payload,
+    { new: true, runValidators: true },
+  );
+
+  if (!updatedData) {
+    throw new Error('Quote not found after update');
+  }
+
+  return updatedData;
+};
+
+const deleteQuoteFromDB = async (id: string) => {
+  const deletedService = await Quote.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
+
+  if (!deletedService) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');  }
+
+  return deletedService;
+};
+
 
 export const QuoteServices = {
   createQuoteIntoDB,
   getAllQuotesFromDB,
   getSingleQuoteFromDB,
+  updateQuoteIntoDB,
+  deleteQuoteFromDB,
+  getAllQuotesByUserFromDB
 };

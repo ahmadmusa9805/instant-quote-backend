@@ -14,7 +14,7 @@ export type  TQuote = {
   startTime: Date;
   service: string;
   designIdea: string;
-  file: string;
+  file?: string;
   propertyAddress: string;
   propertyPostCode: string;
   isDeleted: boolean;
