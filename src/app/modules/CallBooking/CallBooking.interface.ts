@@ -7,6 +7,7 @@ export type TCallBooking = {
   day: string;
   date: Date;
   startTime: string;
+  state: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   endTime: string;
   isDeleted: boolean;
 };

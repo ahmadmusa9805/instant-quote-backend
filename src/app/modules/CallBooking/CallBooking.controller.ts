@@ -38,6 +38,18 @@ const getAllCallBookings = catchAsync(async (req, res) => {
     data: result.result,
   });
 });
+const getAllCallBookingsByUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CallBookingServices.getAllCallBookingsByUserFromDB(req.query, id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'CallBookings are retrieved successfully',
+    meta: result.meta,
+    data: result.result,
+  });
+});
 
 const updateCallBooking = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -70,4 +82,5 @@ export const CallBookingControllers = {
   getAllCallBookings,
   updateCallBooking,
   deleteCallBooking,
+  getAllCallBookingsByUser,
 };

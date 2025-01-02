@@ -8,6 +8,7 @@ import { Schema, model } from 'mongoose';
      date: { type: Date, required: true },
      startTime: { type: String, required: true },
      endTime: { type: String, required: true },
+     state: { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
      isDeleted: { type: Boolean, default: false },
   });
       

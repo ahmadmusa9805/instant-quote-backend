@@ -7,31 +7,6 @@ import mongoose from 'mongoose';
 import { TCallBooking } from './CallBooking.interface';
 import { CallBooking } from './CallBooking.model';
 
-// const createCallBookingIntoDB = async (payload: TCallBooking) => {
-//   // Check for existing booking with the same day, startTime, and endTime
-//   const existingBooking = await CallBooking.findOne({
-//     day: payload.day,
-//     startTime: payload.startTime,
-//     endTime: payload.endTime,
-//     isDeleted: false, // Optionally exclude deleted records
-//   });
-
-//   if (existingBooking) {
-//     throw new AppError(
-//       httpStatus.CONFLICT,
-//       'A booking already exists for the specified day and time.'
-//     );
-//   }
-
-//   // Create the new booking if no conflict is found
-//   const result = await CallBooking.create(payload);
-
-//   if (!result) {
-//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
-//   }
-
-//   return result;
-// };
 
 const createCallBookingIntoDB = async (payload: TCallBooking) => {
   // Check for existing bookings with overlapping times on the same day
@@ -92,6 +67,24 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
     meta,
   };
 };
+const getAllCallBookingsByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
+  const CallBookingQuery = new QueryBuilder(
+    CallBooking.find({userId, isDeleted: false}),
+    query,
+  )
+    .search(CALLBOOKING_SEARCHABLE_FIELDS)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await CallBookingQuery.modelQuery;
+  const meta = await CallBookingQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
+};
 
 const getSingleCallBookingFromDB = async (id: string) => {
   const result = await CallBooking.findById(id);
@@ -104,10 +97,10 @@ const updateCallBookingIntoDB = async (id: string, payload: any) => {
     .collection('callbookings')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, name: 1 } },
+      { projection: { isDeleted: 1, day: 1 } },
     );
 
-  if (!isDeletedService?.name) {
+  if (!isDeletedService?.day) {
     throw new Error('CallBooking not found');
   }
 
@@ -148,4 +141,5 @@ export const CallBookingServices = {
   getSingleCallBookingFromDB,
   updateCallBookingIntoDB,
   deleteCallBookingFromDB,
+  getAllCallBookingsByUserFromDB
 };

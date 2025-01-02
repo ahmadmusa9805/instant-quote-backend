@@ -31,5 +31,9 @@ router.get(
   '/',
   CallBookingControllers.getAllCallBookings,
 );
+router.get(
+  '/user/:id',
+  CallBookingControllers.getAllCallBookingsByUser,
+);
 
 export const CallBookingRoutes = router;
