@@ -2,7 +2,8 @@ import { Schema, model } from 'mongoose';
       import { TExclusion, ExclusionModel } from './Exclusion.interface';
       
       const ExclusionSchema = new Schema<TExclusion, ExclusionModel>({
-        title: { type: String, required: true },
+        name: { type: String, required: true },
+        description: { type: String, required: true },
         isDeleted: { type: Boolean, default: false },
       });
       
