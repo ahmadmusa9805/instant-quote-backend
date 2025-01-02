@@ -6,9 +6,9 @@ export const createQuoteValidationSchema = z.object({
       name: z.object({
         firstName: z.string().nonempty('First Name is required'),
         lastName: z.string().nonempty('Last Name is required'),
-      }),
-      email: z.string().email('Invalid email format'),
-      contactNo: z.string(),
+      }).optional(),
+      email: z.string().email('Invalid email format').optional(),
+      contactNo: z.string().optional(),
       propertyAddress: z.string(),
       propertyPostCode: z.string(),
       // userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format for userId"), // MongoDB ObjectId validation

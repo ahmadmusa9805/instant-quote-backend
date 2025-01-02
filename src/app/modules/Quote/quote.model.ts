@@ -7,7 +7,6 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
     userId: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
-      unique: true,
       ref: 'User',
     },
     property: {

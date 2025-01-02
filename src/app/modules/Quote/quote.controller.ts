@@ -5,6 +5,7 @@ import sendResponse from '../../utils/sendResponse';
 import { QuoteServices } from './quote.service';
 
 const createQuote = catchAsync(async (req, res) => {
+  console.log(req.body, "test controller")
   const { quote: quoteData } = req.body;
   const result = await QuoteServices.createQuoteIntoDB(quoteData, req.file);
 
@@ -16,7 +17,7 @@ const createQuote = catchAsync(async (req, res) => {
   });
 });
 
-const getSingleStartTime = catchAsync(async (req, res) => {
+const getSingleQuote = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await QuoteServices.getSingleQuoteFromDB(id);
 
@@ -28,19 +29,60 @@ const getSingleStartTime = catchAsync(async (req, res) => {
   });
 });
 
-const getAllStartTimes = catchAsync(async (req, res) => {
+const getAllQuotes = catchAsync(async (req, res) => {
   const result = await QuoteServices.getAllQuotesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Quote are retrieved successfully',
+    message: 'Quotes are retrieved successfully',
     meta: result.meta,
     data: result.result,
   });
 });
+const getAllQuotesByUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await QuoteServices.getAllQuotesByUserFromDB(req.query, id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Quotes are retrieved successfully',
+    meta: result.meta,
+    data: result.result,
+  });
+});
+
+const updateQuote = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { quote: quoteData } = req.body;
+  const result = await QuoteServices.updateQuoteIntoDB(id, quoteData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Quote is updated successfully',
+    data: result,
+  });
+});
+
+const deleteQuote = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await QuoteServices.deleteQuoteFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Quote is deleted successfully',
+    data: result,
+  });
+});
 export const QuoteControllers = {
   createQuote,
-  getSingleStartTime,
-  getAllStartTimes,
+  deleteQuote,
+  getSingleQuote,
+  getAllQuotes,
+  updateQuote,
+  getAllQuotesByUser
 };

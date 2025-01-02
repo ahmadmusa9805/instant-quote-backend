@@ -21,6 +21,7 @@ import { DesignIdeaRoutes } from '../modules/DesignIdea/DesignIdea.route';
 import { InclusionRoutes } from '../modules/Inclusion/Inclusion.route';
 import { ExclusionRoutes } from '../modules/Exclusion/Exclusion.route';
 import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
+import { CallBookingRoutes } from '../modules/CallBooking/CallBooking.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -99,6 +100,10 @@ const moduleRoutes = [
   {
     path: '/call-availabilities',
     route: CallAvailabilityRoutes,
+  },
+  {
+    path: '/call-bookings',
+    route: CallBookingRoutes,
   },
 ];
 
