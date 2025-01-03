@@ -46,6 +46,7 @@ const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+
 const getSingleBlogFromDB = async (id: string) => {
   const result = await Blog.findOne({ _id: id, isDeleted: false });
   if (!result) {

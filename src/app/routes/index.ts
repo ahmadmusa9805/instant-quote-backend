@@ -24,6 +24,7 @@ import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailabi
 import { CallBookingRoutes } from '../modules/CallBooking/CallBooking.route';
 import { ProjectRoutes } from '../modules/Project/Project.route';
 import { BlogRoutes } from '../modules/Blog/Blog.route';
+import { CommentRoutes } from '../modules/comment/comment.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -114,6 +115,10 @@ const moduleRoutes = [
   {
     path: '/blogs',
     route: BlogRoutes,
+  },
+  {
+    path: '/comments',
+    route: CommentRoutes,
   },
 ];
 
