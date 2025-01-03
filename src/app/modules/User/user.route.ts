@@ -7,6 +7,8 @@ import { upload } from '../../utils/sendImageToCloudinary';
 // import { createAdminValidationSchema } from '../Admin/admin.validation';
 import { USER_ROLE } from './user.constant';
 import { UserControllers } from './user.controller';
+import validateRequest from '../../middlewares/validateRequest';
+import { UserValidation } from './user.validation';
 
 const router = express.Router();
 // router.post(
@@ -17,10 +19,10 @@ const router = express.Router();
 
 
 router.post(
-  '/create-admin',
+  '/create-user',
   // auth(USER_ROLE.superAdmin),
-  // validateRequest(UserValidation.createAdminValidationSchema),
-  UserControllers.createAdmin,
+  validateRequest(UserValidation.createUserValidationSchema),
+    UserControllers.createUser,
 );
 
 router.get(
@@ -38,8 +40,13 @@ router.post(
 
 router.get(
   '/',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   UserControllers.getAllUsers,
+);
+router.delete(
+  '/:id',
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  UserControllers.deleteUser,
 );
 
 router.patch(

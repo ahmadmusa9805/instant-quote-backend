@@ -5,22 +5,24 @@ import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 // import sendImageToCloudinary from '../../utils/cloudinary';
 
-const createAdmin = catchAsync(async (req, res) => {
-  const { admin: adminData } = req.body;
-  const result = await UserServices.createAdminIntoDB(adminData);
+const createUser = catchAsync(async (req, res) => {
+  const { user: userData } = req.body;
+  const result = await UserServices.createUserIntoDB(userData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Admin is created succesfully',
+    message: 'User is created succesfully',
     data: result,
   });
 });
 
 const getMe = catchAsync(async (req, res) => {
-  const { userEmail, role } = req.user;
+  const { userEmail } = req.user;
+  // const { userEmail, role } = req.user;
 
-  const result = await UserServices.getMe(userEmail, role);
+  const result = await UserServices.getMe(userEmail);
+  // const result = await UserServices.getMe(userEmail, role);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -57,7 +59,8 @@ const changeStatus = catchAsync(async (req, res) => {
 
 const updateUser = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await UserServices.updateUserIntoDB(id, req.body, req.file);
+  const { user } = req.body;
+  const result = await UserServices.updateUserIntoDB(id, user, req.file);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -66,12 +69,24 @@ const updateUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deleteUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.deleteUserFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User is deleted successfully',
+    data: result,
+  });
+});
 
 export const UserControllers = {
 //   createActor,
   // createJudge,
+  deleteUser,
   updateUser,
-  createAdmin,
+  createUser,
   getMe,
   changeStatus,
   getAllUsers

@@ -3,69 +3,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import mongoose from 'mongoose';
 
-import { Admin } from '../Admin/admin.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
-import mongoose from 'mongoose';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
 
-export const createAdminIntoDB = async (payload: TUser) => {
+export const createUserIntoDB = async (payload: TUser) => {
 
-  payload.role = 'admin';
+if(payload.role === 'client'){
+  if(!payload.password){
+    payload.password = 'client12345';
+   }
 
- if(!payload.password){
-  payload.password = 'client12345';
- }
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-
+}
+if(payload.role === 'admin'){
+  if(!payload.password){
+    payload.password = 'admin12345';
+   }
+}
     const newUser = await User.create(payload);
-    // const newUser = await User.create([userData], { session });
     if (!newUser) throw new Error('Failed to create user');
-    // if (!newUser.length) throw new Error('Failed to create user');
 
-    // payload.id = newUser[0].id;
-    // payload.userId = newUser._id;
-    // payload.userId = newUser[0]._id;
-
-    const newAdmin = await Admin.create(payload);
-    // const newAdmin = await Admin.create([payload], { session });
-    if (!newAdmin) throw new Error('Failed to create admin');
-    // if (!newAdmin.length) throw new Error('Failed to create admin');
-
-    // await session.commitTransaction();
-    // await session.endSession();
-
-    return newAdmin;
-  } catch (err: any) {
-    // await session.abortTransaction();
-    // await session.endSession();
-    throw new Error(err.message);
-  }
+    return newUser;
 };
 
 const getMe = async (userEmail: string) => {
-// const getMe = async (userEmail: string, role: string) => {
-  // let result = null;
-  // if (role === 'client') {
-  //   result = await User.findOne({ email: userEmail });
-  // }
-  // if (role === 'admin') {
-  //   result = await Admin.findOne({ email: userEmail }).populate('userId');
-  // }
-
   const result = await User.findOne({ email: userEmail });
 
   return result;
 };
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active'}), query)
+  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()
@@ -147,8 +119,23 @@ const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any)
   return result;
 };
 
+
+const deleteUserFromDB = async (id: string) => {
+  const deletedService = await User.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
+  if (!deletedService) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');  
+  }
+
+  return deletedService;
+};
+
 export const UserServices = {
-  createAdminIntoDB,
+  deleteUserFromDB,
+  createUserIntoDB,
   getMe,
   changeStatus,
   getAllUsersFromDB,

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-export const createAdminValidationSchema = z.object({
+export const createUserValidationSchema = z.object({
   body: z.object({
-    admin: z.object({
+    user: z.object({
       name: z.object({
         firstName: z.string().nonempty('First Name is required'),
         lastName: z.string().nonempty('Last Name is required'),
@@ -16,7 +16,8 @@ export const createAdminValidationSchema = z.object({
 });
 
 export const UserValidation = {
-  createAdminValidationSchema,
+  createUserValidationSchema,
+  // updateUserValidationSchema,
 };
 
 
