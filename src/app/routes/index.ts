@@ -23,6 +23,7 @@ import { ExclusionRoutes } from '../modules/Exclusion/Exclusion.route';
 import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 import { CallBookingRoutes } from '../modules/CallBooking/CallBooking.route';
 import { ProjectRoutes } from '../modules/Project/Project.route';
+import { BlogRoutes } from '../modules/Blog/Blog.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -109,6 +110,10 @@ const moduleRoutes = [
   {
     path: '/projects',
     route: ProjectRoutes,
+  },
+  {
+    path: '/blogs',
+    route: BlogRoutes,
   },
 ];
 

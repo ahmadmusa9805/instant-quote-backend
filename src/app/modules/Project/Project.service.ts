@@ -30,7 +30,7 @@ const createProjectIntoDB = async (
 
 const getAllProjectsFromDB = async (query: Record<string, unknown>) => {
   const ProjectQuery = new QueryBuilder(
-    Project.find(),
+    Project.find({isDeleted: false}),
     query,
   )
     .search(PROJECT_SEARCHABLE_FIELDS)
@@ -48,7 +48,7 @@ const getAllProjectsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleProjectFromDB = async (id: string) => {
-  const result = await Project.findById(id);
+  const result = await Project.findOne({id, isDeleted: false});
 
   return result;
 };
