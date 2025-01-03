@@ -22,6 +22,9 @@ import { InclusionRoutes } from '../modules/Inclusion/Inclusion.route';
 import { ExclusionRoutes } from '../modules/Exclusion/Exclusion.route';
 import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 import { CallBookingRoutes } from '../modules/CallBooking/CallBooking.route';
+import { ProjectRoutes } from '../modules/Project/Project.route';
+import { BlogRoutes } from '../modules/Blog/Blog.route';
+import { CommentRoutes } from '../modules/comment/comment.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -104,6 +107,18 @@ const moduleRoutes = [
   {
     path: '/call-bookings',
     route: CallBookingRoutes,
+  },
+  {
+    path: '/projects',
+    route: ProjectRoutes,
+  },
+  {
+    path: '/blogs',
+    route: BlogRoutes,
+  },
+  {
+    path: '/comments',
+    route: CommentRoutes,
   },
 ];
 
