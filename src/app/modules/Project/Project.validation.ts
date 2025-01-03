@@ -2,10 +2,9 @@ import { z } from 'zod';
 
 export const createProjectValidationSchema = z.object({
   body: z.object({
-    Project: z.object({
-      name: z.string().min(1),
-      description: z.string().optional(),
-      atcCodes: z.string().min(1),
+    project: z.object({
+      title: z.string(),
+      description: z.string(),
       isDeleted: z.boolean().default(false),
     }),
   }),
@@ -13,10 +12,10 @@ export const createProjectValidationSchema = z.object({
 
 export const updateProjectValidationSchema = z.object({
   body: z.object({
-    Project: z.object({
-      name: z.string().optional(),
+    project: z.object({
+      title: z.string().optional(),
       description: z.string().optional(),
-      atcCodes: z.string().optional(),
+      img: z.string().optional(),
       isDeleted: z.boolean().optional(),
     }),
   }),

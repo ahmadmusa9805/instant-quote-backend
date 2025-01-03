@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type TProject = {
-  name: string;
-  description?: string;
-  atcCodes: string;
+  title: string;
+  description: string;
+  img: string;
   isDeleted: boolean;
 };
 

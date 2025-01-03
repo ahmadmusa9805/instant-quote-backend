@@ -2,14 +2,23 @@
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
-import { ProjectSearchableFields } from './Project.constant';
+import { PROJECT_SEARCHABLE_FIELDS } from './Project.constant';
 import mongoose from 'mongoose';
-import { TProject } from './Project.interface';
 import { Project } from './Project.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createProjectIntoDB = async (
-  payload: TProject,
+  payload: any, file: any
 ) => {
+
+  if (file) {
+    const imageName = `${file.originalname}`;
+    const path = file.path;
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+    payload.img = secure_url;
+  }
+
+
   const result = await Project.create(payload);
   
   if (!result) {
@@ -24,7 +33,7 @@ const getAllProjectsFromDB = async (query: Record<string, unknown>) => {
     Project.find(),
     query,
   )
-    .search(ProjectSearchableFields)
+    .search(PROJECT_SEARCHABLE_FIELDS)
     .filter()
     .sort()
     .paginate()
@@ -49,10 +58,10 @@ const updateProjectIntoDB = async (id: string, payload: any) => {
     .collection('projects')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, name: 1 } },
+      { projection: { isDeleted: 1, title: 1 } },
     );
 
-  if (!isDeletedService?.name) {
+  if (!isDeletedService?.title) {
     throw new Error('Project not found');
   }
 

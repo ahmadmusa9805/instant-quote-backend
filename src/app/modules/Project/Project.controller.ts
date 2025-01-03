@@ -4,8 +4,9 @@ import sendResponse from '../../utils/sendResponse';
 import { ProjectServices } from './Project.service';
 
 const createProject = catchAsync(async (req, res) => {
-  const { Project: ProjectData } = req.body;
-  const result = await ProjectServices.createProjectIntoDB(ProjectData);
+  console.log(req.file, "test controller");
+  const { project: ProjectData } = req.body;
+  const result = await ProjectServices.createProjectIntoDB(ProjectData, req.file);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -41,7 +42,7 @@ const getAllProjects = catchAsync(async (req, res) => {
 
 const updateProject = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { Project } = req.body;
+  const { project: Project } = req.body;
   const result = await ProjectServices.updateProjectIntoDB(id, Project);
 
   sendResponse(res, {
