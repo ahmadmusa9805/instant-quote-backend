@@ -74,12 +74,18 @@ const getSinglePropertyPartFromDB = async (id: string) => {
 };
 
 const updatePropertyPartIntoDB = async (id: string, payload: any) => {
+ 
+  console.log("testing");
+
   const isDeletedService = await mongoose.connection
     .collection('propertyparts')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
       { projection: { isDeleted: 1, name: 1 } },
     );
+
+    console.log(isDeletedService?.name, "testing2");
+
 
   if (!isDeletedService?.name) {
     throw new Error('PropertyPart not found');
@@ -88,6 +94,8 @@ const updatePropertyPartIntoDB = async (id: string, payload: any) => {
   if (isDeletedService.isDeleted) {
     throw new Error('Cannot update a deleted PropertyPart');
   }
+
+  console.log(payload, "testing3");
 
   const updatedData = await PropertyPart.findByIdAndUpdate(
     { _id: id },

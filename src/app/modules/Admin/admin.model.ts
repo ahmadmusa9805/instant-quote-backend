@@ -1,25 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { AdminStatus } from './admin.constant';
-import { AdminModel, TAdmin, TUserName } from './admin.interface';
-
-const userNameSchema = new Schema<TUserName>({
-  firstName: {
-    type: String,
-    required: [true, 'First Name is required'],
-    trim: true,
-    maxlength: [20, 'Name can not be more than 20 characters'],
-  },
-  middleName: {
-    type: String,
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    trim: true,
-    required: [true, 'Last Name is required'],
-    maxlength: [20, 'Name can not be more than 20 characters'],
-  },
-});
+import { AdminModel, TAdmin } from './admin.interface';
 
 const adminSchema = new Schema<TAdmin, AdminModel>(
   {
@@ -30,8 +11,14 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       ref: 'User',
     },
     name: {
-      type: userNameSchema,
-      required: [true, 'Name is required'],
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
     },
     email: {
       type: String,
@@ -64,7 +51,6 @@ adminSchema.virtual('fullName').get(function () {
   return (
     this?.name?.firstName +
     '' +
-    this?.name?.middleName +
     '' +
     this?.name?.lastName
   );

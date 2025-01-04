@@ -12,6 +12,7 @@ export interface TUser {
   passwordChangedAt?: Date;
   contactNo: string;
   profileImg?: string;
+  otpVerified: boolean;
   role: 'client' | 'superAdmin' | 'admin';
   status?: 'active' | 'blocked';
   isDeleted: boolean;

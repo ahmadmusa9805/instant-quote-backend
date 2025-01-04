@@ -43,6 +43,11 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       default: '',
     },
+    otpVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     status: {
       type: String,
       enum: Object.values(UserStatus),
