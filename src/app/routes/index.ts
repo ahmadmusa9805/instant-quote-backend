@@ -27,6 +27,7 @@ import { BlogRoutes } from '../modules/Blog/Blog.route';
 import { CommentRoutes } from '../modules/comment/comment.route';
 import { OtpRoutes } from '../modules/Otp/otp.route';
 import { AboutUsRoutes } from '../modules/AboutUs/AboutUs.route';
+import { PrivacyRoutes } from '../modules/Privacy/Privacy.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -129,6 +130,10 @@ const moduleRoutes = [
   {
     path: '/abouts',
     route: AboutUsRoutes,
+  },
+  {
+    path: '/privacies',
+    route: PrivacyRoutes,
   },
 ];
 
