@@ -41,8 +41,8 @@ const getAllPropertyParts = catchAsync(async (req, res) => {
 
 const updatePropertyPart = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { PropertyPart } = req.body;
-  const result = await PropertyPartServices.updatePropertyPartIntoDB(id, PropertyPart);
+  const { propertyPart: PropertyPartData } = req.body;
+  const result = await PropertyPartServices.updatePropertyPartIntoDB(id, PropertyPartData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

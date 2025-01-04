@@ -11,7 +11,6 @@ import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
-
 export const createUserIntoDB = async (payload: TUser) => {
 
 if(payload.role === 'client'){
@@ -28,7 +27,8 @@ if(payload.role === 'admin'){
     const newUser = await User.create(payload);
     if (!newUser) throw new Error('Failed to create user');
 
-    return newUser;
+    
+        return newUser;
 };
 
 const getMe = async (userEmail: string) => {

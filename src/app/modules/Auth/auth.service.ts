@@ -8,7 +8,8 @@ import AppError from '../../errors/AppError';
 import { User } from '../User/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
-import { SendEmail } from '../../utils/sendEmail';
+// import { SendEmail } from '../../utils/sendEmail';
+import { OtpServices } from '../Otp/otp.service';
 
 const loginUser = async (payload: TLoginUser) => {
 
@@ -158,6 +159,7 @@ const forgetPassword = async (userEmail: string) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
+
   // checking if the user is already deleted
   const isDeleted = user?.isDeleted;
 
@@ -183,11 +185,23 @@ const forgetPassword = async (userEmail: string) => {
     '10m',
   );
 
-  const resetUILink = `${config.reset_pass_ui_link}?email=${user.email}&token=${resetToken} `;
-  // console.log(resetUILink, 'resetUILink');
+  // const resetUILink = `${config.reset_pass_ui_link}?email=${user.email}&token=${resetToken} `;
+  // // console.log(resetUILink, 'resetUILink');
 
-  SendEmail.sendResetLinkToEmail(user.email, resetUILink);
+  // SendEmail.sendResetLinkToEmail(user.email, resetUILink);
+          // console.log(newCustomer, 'newCustomer');
+          if(user.role === 'admin' || user.role === 'superAdmin'){
+            const otp = await OtpServices.generateAndSendOTP(user.email);
 
+            if (!otp) {
+              throw new AppError(httpStatus.FORBIDDEN, 'Otp not created ! !');
+            }
+  
+            return {otp, resetToken};
+          }
+
+          return {resetToken};
+   
 };
 
 const resetPassword = async (
