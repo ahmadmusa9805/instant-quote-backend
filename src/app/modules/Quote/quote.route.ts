@@ -27,6 +27,10 @@ router.post(
 );
 
 router.get(
+  '/get-all-quote-elements',
+  QuoteControllers.getAllQuotesElements);
+
+router.get(
   '/:id',
   QuoteControllers.getSingleQuote,
 );
@@ -48,6 +52,8 @@ router.get(
 router.get(
   '/user/:id',
   QuoteControllers.getAllQuotesByUser,);
+
+
 
 
 

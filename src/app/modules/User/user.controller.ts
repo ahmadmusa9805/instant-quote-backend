@@ -44,6 +44,17 @@ const getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+const getUsersMonthly = catchAsync(async (req, res) => {
+  const result = await UserServices.getUsersMonthlyFromDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users are retrieved succesfully',
+    data: result,
+  });
+});
+
 const changeStatus = catchAsync(async (req, res) => {
   const id = req.params.id;
 
@@ -84,6 +95,7 @@ const deleteUser = catchAsync(async (req, res) => {
 export const UserControllers = {
 //   createActor,
   // createJudge,
+  getUsersMonthly,
   deleteUser,
   updateUser,
   createUser,

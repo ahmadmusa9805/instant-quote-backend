@@ -53,6 +53,17 @@ const getAllQuotesByUser = catchAsync(async (req, res) => {
     data: result.result,
   });
 });
+const getAllQuotesElements = catchAsync(async (req, res) => {
+
+  const result = await QuoteServices.getAllQuotesElementsFromDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Quotes are retrieved successfully',
+    data: result,
+  });
+});
 
 const updateQuote = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -84,5 +95,6 @@ export const QuoteControllers = {
   getSingleQuote,
   getAllQuotes,
   updateQuote,
-  getAllQuotesByUser
+  getAllQuotesByUser,
+  getAllQuotesElements
 };

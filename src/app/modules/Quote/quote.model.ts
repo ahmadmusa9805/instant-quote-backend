@@ -42,7 +42,7 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       required: true, 
     },
     startTime: {
-      type: Date, 
+      type: String, 
       required: true, 
     },
     service: {
