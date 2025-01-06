@@ -3,103 +3,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import mongoose from 'mongoose';
 
-import { TActor } from '../Client/actor.interface';
-import { Actor } from '../Client/actor.model';
-import { TAdmin } from '../Admin/admin.interface';
-import { Admin } from '../Admin/admin.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
-export const createActorIntoDB = async (payload: TActor) => {
-  const userData: Partial<TUser> = {
-    password: payload.password,
-    role: 'actor',
-    email: payload.email,
-  };
+export const createUserIntoDB = async (payload: TUser) => {
 
-  // const session = await mongoose.startSession();
+if(payload.role === 'client'){
+  if(!payload.password){
+    payload.password = 'client12345';
+   }
 
-  try {
-    // session.startTransaction();
-
-    const newUser = await User.create(userData);
-    // const newUser = await User.create([userData], { session });
-
+}
+if(payload.role === 'admin'){
+  if(!payload.password){
+    payload.password = 'admin12345';
+   }
+}
+    const newUser = await User.create(payload);
     if (!newUser) throw new Error('Failed to create user');
-    // if (!newUser.length) throw new Error('Failed to create user');
 
-    payload.userId = newUser._id;
-    // payload.userId = newUser[0]._id;
-
-    const newActor = await Actor.create(payload);
-    // const newActor = await Actor.create([payload], { session });
-    if (!newActor) throw new Error('Failed to create actor');
-    // if (!newActor.length) throw new Error('Failed to create actor');
-
-    // await session.commitTransaction();
-    // await session.endSession();
-
-    return newActor;
-  } catch (err: any) {
-    // await session.abortTransaction();
-    // await session.endSession();
-    throw new Error(err?.message);
-  }
-};
-export const createAdminIntoDB = async (payload: TAdmin) => {
-  // export const createAdminIntoDB = async (file: any, payload: TAdmin) => {
-  const userData: Partial<TUser> = {
-    password: payload?.password,
-    role: 'admin',
-    email: payload.email,
-  };
-
-  // const session = await mongoose.startSession();
-
-  try {
-    // session.startTransaction();
-
-
-    const newUser = await User.create(userData);
-    // const newUser = await User.create([userData], { session });
-    if (!newUser) throw new Error('Failed to create user');
-    // if (!newUser.length) throw new Error('Failed to create user');
-
-    // payload.id = newUser[0].id;
-    payload.userId = newUser._id;
-    // payload.userId = newUser[0]._id;
-
-    const newAdmin = await Admin.create(payload);
-    // const newAdmin = await Admin.create([payload], { session });
-    if (!newAdmin) throw new Error('Failed to create admin');
-    // if (!newAdmin.length) throw new Error('Failed to create admin');
-
-    // await session.commitTransaction();
-    // await session.endSession();
-
-    return newAdmin;
-  } catch (err: any) {
-    // await session.abortTransaction();
-    // await session.endSession();
-    throw new Error(err.message);
-  }
+    
+        return newUser;
 };
 
-const getMe = async (userEmail: string, role: string) => {
-  let result = null;
-  if (role === 'actor') {
-    result = await Actor.findOne({ email: userEmail }).populate('userId');
-  }
-  if (role === 'admin') {
-    result = await Admin.findOne({ email: userEmail }).populate('userId');
-  }
+const getMe = async (userEmail: string) => {
+  const result = await User.findOne({ email: userEmail });
 
   return result;
 };
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active'}), query)
+  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()
@@ -114,34 +52,66 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+const getUsersMonthlyFromDB = async () => {
+  const startOfYear = new Date(new Date().getFullYear(), 0, 1); // January 1st, current year
+  const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1); // January 1st, next year
+
+  const result = await User.aggregate([
+    {
+      $match: {
+        status: 'active',
+        isDeleted: false,
+        createdAt: { $gte: startOfYear, $lt: endOfYear } // Filter users created in the current year
+      }
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAt" }, // Group by month of 'createdAt'
+        count: { $sum: 1 } // Count users per month
+      }
+    },
+    {
+      $sort: { _id: 1 } // Sort by month in ascending order
+    }
+  ]);
+
+  // Format result to include month names (optional)
+  const formattedResult = result.map(item => ({
+    month: new Date(0, item._id - 1).toLocaleString('default', { month: 'long' }),
+    count: item.count
+  }));
+
+  return formattedResult;
+};
+
 
 const changeStatus = async (id: string, payload: { status: string }) => {
   const result = await User.findByIdAndUpdate(id, payload, {
     new: true,
   });
-    if(result?.status === 'blocked'){
-      if(result?.role === 'actor'){
-         await Actor.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-       }
+    // if(result?.status === 'blocked'){
+    //   if(result?.role === 'client'){
+    //      await Client.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
+    //    }
        
-       if(result?.role === 'admin'){
-        await Admin.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
-      }
+    //    if(result?.role === 'admin'){
+    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'blocked'}, {new: true}).populate('userId');
+    //   }
 
      
-    }
+    // }
 
-    if(result?.status === 'active'){
-      if(result?.role === 'actor'){
-         await Actor.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-       }
+    // if(result?.status === 'active'){
+    //   if(result?.role === 'client'){
+    //      await Client.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
+    //    }
        
-       if(result?.role === 'admin'){
-        await Admin.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
-      }
+    //    if(result?.role === 'admin'){
+    //     await Admin.findOneAndUpdate({userId: result?._id}, {status: 'active'}, {new: true}).populate('userId');
+    //   }
 
      
-    }
+    // }
 
 
 
@@ -150,10 +120,57 @@ const changeStatus = async (id: string, payload: { status: string }) => {
 };
 
 
+const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any) => {
+  const { name, ...userData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = { ...userData };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  // Handle file upload if present
+  if (file) {
+    const imageName = `${file.originalname}`;
+    const path = file.path;
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+    modifiedUpdatedData.profileImg = secure_url;
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).select('-password');
+
+  return result;
+};
+
+
+const deleteUserFromDB = async (id: string) => {
+  const deletedService = await User.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
+  if (!deletedService) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');  
+  }
+
+  return deletedService;
+};
+
 export const UserServices = {
-  createActorIntoDB,
-  createAdminIntoDB,
+  getUsersMonthlyFromDB, 
+  deleteUserFromDB,
+  createUserIntoDB,
   getMe,
   changeStatus,
-  getAllUsersFromDB
+  getAllUsersFromDB,
+  updateUserIntoDB
 };

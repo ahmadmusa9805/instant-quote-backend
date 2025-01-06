@@ -11,20 +11,16 @@ export type  TQuote = {
   finishLevel: string;
   bathrooms: number;
   windowSize: number;
-  startTime: Date;
+  startTime: string;
   service: string;
   designIdea: string;
-  file: string;
+  file?: string;
+  propertyAddress: string;
+  propertyPostCode: string;
   isDeleted: boolean;
 }
 
 export interface QuoteModel extends Model<TQuote> {
   //instance methods for checking if the user exist
   isQuoteExistById(id: string): Promise<TQuote>;
-
 }
-
-  // password: string;
-  // passwordChangedAt?: Date;
-  // role: 'superAdmin' | 'admin' | 'actor' | 'judge';
-  // status?: 'active' | 'blocked';

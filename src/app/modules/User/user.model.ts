@@ -7,6 +7,20 @@ import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser, UserModel>(
   {
+    name: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+    },
+    contactNo: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -15,19 +29,28 @@ const userSchema = new Schema<TUser, UserModel>(
     password: {
       type: String,
       required: true,
-      select: 0,
+      select: false, // Prevent password from being returned in queries
     },
     passwordChangedAt: {
       type: Date,
     },
     role: {
       type: String,
-      enum: ['superAdmin', 'actor', 'judge', 'admin'],
-      default: 'actor',
+      enum: ['client', 'superAdmin', 'admin'],
+      default: 'client',
     },
+    profileImg : {
+      type: String,
+      default: '',
+    },
+    otpVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     status: {
       type: String,
-      enum: UserStatus,
+      enum: Object.values(UserStatus),
       default: 'active',
     },
     isDeleted: {
@@ -36,7 +59,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically add createdAt and updatedAt fields
   },
 );
 
@@ -57,7 +80,7 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-userSchema.statics.isUserExistsByCustomId = async function (email: string) {
+userSchema.statics.isUserExistsByCustomEmail = async function (email: string) {
   return await User.findOne({ email }).select('+password');
 };
 

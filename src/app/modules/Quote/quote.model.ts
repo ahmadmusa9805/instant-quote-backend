@@ -7,7 +7,6 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
     userId: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
-      unique: true,
       ref: 'User',
     },
     property: {
@@ -43,7 +42,7 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       required: true, 
     },
     startTime: {
-      type: Date, 
+      type: String, 
       required: true, 
     },
     service: {

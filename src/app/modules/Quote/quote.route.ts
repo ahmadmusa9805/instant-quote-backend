@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+// import express from 'express';
 import express, { NextFunction, Request, Response } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { QuoteControllers } from './quote.controller';
@@ -25,30 +26,35 @@ router.post(
   QuoteControllers.createQuote,
 );
 
-// router.post(
-//   '/create-admin',
-//   auth(USER_ROLE.superAdmin),
-//   validateRequest(createAdminValidationSchema),
-//   UserControllers.createAdmin,
-// );
+router.get(
+  '/get-all-quote-elements',
+  QuoteControllers.getAllQuotesElements);
 
-// router.get(
-//   '/me',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.actor, USER_ROLE.judge),
-//   UserControllers.getMe,
-// );
+router.get(
+  '/:id',
+  QuoteControllers.getSingleQuote,
+);
 
-// router.post(
-//   '/change-status/:id',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-//   validateRequest(UserValidation.changeStatusValidationSchema),
-//   UserControllers.changeStatus,
-// );
+router.patch(
+  '/:id',
+  // validateRequest(QuoteValidation.updateQuoteValidationSchema),
+  QuoteControllers.updateQuote,
+);
 
-// router.get(
-//   '/',
-//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.actor, USER_ROLE.judge),
-//   UserControllers.getAllUsers,
-// );
+router.delete(
+  '/:id',
+  QuoteControllers.deleteQuote,);
+
+router.get(
+  '/',
+  QuoteControllers.getAllQuotes,);
+
+router.get(
+  '/user/:id',
+  QuoteControllers.getAllQuotesByUser,);
+
+
+
+
 
 export const QuoteRoutes = router;

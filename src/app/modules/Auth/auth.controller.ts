@@ -30,6 +30,7 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
+
   const { ...passwordData } = req.body;
 
   const result = await AuthServices.changePassword(req.user, passwordData);
@@ -57,10 +58,14 @@ const forgetPassword = catchAsync(async (req, res) => {
   const userEmail = req.body.email;
 
   const result = await AuthServices.forgetPassword(userEmail);
+ 
+  // const { message } = result;
+  console.log(result);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Reset link is generated succesfully!',
+    message: result.otp ? 'OTP sent succesfully!' : 'Token generated succesfully!',
     data: result,
   });
 });
@@ -76,7 +81,7 @@ const resetPassword = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Password reset succesfully!',
+    message: 'Password reset succesfully! Please login',
     data: result,
   });
 });

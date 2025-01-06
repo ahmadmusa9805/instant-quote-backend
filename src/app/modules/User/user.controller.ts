@@ -3,48 +3,26 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
+// import sendImageToCloudinary from '../../utils/cloudinary';
 
-const createActor = catchAsync(async (req, res) => {
-  const { actor: actorData } = req.body;
-  console.log(actorData, 'actorData');
-  const result = await UserServices.createActorIntoDB(actorData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Actor is created successfully',
-    data: result,
-  });
-});
-
-const createJudge = catchAsync(async (req, res) => {
-  const { judge: judgeData } = req.body;
-  const result = await UserServices.createJudgeIntoDB(judgeData);
+const createUser = catchAsync(async (req, res) => {
+  const { user: userData } = req.body;
+  const result = await UserServices.createUserIntoDB(userData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Judge is created succesfully',
-    data: result,
-  });
-});
-
-const createAdmin = catchAsync(async (req, res) => {
-  const { admin: adminData } = req.body;
-  const result = await UserServices.createAdminIntoDB(adminData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Admin is created succesfully',
+    message: 'User is created succesfully',
     data: result,
   });
 });
 
 const getMe = catchAsync(async (req, res) => {
-  const { userEmail, role } = req.user;
+  const { userEmail } = req.user;
+  // const { userEmail, role } = req.user;
 
-  const result = await UserServices.getMe(userEmail, role);
+  const result = await UserServices.getMe(userEmail);
+  // const result = await UserServices.getMe(userEmail, role);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -66,6 +44,17 @@ const getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+const getUsersMonthly = catchAsync(async (req, res) => {
+  const result = await UserServices.getUsersMonthlyFromDB();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users are retrieved succesfully',
+    data: result,
+  });
+});
+
 const changeStatus = catchAsync(async (req, res) => {
   const id = req.params.id;
 
@@ -78,10 +67,38 @@ const changeStatus = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+const updateUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { user } = req.body;
+  const result = await UserServices.updateUserIntoDB(id, user, req.file);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: req.file ? 'User data and profile image updated successfully' : 'User data updated successfully',
+    data: result,
+  });
+});
+const deleteUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.deleteUserFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User is deleted successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
-  createActor,
-  createJudge,
-  createAdmin,
+//   createActor,
+  // createJudge,
+  getUsersMonthly,
+  deleteUser,
+  updateUser,
+  createUser,
   getMe,
   changeStatus,
   getAllUsers
