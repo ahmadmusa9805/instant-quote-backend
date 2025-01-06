@@ -69,7 +69,7 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability) => {
 
 const getAllCallAvailabilitysFromDB = async (query: Record<string, unknown>) => {
   const CallAvailabilityQuery = new QueryBuilder(
-    CallAvailability.find(),
+    CallAvailability.find({isDeleted: false}),
     query,
   )
     .search(CALLAVAILABILITY_SEARCHABLE_FIELDS)
@@ -87,7 +87,7 @@ const getAllCallAvailabilitysFromDB = async (query: Record<string, unknown>) => 
 };
 
 const getSingleCallAvailabilityFromDB = async (id: string) => {
-  const result = await CallAvailability.findById(id);
+  const result = await CallAvailability.findOne({ _id: id, isDeleted: false });
 
   return result;
 };
