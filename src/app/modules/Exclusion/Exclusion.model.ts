@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const ExclusionSchema = new Schema<TExclusion, ExclusionModel>({
         name: { type: String, required: true },
-        description: { type: String, required: true },
+        // description: { type: String, required: true },
         isDeleted: { type: Boolean, default: false },
       });
       

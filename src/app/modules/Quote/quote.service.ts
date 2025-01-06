@@ -12,6 +12,18 @@ import { QUOTE_SEARCHABLE_FIELDS } from './quote.constant';
 import { Quote } from './quote.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import { Property } from '../Property/Property.model';
+import { PropertyPart } from '../PropertyPart/PropertyPart.model';
+import { RefurbishmentType } from '../RefurbishmentType/RefurbishmentType.model';
+import { RefurbishmentSize } from '../RefurbishmentSize/RefurbishmentSize.model';
+import { ExtendSize } from '../ExtendSize/ExtendSize.model';
+import { FinishLevel } from '../FinishLevel/FinishLevel.model';
+import { Bathroom } from '../Bathroom/Bathroom.model';
+import { StartTime } from '../StartTime/StartTime.model';
+import { Service } from '../Service/Service.model';
+import { DesignIdea } from '../DesignIdea/DesignIdea.model';
+import { Window } from '../Window/Window.model';
+
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
   const userData: Partial<TUser> = {
@@ -72,7 +84,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
 const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
   const QuoteQuery = new QueryBuilder(
-    Quote.find({isDeleted: false}),
+    Quote.find({isDeleted: false}).populate('userId'),
     query,
   )
     .search(QUOTE_SEARCHABLE_FIELDS)
@@ -106,6 +118,50 @@ const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: 
     meta,
   };
 };
+// const getAllQuotesElementsFromDB = async () => {
+//   const result = await Quote.find({isDeleted: false});
+//   return result;
+// };
+const getAllQuotesElementsFromDB = async () => {
+  try {
+    // Import all the required modules
+
+
+    // Query all collections in parallel
+    const [properties, propertyParts, refurbishmentTypes, refurbishmentSizes, extendSizes, finishLevels, bathrooms, windows, startTimes, services, designIdeas] = await Promise.all([
+      Property.find({ isDeleted: false }),
+      PropertyPart.find({ isDeleted: false }),
+      RefurbishmentType.find({ isDeleted: false }),
+      RefurbishmentSize.find({ isDeleted: false }),
+      ExtendSize.find({ isDeleted: false }),
+      FinishLevel.find({ isDeleted: false }),
+      Bathroom.find({ isDeleted: false }),
+      Window.find({ isDeleted: false }),
+      StartTime.find({ isDeleted: false }),
+      Service.find({ isDeleted: false }),
+      DesignIdea.find({ isDeleted: false })
+    ]);
+
+    // Aggregate all results into a single object or array
+    return {
+      properties,
+      propertyParts,
+      refurbishmentTypes,
+      refurbishmentSizes,
+      extendSizes,
+      finishLevels,
+      bathrooms,
+      windows,
+      startTimes,
+      services,
+      designIdeas
+    };
+  } catch (error) {
+    console.error('Error fetching data from database:', error);
+    throw new Error('Failed to fetch data from database');
+  }
+};
+
 
 const getSingleQuoteFromDB = async (id: string) => {
   const result = await Quote.findOne({ _id: id, isDeleted: false });
@@ -159,5 +215,6 @@ export const QuoteServices = {
   getSingleQuoteFromDB,
   updateQuoteIntoDB,
   deleteQuoteFromDB,
-  getAllQuotesByUserFromDB
+  getAllQuotesByUserFromDB,
+  getAllQuotesElementsFromDB
 };

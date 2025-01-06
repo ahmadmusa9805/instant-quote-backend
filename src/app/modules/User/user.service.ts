@@ -52,6 +52,38 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+const getUsersMonthlyFromDB = async () => {
+  const startOfYear = new Date(new Date().getFullYear(), 0, 1); // January 1st, current year
+  const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1); // January 1st, next year
+
+  const result = await User.aggregate([
+    {
+      $match: {
+        status: 'active',
+        isDeleted: false,
+        createdAt: { $gte: startOfYear, $lt: endOfYear } // Filter users created in the current year
+      }
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAt" }, // Group by month of 'createdAt'
+        count: { $sum: 1 } // Count users per month
+      }
+    },
+    {
+      $sort: { _id: 1 } // Sort by month in ascending order
+    }
+  ]);
+
+  // Format result to include month names (optional)
+  const formattedResult = result.map(item => ({
+    month: new Date(0, item._id - 1).toLocaleString('default', { month: 'long' }),
+    count: item.count
+  }));
+
+  return formattedResult;
+};
+
 
 const changeStatus = async (id: string, payload: { status: string }) => {
   const result = await User.findByIdAndUpdate(id, payload, {
@@ -134,6 +166,7 @@ const deleteUserFromDB = async (id: string) => {
 };
 
 export const UserServices = {
+  getUsersMonthlyFromDB, 
   deleteUserFromDB,
   createUserIntoDB,
   getMe,

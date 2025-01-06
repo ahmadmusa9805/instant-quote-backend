@@ -11,7 +11,7 @@ export type  TQuote = {
   finishLevel: string;
   bathrooms: number;
   windowSize: number;
-  startTime: Date;
+  startTime: string;
   service: string;
   designIdea: string;
   file?: string;

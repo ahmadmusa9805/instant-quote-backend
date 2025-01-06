@@ -29,6 +29,8 @@ import { OtpRoutes } from '../modules/Otp/otp.route';
 import { AboutUsRoutes } from '../modules/AboutUs/AboutUs.route';
 import { PrivacyRoutes } from '../modules/Privacy/Privacy.route';
 import { TermRoutes } from '../modules/Term/Term.route';
+import { WeDoRoutes } from '../modules/WeDo/WeDo.route';
+import { ContactRoutes } from '../modules/Contact/Contact.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -139,6 +141,14 @@ const moduleRoutes = [
   {
     path: '/terms',
     route: TermRoutes,
+  },
+  {
+    path: '/we-dos',
+    route: WeDoRoutes,
+  },
+  {
+    path: '/contacts',
+    route: ContactRoutes,
   },
 ];
 
