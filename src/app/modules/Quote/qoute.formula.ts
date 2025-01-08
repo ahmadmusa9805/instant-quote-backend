@@ -2,6 +2,8 @@
 
   import { QuotePricing } from "../QuotePricing/QuotePricing.model";
 
+
+
 export const calculateQuote = async (quote?: any) => {
   const formula = await QuotePricing.findOne(); // Fetch pricing data
 
@@ -14,25 +16,6 @@ export const calculateQuote = async (quote?: any) => {
   const windowSizeValue = formula?.window.get(quote.windowSize.toString()) || formula?.window.get('custom');
   const startTimeValue = formula?.startTime.get(quote.startTime);
   const fees = formula?.feesPerSqm;
-
-//   console.log(
-//     refurbishSizeValue,
-//     "refurbishSizeValue",
-//     refurbishTypePersand,
-//     "refurbishTypePersand",
-//     extendSizeValue,
-//     "extendSizeValue",
-//     finishLevelPersand,
-//     "finishLevelPersand",
-//     bathroomQuantity,
-//     "bathroomQuantity",
-//     windowSizeValue,
-//     "windowSizeValue",
-//     startTimeValue,
-//     "startTimeValue",
-//     fees,
-//     "fees"
-//   );
 
   // Ensure values are defined before calculations
   if (
@@ -48,7 +31,6 @@ export const calculateQuote = async (quote?: any) => {
     console.error("Some required values are missing from the formula");
     return null;
   }
-
   // Calculate base costs
   const refurbishCost = refurbishSizeValue * refurbishTypePersand * quote.refurbishSize;
   const extendCost = extendSizeValue * finishLevelPersand * quote.extendSize;
@@ -61,24 +43,21 @@ export const calculateQuote = async (quote?: any) => {
   const structuralFee = fees.structuralEngineering * (quote.refurbishSize + quote.extendSize);
   const planningFee = fees.planning * (quote.refurbishSize + quote.extendSize);
 
-//   console.log(
-//     refurbishCost,
-//     "refurbishCost",
-//     extendCost,
-//     "extendCost",
-//     bathroomCost,
-//     "bathroomCost",
-//     windowCost,
-//     "windowCost",
-//     interiorDesignFee,
-//     "interiorDesignFee",
-//     architecturalFee,
-//     "architecturalFee",
-//     structuralFee,
-//     "structuralFee",
-//     planningFee,
-//     "planningFee"
-//   );
+
+quote.refurbishTypePrice = refurbishTypePersand;
+quote.refurbishSizePrice = refurbishSizeValue;
+quote.extendSizePrice = extendSizeValue;
+quote.finishLevelPrice = finishLevelPersand;
+quote.bathroomsPrice = bathroomQuantity;
+quote.windowSizePrice = windowSizeValue;
+quote.startTimePrice = startTimeValue;
+quote.otherPrice = {
+  interiorDesign: fees.interiorDesign,
+  architectural: fees.architectural,
+  structuralEngineering: fees.structuralEngineering,
+  planning: fees.planning,
+};
+
 
   // Calculate total
   let total =
@@ -94,6 +73,7 @@ export const calculateQuote = async (quote?: any) => {
   // Apply start time multiplier
   total *= startTimeValue;
 
+  quote.total = total;
 
-  return total;
+  return quote;
 };
