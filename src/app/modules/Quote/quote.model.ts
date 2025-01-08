@@ -56,10 +56,15 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
     file: {
       type: String, 
     },
+    total: {
+      type: Number, 
+      default: 0, 
+    },
     isDeleted: {
       type: Boolean,
       default: false,
     },
+
   },
   {
     timestamps: true,

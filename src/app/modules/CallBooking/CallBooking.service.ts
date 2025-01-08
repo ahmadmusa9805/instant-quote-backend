@@ -51,7 +51,7 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
 
 const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const CallBookingQuery = new QueryBuilder(
-    CallBooking.find(),
+    CallBooking.find().populate('userId').populate('quoteId'),
     query,
   )
     .search(CALLBOOKING_SEARCHABLE_FIELDS)
@@ -67,6 +67,7 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
     meta,
   };
 };
+
 const getAllCallBookingsByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
   const CallBookingQuery = new QueryBuilder(
     CallBooking.find({userId, isDeleted: false}),

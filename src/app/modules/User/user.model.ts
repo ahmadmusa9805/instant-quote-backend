@@ -47,7 +47,6 @@ const userSchema = new Schema<TUser, UserModel>(
       type: Boolean,
       default: false,
     },
-
     status: {
       type: String,
       enum: Object.values(UserStatus),

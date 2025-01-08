@@ -17,6 +17,7 @@ export type  TQuote = {
   file?: string;
   propertyAddress: string;
   propertyPostCode: string;
+  total: number;
   isDeleted: boolean;
 }
 
