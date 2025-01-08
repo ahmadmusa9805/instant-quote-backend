@@ -23,6 +23,7 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
+import { calculateQuote } from '../QuotePricing/Quote.formula';
 
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
@@ -65,16 +66,25 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     // payload.userId = newUser._id;
     payload.userId = newUser[0]._id;
 }
+    
+    console.log(payload, "test");
+
+
+    // const result = await calculateQuote(payload);
+    // console.log(result, "test2");
+    // if (!result) {
+    //   throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Quote');
+    // }
 
     // const newClient = await Quote.create(payload);
-    const newClient = await Quote.create([payload], { session });
+    // const newClient = await Quote.create([payload], { session });
     // if (!newClient) throw new Error('Failed to create Client');
-    if (!newClient.length) throw new Error('Failed to create actor');
+    // if (!newClient.length) throw new Error('Failed to create actor');
 
     await session.commitTransaction();
     await session.endSession();
 
-    return newClient;
+    return null;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();

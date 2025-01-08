@@ -24,6 +24,7 @@ export const createQuoteValidationSchema = z.object({
       service: z.string().min(1, "Service is required"),
       designIdea: z.string().min(1, "Design idea is required"),
       file: z.string().optional(), // Optional field for file
+      total: z.number().optional(), // Optional field for file
       isDeleted: z.boolean().optional(), // Optional field with default value
     }),
   }),

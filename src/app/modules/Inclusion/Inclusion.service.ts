@@ -10,6 +10,7 @@ import { Inclusion } from './Inclusion.model';
 const createInclusionIntoDB = async (
   payload: TInclusion,
 ) => {
+  
   const result = await Inclusion.create(payload);
   
   if (!result) {
