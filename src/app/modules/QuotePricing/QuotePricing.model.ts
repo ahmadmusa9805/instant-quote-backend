@@ -1,6 +1,8 @@
 import { model, Schema } from "mongoose";
 import { QuotePricingModel, TQuotePricing } from "./QuotePricing.interface";
 
+
+
 const QuotePricingSchema = new Schema<TQuotePricing, QuotePricingModel>(
   {
     refurbishSize: {

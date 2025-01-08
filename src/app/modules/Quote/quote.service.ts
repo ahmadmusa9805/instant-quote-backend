@@ -73,18 +73,19 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Quote');
     }
     console.log(result, "test3");
-    console.log(result.total, "test4");   
     
-    payload.total = Number(result.total);
-    const newClient = await Quote.create(payload);
+    payload.total = result;
+    console.log(payload.total, "payload.total");
+
+    const newQuote = await Quote.create(payload);
     // const newClient = await Quote.create([payload], { session });
-    if (!newClient) throw new Error('Failed to create Client');
+    if (!newQuote) throw new Error('Failed to create Client');
     // if (!newClient.length) throw new Error('Failed to create actor');
 
     await session.commitTransaction();
     await session.endSession();
 
-    return null;
+    return newQuote;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
