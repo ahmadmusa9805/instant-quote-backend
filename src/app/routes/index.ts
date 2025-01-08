@@ -31,6 +31,7 @@ import { PrivacyRoutes } from '../modules/Privacy/Privacy.route';
 import { TermRoutes } from '../modules/Term/Term.route';
 import { WeDoRoutes } from '../modules/WeDo/WeDo.route';
 import { ContactRoutes } from '../modules/Contact/Contact.route';
+import { QuotePricingRoutes } from '../modules/QuotePricing/QuotePricing.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -53,6 +54,10 @@ const moduleRoutes = [
   {
     path: '/quotes',
     route: QuoteRoutes,
+  },
+  {
+    path: '/quote-pricings',
+    route: QuotePricingRoutes,
   },
   {
     path: '/properties',
