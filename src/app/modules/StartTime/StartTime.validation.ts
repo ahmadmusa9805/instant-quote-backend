@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createStartTimeValidationSchema = z.object({
   body: z.object({
     startTime: z.object({
-      startTime: z.string().min(1),
-      price: z.number().min(1),
+      startTime: z.string(),
+      price: z.number(),
       isDeleted: z.boolean().default(false),
     }),
   }),

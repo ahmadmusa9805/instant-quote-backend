@@ -3,9 +3,9 @@ import { z } from 'zod';
 export const createRefurbishmentSizeValidationSchema = z.object({
   body: z.object({
     refurbishmentSize: z.object({
-      name: z.string().min(1),
-      squareMeterSize: z.string().min(1),
-      price: z.number().min(1),
+      name: z.string(),
+      squareMeterSize: z.string(),
+      price: z.number(),
       isDeleted: z.boolean().default(false),
     }),
   }),

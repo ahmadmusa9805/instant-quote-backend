@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createFinishLevelValidationSchema = z.object({
   body: z.object({
     finishLevel: z.object({
-      level: z.string().min(1),
-      price: z.number().min(1),
+      level: z.string(),
+      price: z.number(),
       isDeleted: z.boolean().default(false),
     }),
   }),

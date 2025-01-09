@@ -4,7 +4,6 @@ import { TProperty, PropertyModel } from './Property.interface';
 const PropertySchema = new Schema<TProperty, PropertyModel>({
   name: { type: String, required: true },
   image: { type: String },
-  price: { type: Number, required: true },
   isDeleted: { type: Boolean, default: false },
 });
 
