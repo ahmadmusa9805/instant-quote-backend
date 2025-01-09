@@ -4,6 +4,7 @@ import { Schema, model } from 'mongoose';
       const ServiceSchema = new Schema<TService, ServiceModel>({
         name: { type: String, required: true },
         price: { type: Number, required: true },
+        hotChoice: { type: Boolean, default: false },
         isDeleted: { type: Boolean, default: false },
       });
       

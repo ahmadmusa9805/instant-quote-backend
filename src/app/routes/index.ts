@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { AdminRoutes } from '../modules/Admin/admin.route';
 import { AuthRoutes } from '../modules/Auth/auth.route';
 
 // import { ClientRoutes } from '../modules/Client/actor.route';
@@ -38,14 +37,6 @@ const moduleRoutes = [
   {
     path: '/users',
     route: UserRoutes,
-  },
-  // {
-  //   path: '/clients',
-  //   route: ClientRoutes,
-  // },
-  {
-    path: '/admins',
-    route: AdminRoutes,
   },
   {
     path: '/auth',

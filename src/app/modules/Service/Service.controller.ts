@@ -39,6 +39,7 @@ const getAllServices = catchAsync(async (req, res) => {
   });
 });
 
+
 const updateService = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { service: ServiceData } = req.body;

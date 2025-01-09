@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const createInclusionValidationSchema = z.object({
   body: z.object({
     inclusion: z.object({
-      title: z.string().min(1),
+      title: z.string(),
       isDeleted: z.boolean().default(false),
     }),
   }),
