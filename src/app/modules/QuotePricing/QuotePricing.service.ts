@@ -7,13 +7,39 @@ import mongoose from 'mongoose';
 import { TQuotePricing } from './QuotePricing.interface';
 import { QuotePricing } from './QuotePricing.model';
 
+// const createQuotePricingIntoDB = async (
+//   payload: TQuotePricing,
+// ) => {
+  
+//   const result = await QuotePricing.create(payload);
+  
+//   if (!result) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create QuotePricing');
+//   }
+
+//   return result;
+// };
+
+///
 const createQuotePricingIntoDB = async (
   payload: TQuotePricing,
 ) => {
-  const result = await QuotePricing.create(payload);
-  
+  // Check if any data exists in the collection
+  const existingRecord = await QuotePricing.findOne();
+
+  let result;
+
+  if (existingRecord) {
+    // If a record exists, update it
+    Object.assign(existingRecord, payload); // Merge payload into the existing record
+    result = await existingRecord.save(); 
+  } else {
+    // If no record exists, create a new one
+    result = await QuotePricing.create(payload);
+  }
+
   if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create QuotePricing');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create or update QuotePricing');
   }
 
   return result;

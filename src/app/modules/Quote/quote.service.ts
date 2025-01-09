@@ -23,7 +23,8 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-import { calculateQuote } from './qoute.formula';
+import { calculateOtherPrices } from './quote.utils';
+// import { calculateQuote } from './qoute.formula';
 // import { calculateQuote } from '../QuotePricing/Quote.formula';
 
 
@@ -43,10 +44,9 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       const imageName = `${file.originalname}`;
       const path = file.path;
       const { secure_url } = await sendImageToCloudinary(imageName, path);
+      console.log(secure_url,  "secure_url");	
       payload.file = secure_url;
     }
-
-
 
 
    if(payload.userId){
@@ -68,18 +68,28 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     payload.userId = newUser[0]._id;
 }
 
-    const result = await calculateQuote(payload);
-    if (!result) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Quote');
-    }
-    console.log(result, "test3");
+
+
+
+ payload = await calculateOtherPrices(payload);
+
+
+
+console.log(payload, "total after calculating");
+
+
+    // const result = await calculateQuote(payload);
+    // if (!result) {
+    //   throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Quote');
+    // }
+    // console.log(result, "test3");
     
-    payload.total = result;
-    console.log(payload.total, "payload.total");
+    // payload.total = result;
+    // console.log(payload.total, "payload.total");
 
     const newQuote = await Quote.create(payload);
     // const newClient = await Quote.create([payload], { session });
-    if (!newQuote) throw new Error('Failed to create Client');
+    // if (!newQuote) throw new Error('Failed to create Client');
     // if (!newClient.length) throw new Error('Failed to create actor');
 
     await session.commitTransaction();
