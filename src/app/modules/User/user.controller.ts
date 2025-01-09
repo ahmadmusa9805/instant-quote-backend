@@ -31,6 +31,20 @@ const getMe = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getSingleUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  // const { userEmail, role } = req.user;
+
+  const result = await UserServices.getSingleUserIntoDB(id);
+  // const result = await UserServices.getMe(userEmail, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User is retrieved succesfully',
+    data: result,
+  });
+});
 
 const getAllUsers = catchAsync(async (req, res) => {
   const result = await UserServices.getAllUsersFromDB(req.query);
@@ -95,6 +109,7 @@ const deleteUser = catchAsync(async (req, res) => {
 export const UserControllers = {
 //   createActor,
   // createJudge,
+  getSingleUser,
   getUsersMonthly,
   deleteUser,
   updateUser,

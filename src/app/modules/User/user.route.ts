@@ -30,6 +30,11 @@ router.get(
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   UserControllers.getMe,
 );
+router.get(
+  '/:id',
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  UserControllers.getSingleUser,
+);
 
 router.post(
   '/change-status/:id',

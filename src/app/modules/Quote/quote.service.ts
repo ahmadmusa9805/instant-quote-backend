@@ -24,9 +24,6 @@ import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
 import { calculateOtherPrices } from './quote.utils';
-// import { calculateQuote } from './qoute.formula';
-// import { calculateQuote } from '../QuotePricing/Quote.formula';
-
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
   const userData: Partial<TUser> = {
@@ -44,7 +41,6 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       const imageName = `${file.originalname}`;
       const path = file.path;
       const { secure_url } = await sendImageToCloudinary(imageName, path);
-      console.log(secure_url,  "secure_url");	
       payload.file = secure_url;
     }
 
@@ -68,34 +64,16 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     payload.userId = newUser[0]._id;
 }
 
-
-
-
  payload = await calculateOtherPrices(payload);
 
-
-
-console.log(payload, "total after calculating");
-
-
-    // const result = await calculateQuote(payload);
-    // if (!result) {
-    //   throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Quote');
-    // }
-    // console.log(result, "test3");
-    
-    // payload.total = result;
-    // console.log(payload.total, "payload.total");
-
-    const newQuote = await Quote.create(payload);
-    // const newClient = await Quote.create([payload], { session });
+    // const newQuote = await Quote.create(payload);
+    const newClient = await Quote.create([payload], { session });
     // if (!newQuote) throw new Error('Failed to create Client');
-    // if (!newClient.length) throw new Error('Failed to create actor');
 
     await session.commitTransaction();
     await session.endSession();
 
-    return newQuote;
+    return newClient;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
@@ -185,7 +163,7 @@ const getAllQuotesElementsFromDB = async () => {
 
 
 const getSingleQuoteFromDB = async (id: string) => {
-  const result = await Quote.findOne({ _id: id, isDeleted: false });
+  const result = await Quote.findOne({ _id: id, isDeleted: false }).populate('userId');
   return result;
 };
 
