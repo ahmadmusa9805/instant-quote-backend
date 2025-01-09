@@ -61,6 +61,21 @@ const updateServiceIntoDB = async (id: string, payload: any) => {
     throw new Error('Cannot update a deleted Service');
   }
 
+  // if(payload.hotChoice === true){
+  //   const updatedData = await Service.find(
+  //     { projection: { isDeleted: 1, hotChoice: 1 } },
+  //   );
+   
+  //   for (let i = 0; i < updatedData.length; i++) {
+  //     updatedData[i].hotChoice = false;
+  //     await updatedData[i].save();
+  //   }
+
+  //   // if (updatedData?.hotChoice === true) {
+  //   //   throw new Error('Cannot update a deleted Service');
+  //   // }
+  // }
+
   const updatedData = await Service.findByIdAndUpdate(
     { _id: id },
     payload,

@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createBathroomValidationSchema = z.object({
   body: z.object({
     bathroom: z.object({
-      bathroomQuantity: z.number().min(1),
-      price: z.number().min(1),
+      bathroomQuantity: z.number(),
+      price: z.number(),
       isDeleted: z.boolean().default(false),
     }),
   }),

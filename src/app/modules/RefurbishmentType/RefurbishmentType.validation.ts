@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 export const createRefurbishmentTypeValidationSchema = z.object({
   refurbishmentType: z.object({
-    title: z.string().min(1),
+    title: z.string(),
     subtitle: z.string().optional(),
-    price: z.number().min(1),
+    price: z.number(),
     isDeleted: z.boolean().default(false),
   }),
 });
