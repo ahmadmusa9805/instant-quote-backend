@@ -30,6 +30,13 @@ router.get(
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   UserControllers.getMe,
 );
+
+router.get(
+  '/users-monthly',
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  UserControllers.getUsersMonthly,
+);
+
 router.get(
   '/:id',
   // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
@@ -48,11 +55,7 @@ router.get(
   // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   UserControllers.getAllUsers,
 );
-router.get(
-  '/users-monthly',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
-  UserControllers.getUsersMonthly,
-);
+
 router.delete(
   '/:id',
   // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),

@@ -7,11 +7,34 @@ import { TWindow } from './Window.interface';
 import { Window } from './Window.model';
 import { WINDOW_SEARCHABLE_FIELDS } from './Window.constant';
 
+// const createWindowIntoDB = async (
+//   payload: TWindow,
+// ) => {
+//   const result = await Window.create(payload);
+  
+//   if (!result) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Window');
+//   }
+
+//   return result;
+// };
+
 const createWindowIntoDB = async (
   payload: TWindow,
 ) => {
+  // Check if a window already exists
+  const existingWindow = await Window.findOne();
+
+  if (existingWindow) {
+    throw new AppError(
+      httpStatus.CONFLICT, 
+      'A window already exists. Cannot create another.'
+    );
+  }
+
+  // Create the new window if none exists
   const result = await Window.create(payload);
-  
+
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Window');
   }
