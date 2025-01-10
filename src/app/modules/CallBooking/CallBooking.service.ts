@@ -6,10 +6,40 @@ import { CALLBOOKING_SEARCHABLE_FIELDS } from './CallBooking.constant';
 import mongoose from 'mongoose';
 import { TCallBooking } from './CallBooking.interface';
 import { CallBooking } from './CallBooking.model';
+import { CallAvailability } from '../CallAvailability/CallAvailability.model';
 
 
 const createCallBookingIntoDB = async (payload: TCallBooking) => {
+
+  console.log(payload, "payload");
+  console.log(payload.day, "day");
+  console.log(payload.startTime, "startTime");
+  console.log(payload.endTime, "endTime");
   // Check for existing bookings with overlapping times on the same day
+  const callAvailability = await CallAvailability.find({day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false})
+  console.log(callAvailability, "callAvailability");
+
+
+//   const day = payload.day.trim();
+//   const startTime = payload.startTime.trim();
+//   const endTime = payload.endTime.trim();
+  
+//   const callAvailability = await CallAvailability.findOne({
+//     day,
+//     isDeleted: false,
+//     startTime,
+//     endTime,
+//   });
+
+ if (!callAvailability.length) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Call availability not found for the specified day.'
+    );
+  }
+
+   console.log( "test1");
+
   const overlappingBooking = await CallBooking.findOne({
     day: payload.day,
     isDeleted: false, // Optionally exclude deleted records
@@ -31,6 +61,9 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
       }
     ],
   });
+  console.log( "test2");
+
+  console.log(overlappingBooking, "overlappingBooking");
 
   if (overlappingBooking) {
     throw new AppError(
@@ -45,6 +78,22 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
   }
+
+  console.log( "test3");
+
+
+  const deletedCallAvailability = await CallAvailability.findOneAndUpdate(
+    // { day: payload.day, isDeleted: false },
+    { day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false },
+    { isDeleted: true },
+    { new: true },
+  );
+
+  if (!deletedCallAvailability) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete CallAvailability');
+  }
+
+  console.log( "test4");
 
   return result;
 };
