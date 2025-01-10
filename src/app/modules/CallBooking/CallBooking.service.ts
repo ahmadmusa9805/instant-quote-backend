@@ -6,10 +6,22 @@ import { CALLBOOKING_SEARCHABLE_FIELDS } from './CallBooking.constant';
 import mongoose from 'mongoose';
 import { TCallBooking } from './CallBooking.interface';
 import { CallBooking } from './CallBooking.model';
+import { CallAvailability } from '../CallAvailability/CallAvailability.model';
 
 
 const createCallBookingIntoDB = async (payload: TCallBooking) => {
+
+
   // Check for existing bookings with overlapping times on the same day
+  const callAvailability = await CallAvailability.find({day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false})
+
+
+ if (!callAvailability.length) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Call availability not found for the specified day.'
+    );
+  }
   const overlappingBooking = await CallBooking.findOne({
     day: payload.day,
     isDeleted: false, // Optionally exclude deleted records
@@ -38,7 +50,6 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
       'A booking already exists that overlaps with the specified time range.'
     );
   }
-
   // Create the new booking if no conflict is found
   const result = await CallBooking.create(payload);
 
@@ -46,6 +57,16 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
   }
 
+  const deletedCallAvailability = await CallAvailability.findOneAndUpdate(
+    // { day: payload.day, isDeleted: false },
+    { day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false },
+    { isDeleted: true },
+    { new: true },
+  );
+
+  if (!deletedCallAvailability) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete CallAvailability');
+  }
   return result;
 };
 
