@@ -36,6 +36,11 @@ const getMe = async (userEmail: string) => {
 
   return result;
 };
+const getSingleUserIntoDB = async (id: string) => {
+  const result = await User.findOne({ _id: id, isDeleted: false });
+
+  return result;
+};
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
   const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false}), query)
     .search(usersSearchableFields)
@@ -166,6 +171,7 @@ const deleteUserFromDB = async (id: string) => {
 };
 
 export const UserServices = {
+  getSingleUserIntoDB,
   getUsersMonthlyFromDB, 
   deleteUserFromDB,
   createUserIntoDB,
