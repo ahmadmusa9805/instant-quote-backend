@@ -3,7 +3,8 @@ import { Model } from 'mongoose';
 
 export type TService = {
   name: string;
-  // hotChoice: boolean;
+  price: number;
+  hotChoice: boolean;
   isDeleted: boolean;
 };
 
