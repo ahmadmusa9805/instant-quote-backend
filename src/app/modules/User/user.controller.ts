@@ -46,6 +46,17 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
+const getAllAdminUsers = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllAdminUsersFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users are retrieved succesfully',
+    meta: result.meta,
+    data: result.result,
+  });
+});
 const getAllUsers = catchAsync(async (req, res) => {
   const result = await UserServices.getAllUsersFromDB(req.query);
 
@@ -109,6 +120,7 @@ const deleteUser = catchAsync(async (req, res) => {
 export const UserControllers = {
 //   createActor,
   // createJudge,
+  getAllAdminUsers,
   getSingleUser,
   getUsersMonthly,
   deleteUser,

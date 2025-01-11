@@ -2,7 +2,8 @@ import { Schema, model } from 'mongoose';
       import { TCallBooking, CallBookingModel } from './CallBooking.interface';
 
   const CallBookingSchema = new Schema<TCallBooking, CallBookingModel>({
-     userId: { type: Schema.Types.ObjectId,  required: true },
+     adminId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
      quoteId: { type: Schema.Types.ObjectId, required: true },
      day: { type: String, required: true },
      date: { type: Date, required: true },
