@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type TCallAvailability = {
+  adminId: Types.ObjectId;
   day: string;
   startTime: string;
   endTime: string;

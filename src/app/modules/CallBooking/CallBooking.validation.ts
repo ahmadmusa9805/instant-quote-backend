@@ -4,6 +4,7 @@ export const createCallBookingValidationSchema = z.object({
   body: z.object({
     callBooking: z.object({
       userId: z.string(),
+      adminId: z.string(),
       quoteId: z.string(),
       day: z.string(),
       date: z.preprocess((val) => new Date( val as string), z.date()),
@@ -19,6 +20,7 @@ export const updateCallBookingValidationSchema = z.object({
   body: z.object({
     callBooking: z.object({
       userId: z.string().optional(),
+      adminId: z.string().optional(),
       quoteId: z.string().optional(),
       day: z.string().optional(),
       date: z.preprocess((val) => new Date( val as string), z.date()).optional(),

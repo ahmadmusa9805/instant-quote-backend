@@ -57,6 +57,22 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+const getAllAdminUsersFromDB = async (query: Record<string, unknown>) => {
+  const studentQuery = new QueryBuilder(User.find({status: 'active',role: 'admin', isDeleted: false}), query)
+    .search(usersSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
 const getUsersMonthlyFromDB = async () => {
   const startOfYear = new Date(new Date().getFullYear(), 0, 1); // January 1st, current year
   const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1); // January 1st, next year
@@ -171,6 +187,7 @@ const deleteUserFromDB = async (id: string) => {
 };
 
 export const UserServices = {
+  getAllAdminUsersFromDB,
   getSingleUserIntoDB,
   getUsersMonthlyFromDB, 
   deleteUserFromDB,
