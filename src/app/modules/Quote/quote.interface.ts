@@ -61,8 +61,6 @@ export type  TQuote = {
     quantity: number;
     price: number;
   };
-  refurbishSizePrice: number;
-  extendSizePrice: number;
   finishLevel: {
     level: string;
     percentage: number;
@@ -77,25 +75,21 @@ export type  TQuote = {
     quantity: number;
     price: number;
   };
-
   windowSizePrice: number;
   startTime: {
     startTime: string;
     percentage: number;
   };
-
   startTimePrice: number;
   service: string;
   designIdea: string;
   file?: string;
   propertyAddress: string;
   propertyPostCode: string;
-  otherPrice: {
-    interiorDesign: number;
-    architectural: number;
-    structuralEngineering: number;
-    planning: number;
-  };
+  interiorDesign: number;
+  architectural: number;
+  structuralEngineering: number;
+  planning: number;
   extendCost: number;
   refurbishCost: number;
   total: number;
