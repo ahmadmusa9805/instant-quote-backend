@@ -46,6 +46,16 @@ const getSingleServiceFromDB = async (id: string) => {
 };
 
 const updateServiceIntoDB = async (id: string, payload: any) => {
+  const isDeletedServic = await Service.find(
+      { hotChoice: true, isDeleted: false },
+    );
+
+  console.log(isDeletedServic, "isDeletedServic");
+
+  if (isDeletedServic[0]?.hotChoice === true) {
+    throw new Error('Already selected Hot Choice Service');
+  }
+
   const isDeletedService = await mongoose.connection
     .collection('services')
     .findOne(
