@@ -2,6 +2,7 @@
 import { Model, Types } from 'mongoose';
 
 export type TCallBooking = {
+  adminId: Types.ObjectId;
   userId: Types.ObjectId;
   quoteId: Types.ObjectId;
   day: string;

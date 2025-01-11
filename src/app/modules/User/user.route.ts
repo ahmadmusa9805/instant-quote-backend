@@ -32,6 +32,12 @@ router.get(
 );
 
 router.get(
+  '/admin',
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  UserControllers.getAllAdminUsers,
+);
+
+router.get(
   '/users-monthly',
   // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   UserControllers.getUsersMonthly,
