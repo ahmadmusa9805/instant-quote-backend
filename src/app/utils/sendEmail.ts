@@ -51,6 +51,23 @@ export class SendEmail {
       throw new Error('Failed to send OTP email.');
     }
   }
+  static async sendQuoteEmailToClient(email: string, password: any, quote: string): Promise<void> {
+    const mailOptions = {
+      // from: process.env.EMAIL_USER, // Sender email address
+      from: "ahmadmusa9805@gmail.com", // Sender email address
+      to: email, // Recipient email
+      subject: 'Your Accoount And Quote Is Created',
+      text: `Your Account and Quote is created. Account: ${email} and password: ${password}. Quote: ${quote}.`,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`OTP sent to ${email}`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new Error('Failed to send OTP email.');
+    }
+  }
   static async sendResetLinkToEmail(email: string, resetLink: string): Promise<void> {
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
