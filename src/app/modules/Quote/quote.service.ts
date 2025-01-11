@@ -24,6 +24,7 @@ import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
 import { calculateOtherPrices } from './quote.utils';
+import { SendEmail } from '../../utils/sendEmail';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
   const userData: Partial<TUser> = {
@@ -67,13 +68,19 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
  payload = await calculateOtherPrices(payload);
 
     // const newQuote = await Quote.create(payload);
-    const newClient = await Quote.create([payload], { session });
-    // if (!newQuote) throw new Error('Failed to create Client');
+    const newQuote = await Quote.create([payload], { session });
+    if (!newQuote.length) throw new Error('Failed to create Client');
+     
+    await SendEmail.sendQuoteEmailToClient(
+      payload.email,
+      payload.password || 'client12345',
+      JSON.stringify(newQuote)
+    );
 
     await session.commitTransaction();
     await session.endSession();
 
-    return newClient;
+    return newQuote;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
