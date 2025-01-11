@@ -74,7 +74,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     await SendEmail.sendQuoteEmailToClient(
       payload.email,
       payload.password || 'client12345',
-      JSON.stringify(newQuote)
+      // JSON.stringify(newQuote)
     );
 
     await session.commitTransaction();
