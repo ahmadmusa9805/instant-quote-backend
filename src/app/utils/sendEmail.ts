@@ -51,13 +51,13 @@ export class SendEmail {
       throw new Error('Failed to send OTP email.');
     }
   }
-  static async sendQuoteEmailToClient(email: string, password: any, quote: string): Promise<void> {
+  static async sendQuoteEmailToClient(email: string, password: any): Promise<void> {
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
       from: "ahmadmusa9805@gmail.com", // Sender email address
       to: email, // Recipient email
       subject: 'Your Accoount And Quote Is Created',
-      text: `Your Account and Quote is created. Account: ${email} and password: ${password}. Quote: ${quote}.`,
+      text: `Your Account and Quote is created. Email: ${email} and password: ${password}.`,
     };
 
     try {
