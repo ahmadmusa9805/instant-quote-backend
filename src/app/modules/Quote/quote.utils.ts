@@ -3,7 +3,7 @@
 
 export const calculateOtherPrices = async (payload?: any) => {
 
-    console.log('dsfdsafasdfa', payload);
+
     // calculating total price
     const refurbishCost = payload.refurbishSize.quantity * payload.refurbishSize.price * payload.refurbishType.percentage;
     const extendCost = payload.extendSize.quantity * payload.extendSize.price * payload.finishLevel.percentage;
