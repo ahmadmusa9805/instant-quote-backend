@@ -1,1 +1,1 @@
-export const WEDO_SEARCHABLE_FIELDS = ['name', 'description', 'atcCodes'];
+export const WEDO_SEARCHABLE_FIELDS = [ 'description', 'description'];

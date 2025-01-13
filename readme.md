@@ -10,7 +10,7 @@ Description: This document outlines the detailed analysis of project requirement
 
 ![ER DIAGRAM](./erdiagram.png)
 
-Description: This is an updated diagram illustrates the relationships among User, Student, Admin, Faculty, Academic Semester, Academic Faculty, Academic Department , Course , Semester Registration , Offered Couse.
+A property development project involves planning, designing, and constructing residential, commercial, or industrial properties to create value and meet market demands. It encompasses land acquisition, regulatory approvals, construction, and final sale or leasing of the developed property.
 
 ---
 

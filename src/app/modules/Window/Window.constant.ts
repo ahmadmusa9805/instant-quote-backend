@@ -1,1 +1,1 @@
-export const WINDOW_SEARCHABLE_FIELDS = ['name', 'description', 'atcCodes'];
+export const WINDOW_SEARCHABLE_FIELDS = ['windowSquareMeters'];

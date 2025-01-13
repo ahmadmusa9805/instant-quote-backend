@@ -14,7 +14,7 @@ async function main() {
     await seedSuperAdmin();
     server = httpServer.listen(config.port, () => {
       // server = app.listen(5000, () => {
-      console.log(`app is listening on port ${config.port}`);
+      console.log(`application is listening on port ${config.port}`);
     });
   } catch (err) {
     console.log(err);
