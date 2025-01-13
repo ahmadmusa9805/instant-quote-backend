@@ -1,1 +1,1 @@
-export const REFURBISHMENTTYPE_SEARCHABLE_FIELDS = ['name', 'description', 'atcCodes'];
+export const REFURBISHMENTTYPE_SEARCHABLE_FIELDS = ['subtitle', 'title'];
