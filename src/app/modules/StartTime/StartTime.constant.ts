@@ -1,1 +1,1 @@
-export const STARTTIME_SEARCHABLE_FIELDS = ['name', 'description', 'atcCodes'];
+export const STARTTIME_SEARCHABLE_FIELDS = [ 'startTime' ];
