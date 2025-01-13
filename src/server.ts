@@ -35,6 +35,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('uncaughtException', () => {
+  // console.log(config.s3,'config.s3')
   console.log(`😈 uncaughtException is detected , shutting down ...`);
   process.exit(1);
 });
