@@ -5,13 +5,12 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
-import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
 import { createServer } from 'http';
 import helmet from 'helmet';
-
-
+import config from './app/config';
+import globalErrorHandler from './app/middlewares/globalErrorhandler';
 const app: Application = express();
 const httpServer = createServer(app);
 
@@ -35,8 +34,9 @@ app.use(express.json({ verify: (req: any, res, buf) => { req.rawBody = buf.toStr
 
 // Routes
 app.use('/api/v1', router);
+
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome To Performance Room!');
+  res.send('Welcome To Property API!');
 });
 
 
