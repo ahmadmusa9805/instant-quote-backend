@@ -33,3 +33,4 @@ export default {
   },
   stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
 };
+
