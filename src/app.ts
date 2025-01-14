@@ -70,7 +70,9 @@ app.use(globalErrorHandler);
 app.use(notFound);
 
 process.on('SIGTERM', () => {
+  // eslint-disable-next-line no-console
   console.log('SIGTERM received: closing server...');
+  // eslint-disable-next-line no-console
   httpServer.close(() => console.log('Server closed.'));
 });
 
