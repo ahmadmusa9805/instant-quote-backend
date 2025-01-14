@@ -5,17 +5,14 @@ import AppError from '../../errors/AppError';
 import { PROJECT_SEARCHABLE_FIELDS } from './Project.constant';
 import mongoose from 'mongoose';
 import { Project } from './Project.model';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createProjectIntoDB = async (
   payload: any, file: any
 ) => {
 
   if (file) {
-    const imageName = `${file.originalname}`;
-    const path = file.path;
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
-    payload.img = secure_url;
+
+    payload.img = file.location as string;
   }
 
 

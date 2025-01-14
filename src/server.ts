@@ -6,7 +6,7 @@ import seedSuperAdmin from './app/DB/index.js';
 let server: Server;
 async function main() {
   try {
-    // await mongoose.connect("mongodb://localhost:27017/performance-room-server" as string);
+    // await mongoose.connect("mongodb+srv://property-db:tQuvNkBQyuqlH7e6@cluster0.1ddal.mongodb.net/property-development?retryWrites=true&w=majority&appName=Cluster0" as string);
     await mongoose.connect(config.database_url as string);
 
     // const port = config.port || 3000;  // Default to 3000 if undefined

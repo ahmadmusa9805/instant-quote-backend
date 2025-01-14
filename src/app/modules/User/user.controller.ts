@@ -118,8 +118,6 @@ const deleteUser = catchAsync(async (req, res) => {
 });
 
 export const UserControllers = {
-//   createActor,
-  // createJudge,
   getAllAdminUsers,
   getSingleUser,
   getUsersMonthly,
