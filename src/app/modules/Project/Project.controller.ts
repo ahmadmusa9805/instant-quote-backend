@@ -4,7 +4,6 @@ import sendResponse from '../../utils/sendResponse';
 import { ProjectServices } from './Project.service';
 
 const createProject = catchAsync(async (req, res) => {
-  console.log(req.file, "test controller");
   const { project: ProjectData } = req.body;
   const result = await ProjectServices.createProjectIntoDB(ProjectData, req.file);
 
