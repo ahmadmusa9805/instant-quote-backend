@@ -2,13 +2,13 @@ import express, { NextFunction, Request, Response } from 'express';
 import { PropertyControllers } from './Property.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { createPropertyValidationSchema, updatePropertyValidationSchema } from './Property.validation';
-import { upload } from '../../utils/sendImageToCloudinary';
+import { uploadFileS3 } from '../../utils/UploaderS3';
 
 const router = express.Router();
 
 router.post(
   '/create-Property',
-  upload.single('file'),
+  uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
       try {

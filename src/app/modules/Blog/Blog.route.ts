@@ -2,13 +2,13 @@ import express, { NextFunction, Request, Response } from 'express';
 import { BlogControllers } from './Blog.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { createBlogValidationSchema, updateBlogValidationSchema } from './Blog.validation';
-import { upload } from '../../utils/sendImageToCloudinary';
+import { uploadFileS3 } from '../../utils/UploaderS3';
 
 const router = express.Router();
 
 router.post(
   '/create-blog',
-  upload.single('file'),
+  uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
       try {

@@ -2,13 +2,13 @@
 
 import express, { NextFunction, Response, Request } from 'express';
 import auth from '../../middlewares/auth';
-import { upload } from '../../utils/sendImageToCloudinary';
 // import { createActorValidationSchema } from '../Client/actor.validation';
 // import { createAdminValidationSchema } from '../Admin/admin.validation';
 import { USER_ROLE } from './user.constant';
 import { UserControllers } from './user.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { UserValidation } from './user.validation';
+import { uploadFileS3 } from '../../utils/UploaderS3';
 
 const router = express.Router();
 // router.post(
@@ -71,7 +71,7 @@ router.delete(
 router.patch(
   '/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
-  upload.single('file'),
+  uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
       try {

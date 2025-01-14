@@ -5,18 +5,15 @@ import AppError from '../../errors/AppError';
 import { BLOG_SEARCHABLE_FIELDS } from './Blog.constant';
 import mongoose from 'mongoose';
 import { Blog } from './Blog.model';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createBlogIntoDB = async (
   payload: any,
   file: any
 ) => {
   if (file) {
-    const imageName = `${file.originalname}`;
-    const path = file.path;
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
 
-    payload.img = secure_url;
+
+    payload.img = file.location as string;
   }
   const result = await Blog.create(payload);
   
