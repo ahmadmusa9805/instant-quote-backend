@@ -20,8 +20,8 @@ jobs:
     # Step 3: Create the .env file
     - name: Create .env file
       run: |
-        echo "NODE_ENV="productions" > .env
-        cat .env  # Debugging only, remove for production
+       echo "${{ secrets.ENV_VARS }}" > .env
+       cat .env  # Debugging only, remove for production
 
     # Step 4: Build and Test with Docker Compose
     - name: Build and Test Docker Compose
