@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Server } from 'node:http';
 import mongoose from 'mongoose';
 import httpServer from './app.js';  // Import HTTP server from app.ts
@@ -14,6 +15,7 @@ async function main() {
     await seedSuperAdmin();
     server = httpServer.listen(config.port, () => {
       // server = app.listen(5000, () => {
+      // eslint-disable-next-line no-console
       console.log(`application is listening on port ${config.port}`);
     });
   } catch (err) {
@@ -35,6 +37,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('uncaughtException', () => {
+  // console.log(config.s3,'config.s3')
   console.log(`😈 uncaughtException is detected , shutting down ...`);
   process.exit(1);
 });
