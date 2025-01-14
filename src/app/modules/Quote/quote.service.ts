@@ -5,7 +5,6 @@
 
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { TUser } from '../User/user.interface';
 import { User } from '../User/user.model';
 import { QUOTE_SEARCHABLE_FIELDS } from './quote.constant';
@@ -39,10 +38,10 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   try {
     session.startTransaction();
     if (file) {
-      const imageName = `${file.originalname}`;
-      const path = file.path;
-      const { secure_url } = await sendImageToCloudinary(imageName, path);
-      payload.file = secure_url;
+      // const imageName = `${file.originalname}`;
+      // const path = file.path;
+      // const { secure_url } = await sendImageToCloudinary(imageName, path);
+      payload.file = file?.location;
     }
 
 

@@ -7,7 +7,6 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
@@ -154,10 +153,7 @@ const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any)
 
   // Handle file upload if present
   if (file) {
-    const imageName = `${file.originalname}`;
-    const path = file.path;
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
-    modifiedUpdatedData.profileImg = secure_url;
+    modifiedUpdatedData.profileImg = file.location as string;
   }
 
   const result = await User.findByIdAndUpdate(

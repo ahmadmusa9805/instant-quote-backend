@@ -15,7 +15,7 @@ export class SendEmail {
   static async sendOTPEmail(email: string, otp: string): Promise<void> {
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
-      from: "ahmadmusa9805@gmail.com", // Sender email address
+      from: config.admin_email_user, // Sender email address
       to: email, // Recipient email
       subject: 'Your OTP for Verification',
       text: `Your OTP is ${otp}. It is valid for 5 minutes.`,
@@ -32,7 +32,7 @@ export class SendEmail {
   static async sendQuoteEmailToClient(email: string, password: any): Promise<void> {
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
-      from: "ahmadmusa9805@gmail.com", // Sender email address
+      from: config.admin_email_user, // Sender email address
       to: email, // Recipient email
       subject: 'Your Accoount And Quote Is Created',
       text: `Your Account and Quote is created. Email: ${email} and password: ${password}.`,
@@ -49,7 +49,7 @@ export class SendEmail {
   static async sendResetLinkToEmail(email: string, resetLink: string): Promise<void> {
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
-      from: "ahmadmusa9805@gmail.com", // Sender email address
+      from: config.admin_email_user, // Sender email address
       to: email, // Recipient email
       subject: 'Your resetLink for Change Password',
       text: `Your resetLink is & It is valid for 10 minutes. Link: ${resetLink}`,

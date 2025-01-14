@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 import { TPropertyPart } from './PropertyPart.interface';
 import { PropertyPart } from './PropertyPart.model';
 import { PROPERTYPART_SEARCHABLE_FIELDS } from './PropertyPart.constant';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createPropertyPartIntoDB = async (
   payload: TPropertyPart,
@@ -14,13 +13,9 @@ const createPropertyPartIntoDB = async (
 ) => {
 
   if (file) {
-    const imageName = `${file.originalname}`;
-    const path = file.path;
-    const { secure_url } = await sendImageToCloudinary(imageName, path);
-    payload.image = secure_url as string;
+
+    payload.image = file.location as string;
   }
-
-
 
   const result = await PropertyPart.create(payload);
   
