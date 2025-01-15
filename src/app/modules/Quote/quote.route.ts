@@ -13,7 +13,6 @@ const router = express.Router();
 
 router.post(
   '/create-quote',
-  // upload.single('file'),
   uploadFileS3(true).single('file'),
     (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
