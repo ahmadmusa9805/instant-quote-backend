@@ -38,9 +38,6 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   try {
     session.startTransaction();
     if (file) {
-      // const imageName = `${file.originalname}`;
-      // const path = file.path;
-      // const { secure_url } = await sendImageToCloudinary(imageName, path);
       payload.file = file?.location;
     }
 
