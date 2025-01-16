@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type TNotification = {
-  name: string;
-  description?: string;
-  atcCodes: string;
+  type: string;
+  message: string;
+  isRead: boolean;
+  createdAt: Date;
   isDeleted: boolean;
 };
 

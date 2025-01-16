@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { TCallBooking } from './CallBooking.interface';
 import { CallBooking } from './CallBooking.model';
 import { CallAvailability } from '../CallAvailability/CallAvailability.model';
+import { NotificationServices } from '../Notification/Notification.service';
 
 
 const createCallBookingIntoDB = async (payload: TCallBooking) => {
@@ -56,6 +57,14 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
   }
+
+  await NotificationServices.createNotificationIntoDB({
+    type: 'callBooking',
+    message: `New call booking created for ${payload.day} at ${payload.startTime} - ${payload.endTime}`,
+    isDeleted: false,
+    isRead: false,
+    createdAt: new Date(),
+  });
 
   const deletedCallAvailability = await CallAvailability.findOneAndUpdate(
     // { day: payload.day, isDeleted: false },

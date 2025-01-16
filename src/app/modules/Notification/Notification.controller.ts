@@ -4,8 +4,8 @@ import sendResponse from '../../utils/sendResponse';
 import { NotificationServices } from './Notification.service';
 
 const createNotification = catchAsync(async (req, res) => {
-  const { Notification: NotificationData } = req.body;
-  const result = await NotificationServices.createNotificationIntoDB(NotificationData);
+  const { notification } = req.body;
+  const result = await NotificationServices.createNotificationIntoDB(notification);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -15,34 +15,19 @@ const createNotification = catchAsync(async (req, res) => {
   });
 });
 
-const getSingleNotification = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await NotificationServices.getSingleNotificationFromDB(id);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Notification is retrieved successfully',
-    data: result,
-  });
-});
-
-const getAllNotifications = catchAsync(async (req, res) => {
-  const result = await NotificationServices.getAllNotificationsFromDB(req.query);
-
+const getAllUnreadNotifications = catchAsync(async (req, res) => {
+  const result = await NotificationServices.getAllUnreadNotificationsFromDB();
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Notifications are retrieved successfully',
-    meta: result.meta,
-    data: result.result,
+    data: result,
   });
 });
 
-const updateNotification = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const { Notification } = req.body;
-  const result = await NotificationServices.updateNotificationIntoDB(id, Notification);
+const markNotificationAsRead = catchAsync(async (req, res) => {
+  const result = await NotificationServices.markNotificationAsReadIntoDB();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -52,22 +37,8 @@ const updateNotification = catchAsync(async (req, res) => {
   });
 });
 
-const deleteNotification = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await NotificationServices.deleteNotificationFromDB(id);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Notification is deleted successfully',
-    data: result,
-  });
-});
-
 export const NotificationControllers = {
   createNotification,
-  getSingleNotification,
-  getAllNotifications,
-  updateNotification,
-  deleteNotification,
+  getAllUnreadNotifications,
+  markNotificationAsRead,
 };

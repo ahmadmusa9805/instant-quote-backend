@@ -2,9 +2,12 @@ import { Schema, model } from 'mongoose';
       import { TNotification, NotificationModel } from './Notification.interface';
       
       const NotificationSchema = new Schema<TNotification, NotificationModel>({
-        name: { type: String, required: true },
-        description: { type: String },
-        atcCodes: { type: String, required: true },
+        type: { type: String,
+          enum: ['quote', 'callBooking'],
+          required: true },
+        message: { type: String, required: true },
+        isRead: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
         isDeleted: { type: Boolean, default: false },
       });
       
