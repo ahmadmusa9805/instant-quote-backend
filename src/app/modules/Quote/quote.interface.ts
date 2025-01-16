@@ -90,6 +90,7 @@ export type  TQuote = {
   architectural: number;
   structuralEngineering: number;
   planning: number;
+  projectManagement: number;
   extendCost: number;
   refurbishCost: number;
   total: number;

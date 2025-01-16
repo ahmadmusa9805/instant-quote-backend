@@ -22,10 +22,11 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-import { calculateOtherPrices } from './quote.utils';
+import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
+
   const userData: Partial<TUser> = {
     password: payload.password || 'client12345',
     role: 'client',
@@ -38,33 +39,24 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   try {
     session.startTransaction();
     if (file) {
-      // const imageName = `${file.originalname}`;
-      // const path = file.path;
-      // const { secure_url } = await sendImageToCloudinary(imageName, path);
       payload.file = file?.location;
     }
 
 
-   if(payload.userId){
-    const user = await User.findOne({ _id: payload.userId });
-    if (!user) {
-      throw new Error('User not found');
+    const user = await User.findOne({ email: payload.email });
+    if (user) {
+      payload.userId = user._id;
     }
-   }
-
    
-   if(!payload.userId){
-    // const newUser = await User.create(userData);
+   if(!user){
     const newUser = await User.create([userData], { session });
 
-    // if (!newUser) throw new Error('Failed to create user');
     if (!newUser.length) throw new Error('Failed to create user');
 
-    // payload.userId = newUser._id;
     payload.userId = newUser[0]._id;
-}
+  }
 
- payload = await calculateOtherPrices(payload);
+    payload = await calculateOtherPrices(payload);
 
     // const newQuote = await Quote.create(payload);
     const newQuote = await Quote.create([payload], { session });
@@ -72,8 +64,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
      
     await SendEmail.sendQuoteEmailToClient(
       payload.email,
-      payload.password || 'client12345',
-      // JSON.stringify(newQuote)
+      payload.password || generateRandomPassword(),
     );
 
     await session.commitTransaction();
