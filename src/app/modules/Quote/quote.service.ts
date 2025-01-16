@@ -27,10 +27,6 @@ import { SendEmail } from '../../utils/sendEmail';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
 
-  // console.log(payload, "test");
-  
-  // return null;
-
   const userData: Partial<TUser> = {
     password: payload.password || 'client12345',
     role: 'client',
@@ -53,13 +49,10 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     }
    
    if(!user){
-    // const newUser = await User.create(userData);
     const newUser = await User.create([userData], { session });
 
-    // if (!newUser) throw new Error('Failed to create user');
     if (!newUser.length) throw new Error('Failed to create user');
 
-    // payload.userId = newUser._id;
     payload.userId = newUser[0]._id;
   }
 
