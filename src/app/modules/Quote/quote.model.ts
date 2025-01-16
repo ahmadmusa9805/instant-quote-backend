@@ -101,10 +101,21 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       required: true, 
     },
     service: {
-      interiorDesign: Number,
-  architectural: Number,
-  structuralEngineering: Number,
-  planning: Number
+      interiorDesign: {
+        type: Number,
+      },
+      architectural: {
+        type: Number,
+      },
+      structuralEngineering: {
+        type: Number,
+      },
+      planning: {
+        type: Number,
+      },
+      projectManagement: {
+        type: Number,
+      },
     },
     designIdea: {
       type: String,
