@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 
@@ -11,57 +12,80 @@ export function generateRandomPassword(length = 12) {
     return password;
 }
 
-function convertKeysToCamelCase(serviceObject: any) {
-    return Object.keys(serviceObject).reduce((result: any, key) => {
-        const camelCaseKey = key
-            .toLowerCase() // Convert to lowercase
-            .replace(/[^\w\s]/g, '') // Remove special characters like punctuation
-            .split(' ') // Split into words
-            .map((word, index) =>
-                index === 0
-                    ? word // Keep the first word lowercase
-                    : word.charAt(0).toUpperCase() + word.slice(1) // Capitalize subsequent words
-            )
-            .join(''); // Join back into a single string
+// function convertKeysToCamelCase(serviceObject: any) {
+//     return Object.keys(serviceObject).reduce((result: any, key) => {
+//         const camelCaseKey = key
+//             .toLowerCase() // Convert to lowercase
+//             .replace(/[^\w\s]/g, '') // Remove special characters like punctuation
+//             .split(' ') // Split into words
+//             .map((word, index) =>
+//                 index === 0
+//                     ? word // Keep the first word lowercase
+//                     : word.charAt(0).toUpperCase() + word.slice(1) // Capitalize subsequent words
+//             )
+//             .join(''); // Join back into a single string
 
-        // Add the new camelCase key with the original value
-        result[camelCaseKey] = serviceObject[key];
-        return result;
-    }, {});
+//         // Add the new camelCase key with the original value
+//         result[camelCaseKey] = serviceObject[key];
+//         return result;
+//     }, {});
+// }
+
+function calculateScaledValues(baseValue: number, data: Record<string, number>): Record<string, number> {
+    const scaledValues: Record<string, number> = {};
+  
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        scaledValues[key] = data[key] * baseValue;
+      }
+    }
+  
+    return scaledValues;
+  }
+
+function calculateTotalValues(data: Record<string, number>): number {
+    return Object.values(data).reduce((total, value) => total + value, 0);
 }
+  
+  function convertObjectToArray(data: Record<string, number>): Array<{ name: string; value: number }> {
+    return Object.entries(data).map(([key, value]) => ({
+      name: key,
+      value: value,
+    }));
+  }
 
 
 export const calculateOtherPrices = async (payload:any) => {
-  
-    const {refurbishSize, refurbishType, extendSize, finishLevel, bathrooms, windowSize, service:servicePayload, startTime} = payload
-     const service = convertKeysToCamelCase(servicePayload)
+        const { refurbishSize, refurbishType, extendSize, finishLevel, bathrooms, windowSize, service, startTime } = payload;
+        // const service = convertKeysToCamelCase(servicePayload);
+      
+        const refurbishCost = refurbishSize.quantity * refurbishSize.price * refurbishType.percentage * finishLevel.percentage;
+        const extendCost = extendSize.quantity * extendSize.price * finishLevel.percentage;
+        const bathroomCost = bathrooms.price * bathrooms.quantity || 0;
+        const windowCost = windowSize.quantity * windowSize.price;
+        const extendRefurbishArea = refurbishSize.quantity + extendSize.quantity;
+      
+        const services = calculateScaledValues(extendRefurbishArea, service);
+        const startTimeCost = Number(startTime.percentage);
+        const serviceTotal = calculateTotalValues(services);
+      
+        
+        const total = refurbishCost + extendCost + bathroomCost + windowCost + serviceTotal;
 
-    // calculating total price
-    const refurbishCost = refurbishSize.quantity * refurbishSize.price * refurbishType.percentage * finishLevel.percentage;
-    const extendCost = extendSize.quantity * extendSize.price * finishLevel.percentage;
-    const bathroomCost =  bathrooms.price * bathrooms.quantity || 0;
-    const windowCost = windowSize.quantity * windowSize.price;
-    const extendRefurbishArea = refurbishSize.quantity + extendSize.quantity;
-    const interiorDesign = service.interiorDesign * extendRefurbishArea || 0;
-    const architectural = service.architectural * extendRefurbishArea || 0;
-    const structuralEngineering = service.structuralEngineering * extendRefurbishArea || 0;
-    const planning = service.planning * extendRefurbishArea || 0;
-    const projectManagement = service.projectManagement * extendRefurbishArea || 0;
-    const startTimeCost = Number(startTime.percentage);
-    const total = refurbishCost + extendCost + bathroomCost + windowCost + interiorDesign + architectural + structuralEngineering + planning + projectManagement;
-    const startTimePrice = total * startTimeCost;
+        const startTimePrice = total * startTimeCost;
+
+        const grandTotal = total + startTimePrice;
+
+        const finalServices = convertObjectToArray(services);
+      
+        payload.extendCost = extendCost;
+        payload.refurbishCost = refurbishCost;
+        payload.bathroomsPrice = bathroomCost;
+        payload.windowSizePrice = windowCost;
+        payload.startTimePrice = startTimePrice;
+        payload.services = finalServices;
+        payload.total = grandTotal; // Ensure total is explicitly set
 
 
-    payload.extendCost = extendCost;
-    payload.refurbishCost = refurbishCost;
-    payload.bathroomsPrice = payload.bathrooms.quantity * payload.bathrooms.price;
-    payload.windowSizePrice = payload.windowSize.quantity * payload.windowSize.price;
-    payload.startTimePrice = startTimePrice;
-    payload.interiorDesign = interiorDesign;
-    payload.architectural = architectural;
-    payload.structuralEngineering = structuralEngineering;
-    payload.planning = planning;
-    payload.total = total + startTimePrice;
-    
     return payload;
 };
