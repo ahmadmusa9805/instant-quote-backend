@@ -24,6 +24,7 @@ import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
+import { NotificationServices } from '../Notification/Notification.service';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
 
@@ -56,16 +57,29 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     payload.userId = newUser[0]._id;
   }
 
-    payload = await calculateOtherPrices(payload);
+
+  const modifyPayload = await calculateOtherPrices(payload);
 
     // const newQuote = await Quote.create(payload);
-    const newQuote = await Quote.create([payload], { session });
+    const newQuote = await Quote.create([modifyPayload], { session });
     if (!newQuote.length) throw new Error('Failed to create Client');
+
+    await NotificationServices.createNotificationIntoDB({
+      type: 'quote',
+      message: `New quote created with Email: ${payload.email}`,
+      isDeleted: false,
+      isRead: false,
+      createdAt: new Date(),
+    });
+
+    
+    if(!user){
+      await SendEmail.sendQuoteEmailToClient(
+        payload.email,
+        payload.password || generateRandomPassword(),
+      );
+    }
      
-    await SendEmail.sendQuoteEmailToClient(
-      payload.email,
-      payload.password || generateRandomPassword(),
-    );
 
     await session.commitTransaction();
     await session.endSession();
