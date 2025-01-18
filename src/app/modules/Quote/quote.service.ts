@@ -22,14 +22,17 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
+// import { calculateOtherPrices } from './quote.utils';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
+ 
+  const password = payload.password || generateRandomPassword();
 
   const userData: Partial<TUser> = {
-    password: payload.password || 'client12345',
+    password,
     role: 'client',
     email: payload.email,
     contactNo: payload.contactNo,
@@ -76,7 +79,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     if(!user){
       await SendEmail.sendQuoteEmailToClient(
         payload.email,
-        payload.password || generateRandomPassword(),
+        password,
       );
     }
      
