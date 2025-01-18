@@ -1,7 +1,21 @@
 
 import { Schema, model } from 'mongoose';
-import { QuoteModel, TQuote } from './quote.interface';
+import { QuoteModel, TQuote, TService } from './quote.interface';
 
+
+const serviceSchema = new Schema<TService>(
+  {
+    name: {
+      type: String,
+      required: [true, 'Service name is required'],
+    },
+    value: {
+      type: Number,
+      required: [true, 'Service value is required'],
+    },
+  },
+  { _id: false } // Prevent creation of a separate _id for each service object
+);
 
 const quoteSchema = new Schema<TQuote, QuoteModel>(
   {
@@ -100,22 +114,9 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       type: Number, 
       required: true, 
     },
-    service: {
-      interiorDesign: {
-        type: Number,
-      },
-      architectural: {
-        type: Number,
-      },
-      structuralEngineering: {
-        type: Number,
-      },
-      planning: {
-        type: Number,
-      },
-      projectManagement: {
-        type: Number,
-      },
+    services: {
+      type: [serviceSchema], // Use the service schema to define an array of service objects
+      required: [true, 'Services are required'],
     },
     designIdea: {
       type: String,
@@ -125,8 +126,8 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       type: String, 
     },
     total: {
-      type: Number, 
-      default: 0, 
+      type: Number,
+      required: true, // Ensures `total` must be provided
     },
       extendCost: {
         type: Number, 

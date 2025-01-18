@@ -57,12 +57,13 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     payload.userId = newUser[0]._id;
   }
 
-    payload = await calculateOtherPrices(payload);
+
+  const modifyPayload = await calculateOtherPrices(payload);
 
     // const newQuote = await Quote.create(payload);
-    const newQuote = await Quote.create([payload], { session });
+    const newQuote = await Quote.create([modifyPayload], { session });
     if (!newQuote.length) throw new Error('Failed to create Client');
-   
+
     await NotificationServices.createNotificationIntoDB({
       type: 'quote',
       message: `New quote created with Email: ${payload.email}`,
@@ -71,10 +72,14 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       createdAt: new Date(),
     });
 
-    await SendEmail.sendQuoteEmailToClient(
-      payload.email,
-      payload.password || generateRandomPassword(),
-    );
+    
+    if(!user){
+      await SendEmail.sendQuoteEmailToClient(
+        payload.email,
+        payload.password || generateRandomPassword(),
+      );
+    }
+     
 
     await session.commitTransaction();
     await session.endSession();

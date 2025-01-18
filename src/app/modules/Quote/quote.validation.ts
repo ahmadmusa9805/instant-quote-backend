@@ -41,12 +41,7 @@ export const createQuoteValidationSchema = z.object({
       designIdea: z.string().min(1, "Design idea is required"),
       file: z.string().optional(),
       total: z.number().optional().default(0),
-      service: z.object({
-        interiorDesign: z.number().optional(),
-        architectural: z.number().optional(),
-        structuralEngineering: z.number().optional(),
-        planning: z.number().optional(),
-      }).optional(),
+      service: z.object({}).optional(),
       extendCost: z.number().optional().default(0),
       refurbishCost: z.number().optional().default(0),
       isDeleted: z.boolean().optional().default(false),
