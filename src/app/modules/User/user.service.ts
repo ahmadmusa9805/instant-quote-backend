@@ -170,21 +170,6 @@ const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any)
   return result;
 };
 
-
-// const deleteUserFromDB = async (id: string) => {
-//   const deletedService = await User.findByIdAndUpdate(
-//     id,
-//     { isDeleted: true },
-//     { new: true },
-//   );
-//   if (!deletedService) {
-//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');  
-//   }
-
-//   return deletedService;
-// };
-
-
 const deleteUserFromDB = async (id: string) => {
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
