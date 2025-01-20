@@ -22,7 +22,6 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-// import { calculateOtherPrices } from './quote.utils';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
@@ -49,7 +48,11 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
     const user = await User.findOne({ email: payload.email });
     if (user) {
-      payload.userId = user._id;
+      
+      const quote = await Quote.findOne({ email: payload.email });
+      if(quote){
+        throw new Error('User Have already Created a Quote');
+      }
     }
    
    if(!user){
