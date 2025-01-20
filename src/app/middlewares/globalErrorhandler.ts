@@ -11,6 +11,7 @@ import handleZodError from '../errors/handleZodError';
 import { TErrorSources } from '../interface/error';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  // eslint-disable-next-line no-console
   console.log(err.statusCode);
   //setting default values
   let statusCode = 500;
