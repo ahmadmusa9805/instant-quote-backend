@@ -49,7 +49,8 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     const user = await User.findOne({ email: payload.email });
     if (user) {
       
-      const quote = await Quote.findOne({ email: payload.email });
+      const quote = await Quote.findOne({ userId: user._id });
+      console.log('quote', quote);
       if(quote){
         throw new Error('User Have already Created a Quote');
       }
