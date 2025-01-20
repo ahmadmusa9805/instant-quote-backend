@@ -9,6 +9,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { usersSearchableFields } from './user.constant';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
+import { Quote } from '../Quote/quote.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
 
@@ -169,17 +171,59 @@ const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any)
 };
 
 
-const deleteUserFromDB = async (id: string) => {
-  const deletedService = await User.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true },
-  );
-  if (!deletedService) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');  
-  }
+// const deleteUserFromDB = async (id: string) => {
+//   const deletedService = await User.findByIdAndUpdate(
+//     id,
+//     { isDeleted: true },
+//     { new: true },
+//   );
+//   if (!deletedService) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');  
+//   }
 
-  return deletedService;
+//   return deletedService;
+// };
+
+
+const deleteUserFromDB = async (id: string) => {
+  const session = await mongoose.startSession(); // Start a session
+  session.startTransaction(); // Start transaction
+
+  try {
+    // Step 1: Soft-delete the user
+    const deletedUser = await User.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session } // Pass the session
+    );
+
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');
+    }
+
+    // Step 2: Soft-delete the associated quote
+    const deletedQuote = await Quote.findOneAndUpdate(
+      { userId: id }, // Find the single quote associated with the user
+      { isDeleted: true }, // Set isDeleted to true
+      { new: true, session } // Pass the session
+    );
+
+    // Optional: Validate that a quote was found and updated
+    if (!deletedQuote) {
+      console.warn(`No quote found for user with ID ${id}`);
+    }
+
+    // Commit the transaction if all operations succeed
+    await session.commitTransaction();
+    session.endSession();
+
+    return deletedUser;
+  } catch (error) {
+    // Rollback the transaction if any operation fails
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // Propagate the error to be handled by the caller
+  }
 };
 
 export const UserServices = {
