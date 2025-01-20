@@ -22,7 +22,6 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-// import { calculateOtherPrices } from './quote.utils';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
@@ -49,7 +48,11 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
     const user = await User.findOne({ email: payload.email });
     if (user) {
-      payload.userId = user._id;
+      
+      const quote = await Quote.findOne({ email: payload.email });
+      if(quote){
+        throw new Error('User Have already Created a Quote');
+      }
     }
    
    if(!user){
@@ -209,18 +212,46 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
 };
 
 const deleteQuoteFromDB = async (id: string) => {
-  const deletedService = await Quote.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true },
-  );
+  const session = await mongoose.startSession(); // Start a session
+  session.startTransaction(); // Start transaction
 
-  if (!deletedService) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');  }
+  try {
+    // Step 1: Find and soft-delete the quote
+    const deletedQuote = await Quote.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session } // Pass the session
+    );
 
-  return deletedService;
+    if (!deletedQuote) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');
+    }
+
+    // Step 2: Delete the associated user if the user ID exists in the quote
+    if (deletedQuote.userId) {
+      const deletedUser = await User.findByIdAndUpdate(
+        deletedQuote.userId,
+        { isDeleted: true },
+        { new: true, session } // Pass the session
+      );
+
+      if (!deletedUser) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
+      }
+    }
+
+    // Commit the transaction if all operations succeed
+    await session.commitTransaction();
+    session.endSession();
+
+    return deletedQuote;
+  } catch (error) {
+    // Rollback the transaction if any operation fails
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // Propagate the error to be handled by the caller
+  }
 };
-
 
 export const QuoteServices = {
   createQuoteIntoDB,

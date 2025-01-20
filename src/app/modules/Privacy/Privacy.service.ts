@@ -11,7 +11,7 @@ const createPrivacyIntoDB = async (
   payload: TPrivacy,
 ) => {
   const result = await Privacy.create(payload);
-  
+    console.log(result)
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Privacy');
   }

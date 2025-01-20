@@ -6,11 +6,8 @@ import validateRequest from '../../middlewares/validateRequest';
 import { QuoteControllers } from './quote.controller';
 import {  QuoteValidation } from './quote.validation';
 import { uploadFileS3 } from '../../utils/UploaderS3';
-// import { upload } from '../../utils/sendImageToCloudinary';
-// import { s3Upload } from '../../utils/UploaderS3';
 
 const router = express.Router();
-
 router.post(
   '/create-quote',
   uploadFileS3(true).single('file'),

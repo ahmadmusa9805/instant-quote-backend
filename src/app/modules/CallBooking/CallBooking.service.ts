@@ -11,12 +11,14 @@ import { NotificationServices } from '../Notification/Notification.service';
 
 
 const createCallBookingIntoDB = async (payload: TCallBooking) => {
-
+  console.log(payload, "payload");
 
   // Check for existing bookings with overlapping times on the same day
+  // const callAvailability = await CallAvailability.find()
   const callAvailability = await CallAvailability.find({day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false})
+  console.log(callAvailability, "callAvailability");
 
-
+  // return null
  if (!callAvailability.length) {
     throw new AppError(
       httpStatus.CONFLICT,
@@ -51,6 +53,13 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
       'A booking already exists that overlaps with the specified time range.'
     );
   }
+  
+  const callBookingExists = await CallBooking.findOne({ userId: payload.userId });
+  if(callBookingExists){
+    throw new Error('User Have already Call Booked');
+  }
+
+
   // Create the new booking if no conflict is found
   const result = await CallBooking.create(payload);
 
