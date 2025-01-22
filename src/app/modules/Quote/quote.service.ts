@@ -25,11 +25,10 @@ import { Window } from '../Window/Window.model';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
+import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
- 
   const password = payload.password || generateRandomPassword();
-
   const userData: Partial<TUser> = {
     password,
     role: 'client',
@@ -45,11 +44,20 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       payload.file = file?.location;
     }
 
+     await emailValidate(payload.email);
+
+
+
+    // Validate the email
+    // const { valid, flag } = await emailValidate(payload.email);
+    // if (!valid) {
+    //   userData.needs_review = true; // Flag the email if SMTP validation fails
+    // }
 
     const user = await User.findOne({ email: payload.email });
     if (user) {
       
-      const quote = await Quote.findOne({ email: payload.email });
+      const quote = await Quote.findOne({ userId: user._id });
       if(quote){
         throw new Error('User Have already Created a Quote');
       }
@@ -85,7 +93,6 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
         password,
       );
     }
-     
 
     await session.commitTransaction();
     await session.endSession();
