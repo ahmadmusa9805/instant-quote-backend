@@ -11,9 +11,9 @@ import { createServer } from 'http';
 import helmet from 'helmet';
 import config from './app/config';
 import globalErrorHandler from './app/middlewares/globalErrorhandler';
+import { uploadFileS3 } from './app/utils/UploaderS3';
 const app: Application = express();
 const httpServer = createServer(app);
-
 
 // Middleware
 app.use(helmet()); // Security headers
@@ -32,6 +32,9 @@ app.use(
 
 app.use(express.json({ verify: (req: any, res, buf) => { req.rawBody = buf.toString(); } }));
 
+
+
+
 // Routes
 app.use('/api/v1', router);
 
@@ -39,27 +42,38 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Welcome To Property API!');
 });
 
-
+// app.post('/upload/single',  uploadFileS3(true).single('img'), (req: Request, res: Response) => {
+//     try {
+//         if (!req.file) {
+//             return res.status(400).json({ success: false, message: 'No file uploaded' });
+//         }
+//         const file = req.file as Express.MulterS3.File;
+//         res.status(200).json({
+//             success: true,
+//             message: 'File uploaded successfully',
+//             data: {
+//                 url: file.location,
+//                 key: file.key,
+//                 mimetype: file.mimetype,
+//                 size: file.size
+//             }
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             success: false,
+//             message: error instanceof Error ? error.message : 'File upload failed'
+//         });
+//     }
+// });
 
 app.use(globalErrorHandler);
 app.use(notFound);
 
-
 process.on('SIGTERM', () => {
+  // eslint-disable-next-line no-console
   console.log('SIGTERM received: closing server...');
+  // eslint-disable-next-line no-console
   httpServer.close(() => console.log('Server closed.'));
 });
 
 export default httpServer;
-
-
-
-
-
-
-
-
-
-
-
-

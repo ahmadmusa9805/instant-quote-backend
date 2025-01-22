@@ -9,9 +9,10 @@ import { AboutUs } from './AboutUs.model';
 const createAboutUsIntoDB = async (
   payload: any,
 ) => {
+  // eslint-disable-next-line no-console
   console.log(payload, "test1");
   const result = await AboutUs.create(payload);
-  console.log(result, "test2");
+  // console.log(result, "test2");
   
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create AboutUs');
