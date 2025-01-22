@@ -30,9 +30,6 @@ app.use(
   })
 );
 
-
-
-
 app.use(express.json({ verify: (req: any, res, buf) => { req.rawBody = buf.toString(); } }));
 
 // Routes
