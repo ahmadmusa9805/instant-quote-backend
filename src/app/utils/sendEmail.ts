@@ -30,6 +30,9 @@ export class SendEmail {
     }
   }
   static async sendQuoteEmailToClient(email: string, password: any): Promise<void> {
+    console.log(email, "email2")
+    console.log(config.admin_email_user, "config.admin_email_user")
+
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
       from: config.admin_email_user, // Sender email address
@@ -37,6 +40,7 @@ export class SendEmail {
       subject: 'Your Accoount And Quote Is Created',
       text: `Your Account and Quote is created. Email: ${email} and password: ${password}.`,
     };
+    console.log(mailOptions, "mailOptions")
 
     try {
       await this.transporter.sendMail(mailOptions);

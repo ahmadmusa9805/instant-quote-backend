@@ -23,9 +23,9 @@ import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
-import { SendEmail } from '../../utils/sendEmail';
+// import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
-import { emailValidate } from '../../utils/emailValidate';
+// import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
   const password = payload.password || generateRandomPassword();
@@ -44,7 +44,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       payload.file = file?.location;
     }
 
-     await emailValidate(payload.email);
+    //  await emailValidate(payload.email);
 
 
 
@@ -86,13 +86,14 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       createdAt: new Date(),
     });
 
+    console.log(payload.email, "email")
     
-    if(!user){
-      await SendEmail.sendQuoteEmailToClient(
-        payload.email,
-        password,
-      );
-    }
+    // if(!user){
+    //   await SendEmail.sendQuoteEmailToClient(
+    //     payload.email,
+    //     password,
+    //   );
+    // }
 
     await session.commitTransaction();
     await session.endSession();
