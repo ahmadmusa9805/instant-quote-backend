@@ -29,19 +29,15 @@ export class SendEmail {
       throw new Error('Failed to send OTP email.');
     }
   }
-  static async sendQuoteEmailToClient(email: string, password: any): Promise<void> {
-    console.log(email, "email2")
-    console.log(config.admin_email_user, "config.admin_email_user")
+  static async sendQuoteEmailToClient(email: string): Promise<void> {
 
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
       from: config.admin_email_user, // Sender email address
       to: email, // Recipient email
       subject: 'Your Accoount And Quote Is Created',
-      text: `Your Account and Quote is created. Email: ${email} and password: ${password}.`,
+      text: `Your Account and Quote is created. With Email: ${email}.`,
     };
-    console.log(mailOptions, "mailOptions")
-
     try {
       await this.transporter.sendMail(mailOptions);
       console.log(`OTP sent to ${email}`);

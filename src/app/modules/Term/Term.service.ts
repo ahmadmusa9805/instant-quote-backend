@@ -10,6 +10,11 @@ import { Term } from './Term.model';
 const createTermIntoDB = async (
   payload: TTerm,
 ) => {
+  const term = await Term.find({ isDeleted: false });
+  
+  if(term.length > 0){
+    throw new AppError(httpStatus.CONFLICT, 'Term already exists');
+  }
   const result = await Term.create(payload);
   
   if (!result) {
