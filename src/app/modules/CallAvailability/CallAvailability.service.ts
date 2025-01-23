@@ -9,8 +9,19 @@ import { CallAvailability } from './CallAvailability.model';
 import mongoose from 'mongoose';
 
 const createCallAvailabilityIntoDB = async (payload: TCallAvailability) => {
-  const { day, startTime, endTime } = payload;
- 
+  const { day, startTime, endTime, date } = payload;
+  
+// Get the current date
+const currentDate = new Date();
+
+// Convert the date from the payload to a Date object
+const inputDate = new Date(date as any);
+
+// Check if the input date is in the past
+if (inputDate < currentDate) {
+    throw new Error("The date is in the past. Please provide a future date.");
+}
+
   // Utility function to parse time strings like "09:00 AM" into Date objects
   const parseTime = (time: string | any) => {
     const [hours, minutes] = time.match(/(\d+):(\d+)/).slice(1, 3);

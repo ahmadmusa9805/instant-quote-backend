@@ -10,8 +10,13 @@ import { Privacy } from './Privacy.model';
 const createPrivacyIntoDB = async (
   payload: TPrivacy,
 ) => {
+  const privacy = await Privacy.find({ isDeleted: false });
+  
+  if(privacy.length > 0){
+    throw new AppError(httpStatus.CONFLICT, 'Term already exists');
+  }
+
   const result = await Privacy.create(payload);
-    console.log(result)
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Privacy');
   }

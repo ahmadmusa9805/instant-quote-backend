@@ -10,7 +10,6 @@ const createAboutUsIntoDB = async (
   payload: any,
 ) => {
   // eslint-disable-next-line no-console
-  console.log(payload, "test1");
   const result = await AboutUs.create(payload);
   // console.log(result, "test2");
   

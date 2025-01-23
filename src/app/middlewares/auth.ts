@@ -10,7 +10,6 @@ import catchAsync from '../utils/catchAsync';
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    // console.log(token, 'token');
     // checking if the token is missing
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
@@ -37,7 +36,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (isDeleted) {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
     }
-    // console.log(user, 'user');
 
     // checking if the user is blocked
     const userStatus = user?.status;
@@ -67,7 +65,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
 
     req.user = decoded as JwtPayload & { role: string };
-    // console.log(req.user, 'req.user');
 
     next();
   });
