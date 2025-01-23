@@ -16,7 +16,7 @@ const createNotificationIntoDB = async (
 };
 
 const getAllUnreadNotificationsFromDB = async () => {
-  const notification =  await Notification.find().sort({ createdAt: -1 });
+  const notification =  await Notification.find().sort({ createdAt: -1 }).limit(20);
   return notification;
 };
 
