@@ -29,11 +29,11 @@ if(payload.role === 'admin'){
     if (!newUser) throw new Error('Failed to create user');
 
     
-        return newUser;
+    return newUser;
 };
 
 const getMe = async (userEmail: string) => {
-  const result = await User.findOne({ email: userEmail });
+  const result = await User.findOne({ email: userEmail , isDeleted: false });
 
   return result;
 };
@@ -176,9 +176,9 @@ const deleteUserFromDB = async (id: string) => {
 
   try {
     // Step 1: Soft-delete the user
-    const deletedUser = await User.findByIdAndUpdate(
+    const deletedUser = await User.findByIdAndDelete(
       id,
-      { isDeleted: true },
+      // { isDeleted: true },
       { new: true, session } // Pass the session
     );
 
@@ -187,9 +187,9 @@ const deleteUserFromDB = async (id: string) => {
     }
 
     // Step 2: Soft-delete the associated quote
-    const deletedQuote = await Quote.findOneAndUpdate(
+    const deletedQuote = await Quote.findByIdAndDelete(
       { userId: id }, // Find the single quote associated with the user
-      { isDeleted: true }, // Set isDeleted to true
+      // { isDeleted: true }, // Set isDeleted to true
       { new: true, session } // Pass the session
     );
 
