@@ -56,10 +56,11 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     //   userData.needs_review = true; // Flag the email if SMTP validation fails
     // }
 
-    const user = await User.findOne({ email: payload.email });
+    const user = await User.findOne({ email: payload.email , isDeleted: false});
     if (user) {
       
-      const quote = await Quote.findOne({ userId: user._id });
+      const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
+
       if(quote){
         throw new Error('User Have already Created a Quote');
       }
@@ -88,8 +89,6 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       createdAt: new Date(),
     });
 
-    console.log(payload.email, "email")
-    
     if(!user){
       await SendEmail.sendQuoteEmailToClient(
         payload.email,
@@ -226,9 +225,9 @@ const deleteQuoteFromDB = async (id: string) => {
 
   try {
     // Step 1: Find and soft-delete the quote
-    const deletedQuote = await Quote.findByIdAndUpdate(
+    const deletedQuote = await Quote.findByIdAndDelete(
       id,
-      { isDeleted: true },
+      // { isDeleted: true },
       { new: true, session } // Pass the session
     );
 
@@ -238,9 +237,9 @@ const deleteQuoteFromDB = async (id: string) => {
 
     // Step 2: Delete the associated user if the user ID exists in the quote
     if (deletedQuote.userId) {
-      const deletedUser = await User.findByIdAndUpdate(
+      const deletedUser = await User.findByIdAndDelete(
         deletedQuote.userId,
-        { isDeleted: true },
+        // { isDeleted: true },
         { new: true, session } // Pass the session
       );
 
