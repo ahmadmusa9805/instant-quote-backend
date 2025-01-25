@@ -11,6 +11,7 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { Quote } from '../Quote/quote.model';
+import { CallBooking } from '../CallBooking/CallBooking.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
 
@@ -195,6 +196,17 @@ const deleteUserFromDB = async (id: string) => {
     // Optional: Validate that a quote was found and updated
     if (!deletedQuote) {
       console.warn(`No quote found for user with ID ${id}`);
+    }
+
+    const deletedCallBooking = await CallBooking.findOneAndDelete(
+      { userId: deletedUser._id }, // Correct filter as an object
+      // { isDeleted: true },
+      { new: true, session } // Pass the session
+    );
+
+
+    if (!deletedCallBooking) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated CallBooking');
     }
 
     // Commit the transaction if all operations succeed

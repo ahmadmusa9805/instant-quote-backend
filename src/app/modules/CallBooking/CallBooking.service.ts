@@ -103,6 +103,7 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const result = await CallBookingQuery.modelQuery;
   const meta = await CallBookingQuery.countTotal();
 
+    console.log(result, "resul-musa");
 
   return {
     result,

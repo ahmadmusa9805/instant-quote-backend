@@ -27,6 +27,7 @@ import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { NotificationServices } from '../Notification/Notification.service';
 import { emailValidate } from '../../utils/emailValidate';
 import { SendEmail } from '../../utils/sendEmail';
+import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
@@ -222,7 +223,6 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
 const deleteQuoteFromDB = async (id: string) => {
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
-
   try {
     // Step 1: Find and soft-delete the quote
     const deletedQuote = await Quote.findByIdAndDelete(
@@ -246,6 +246,18 @@ const deleteQuoteFromDB = async (id: string) => {
       if (!deletedUser) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
       }
+
+      const deletedCallBooking = await CallBooking.findOneAndDelete(
+        { userId: deletedQuote.userId }, // Correct filter as an object
+        // { isDeleted: true },
+        { new: true, session } // Pass the session
+      );
+
+
+      if (!deletedCallBooking) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated CallBooking');
+      }
+
     }
 
     // Commit the transaction if all operations succeed
