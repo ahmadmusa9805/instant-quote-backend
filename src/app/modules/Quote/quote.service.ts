@@ -107,24 +107,127 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   }
 };
 
-const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
-  const QuoteQuery = new QueryBuilder(
-    Quote.find({isDeleted: false}).populate('userId'),
-    query,
-  )
-    .search(QUOTE_SEARCHABLE_FIELDS)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
 
-  const result = await QuoteQuery.modelQuery;
-  const meta = await QuoteQuery.countTotal();
+// const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
+//   // Step 1: Use QueryBuilder to retrieve the base data
+//   const QuoteQuery = new QueryBuilder(
+//     Quote.find({ isDeleted: false }).populate('userId'), // Populate userId for accessing user details
+//     query
+//   )
+//     .search(QUOTE_SEARCHABLE_FIELDS) // Search on Quote fields
+//     .filter() // Apply filters
+//     .sort() // Apply sorting
+//     .paginate() // Apply pagination
+//     .fields(); // Select specific fields
+
+//   // Step 2: Fetch results and metadata
+//   const result = await QuoteQuery.modelQuery;
+//   const meta = await QuoteQuery.countTotal();
+
+
+//   // Step 5: Return final result and metadata
+//   return {
+//     result,
+//     meta
+//   };
+// };
+
+// export default getAllQuotesFromDB;
+// const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
+//   // Step 1: Use QueryBuilder to retrieve the base data
+//   const QuoteQuery = new QueryBuilder(
+//     Quote.find({ isDeleted: false }).populate({
+//       path: 'userId',
+//       match: query.searchTerm
+//         ? {
+//             // Search on user fields using regex
+//             $or: [
+//               { 'name.firstName': { $regex: query.searchTerm, $options: 'i' } }, // Case-insensitive search
+//               { 'name.lastName': { $regex: query.searchTerm, $options: 'i' } },
+//               { email: { $regex: query.searchTerm, $options: 'i' } },
+//             ],
+//           }
+//         : {}, // If no search term, don't filter users
+//     }),
+//     query
+//   )
+//     .search(QUOTE_SEARCHABLE_FIELDS) // Search on Quote fields
+//     .filter() // Apply filters
+//     .sort() // Apply sorting
+//     .paginate() // Apply pagination
+//     .fields(); // Select specific fields
+
+//   // Step 2: Fetch Results and Metadata
+//   const result = await QuoteQuery.modelQuery;
+//   const meta = await QuoteQuery.countTotal();
+
+//   // Step 3: Filter Quotes Without Matching Users
+//   const filteredResult = result.filter((quote: any) => quote.userId !== null);
+
+//   // Step 4: Parse the limit from the query as a number
+//   const limit = Number(query.limit) || 10; // Default to 10 if limit is not provided or invalid
+
+//   // Step 5: Return Final Result and Metadata
+//   return {
+//     result: filteredResult,
+//     meta: {
+//       ...meta,
+//       total: filteredResult.length,
+//       totalPage: Math.ceil(filteredResult.length / limit), // Use parsed limit here
+//     },
+//   };
+// };
+const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
+  // Step 1: Extract searchTerm, page, and limit from the query
+  const { searchTerm, page = 1, limit = 10 } = query;
+  const pageNumber = Number(page) || 1;
+  const pageSize = Number(limit) || 10;
+
+  // Step 2: Base Query
+  const baseQuery = { isDeleted: false }; // Ensure only non-deleted quotes are fetched
+
+  // Step 3: Add search logic for `userId` fields
+  const populateQuery: any = {
+    path: 'userId',
+    match: {},
+  };
+
+  if (searchTerm) {
+    populateQuery.match = {
+      $or: [
+        { 'name.firstName': { $regex: searchTerm, $options: 'i' } },
+        { 'name.lastName': { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } },
+      ],
+    };
+  }
+
+  // Step 4: Fetch the Quotes with Pagination
+  const quotes = await Quote.find(baseQuery)
+    .populate(populateQuery)
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize);
+
+  // Step 5: Count total quotes (considering search filter on user fields)
+  const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
+
+  // Step 6: Filter out quotes where `userId` doesn't match the search
+  const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
+
+  // Step 7: Return result and metadata
   return {
-    result,
-    meta,
+    result: filteredQuotes,
+    meta: {
+      page: pageNumber,
+      limit: pageSize,
+      total: totalQuotes, // Reflect total quotes that match the query
+      totalPage: Math.ceil(totalQuotes / pageSize),
+    },
   };
 };
+
+
+
 const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
   const QuoteQuery = new QueryBuilder(
     Quote.find({isDeleted: false, userId}),
