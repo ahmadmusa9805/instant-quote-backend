@@ -91,6 +91,7 @@ const createCallBookingIntoDB = async (payload: TCallBooking) => {
 const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const CallBookingQuery = new QueryBuilder(
     CallBooking.find().populate('userId').populate('adminId'),
+    // CallBooking.find({ status: 'completed' }).populate('userId').populate('adminId'),
     query,
   )
     .search(CALLBOOKING_SEARCHABLE_FIELDS)
@@ -101,6 +102,8 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
 
   const result = await CallBookingQuery.modelQuery;
   const meta = await CallBookingQuery.countTotal();
+
+
   return {
     result,
     meta,

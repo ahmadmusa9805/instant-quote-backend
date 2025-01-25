@@ -27,7 +27,6 @@ if(payload.role === 'admin'){
 }
     const newUser = await User.create(payload);
     if (!newUser) throw new Error('Failed to create user');
-
     
     return newUser;
 };
