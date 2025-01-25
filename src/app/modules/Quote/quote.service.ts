@@ -27,6 +27,7 @@ import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 import { NotificationServices } from '../Notification/Notification.service';
 import { emailValidate } from '../../utils/emailValidate';
 import { SendEmail } from '../../utils/sendEmail';
+import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
@@ -107,23 +108,56 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 };
 
 const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
-  const QuoteQuery = new QueryBuilder(
-    Quote.find({isDeleted: false}).populate('userId'),
-    query,
-  )
-    .search(QUOTE_SEARCHABLE_FIELDS)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  // Step 1: Extract searchTerm, page, and limit from the query
+  const { searchTerm, page = 1, limit = 10 } = query;
+  const pageNumber = Number(page) || 1;
+  const pageSize = Number(limit) || 10;
 
-  const result = await QuoteQuery.modelQuery;
-  const meta = await QuoteQuery.countTotal();
+  // Step 2: Base Query
+  const baseQuery = { isDeleted: false }; // Ensure only non-deleted quotes are fetched
+
+  // Step 3: Add search logic for `userId` fields
+  const populateQuery: any = {
+    path: 'userId',
+    match: {},
+  };
+
+  if (searchTerm) {
+    populateQuery.match = {
+      $or: [
+        { 'name.firstName': { $regex: searchTerm, $options: 'i' } },
+        { 'name.lastName': { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } },
+      ],
+    };
+  }
+
+  // Step 4: Fetch the Quotes with Pagination
+  const quotes = await Quote.find(baseQuery)
+    .populate(populateQuery)
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize);
+
+  // Step 5: Count total quotes (considering search filter on user fields)
+  const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
+
+  // Step 6: Filter out quotes where `userId` doesn't match the search
+  const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
+
+  // Step 7: Return result and metadata
   return {
-    result,
-    meta,
+    result: filteredQuotes,
+    meta: {
+      page: pageNumber,
+      limit: pageSize,
+      total: totalQuotes, // Reflect total quotes that match the query
+      totalPage: Math.ceil(totalQuotes / pageSize),
+    },
   };
 };
+
+
+
 const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
   const QuoteQuery = new QueryBuilder(
     Quote.find({isDeleted: false, userId}),
@@ -219,40 +253,100 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
   return updatedData;
 };
 
+// const deleteQuoteFromDB = async (id: string) => {
+//   const session = await mongoose.startSession(); // Start a session
+//   session.startTransaction(); // Start transaction
+//   try {
+//     // Step 1: Find and soft-delete the quote
+//     const deletedQuote = await Quote.findByIdAndDelete(
+//       id,
+//       // { isDeleted: true },
+//       { new: true, session } // Pass the session
+//     );
+
+//     if (!deletedQuote) {
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');
+//     }
+
+//     // Step 2: Delete the associated user if the user ID exists in the quote
+//     if (deletedQuote.userId) {
+//       const deletedUser = await User.findByIdAndDelete(
+//         deletedQuote.userId,
+//         // { isDeleted: true },
+//         { new: true, session } // Pass the session
+//       );
+
+//       if (!deletedUser) {
+//         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
+//       }
+
+//       const deletedCallBooking = await CallBooking.findOneAndDelete(
+//         { userId: deletedQuote.userId }, // Correct filter as an object
+//         // { isDeleted: true },
+//         { new: true, session } // Pass the session
+//       );
+
+
+//       if (!deletedCallBooking) {
+//         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated CallBooking');
+//       }
+
+//     }
+
+//     // Commit the transaction if all operations succeed
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     return deletedQuote;
+//   } catch (error) {
+//     // Rollback the transaction if any operation fails
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error; // Propagate the error to be handled by the caller
+//   }
+// };
 const deleteQuoteFromDB = async (id: string) => {
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
 
   try {
-    // Step 1: Find and soft-delete the quote
-    const deletedQuote = await Quote.findByIdAndDelete(
-      id,
-      // { isDeleted: true },
-      { new: true, session } // Pass the session
-    );
+    // Step 1: Check if the quote exists
+    const quote = await Quote.findById(id).session(session); // Find the quote with the session
+    if (!quote) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Quote not found');
+    }
+    // Step 2: Delete the quote
+    const deletedQuote = await Quote.findByIdAndDelete(id, { session }); // Pass session for deletion
 
-    if (!deletedQuote) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');
+    // Step 3: Check and delete the associated user
+    if (quote.userId) {
+      const user = await User.findById(quote.userId).session(session); // Find the associated user
+      if (user) {
+         await User.findByIdAndDelete(quote.userId, { session }); // Delete the user
+        
+      } else {
+        console.warn(`No user found for userId: ${quote.userId}`);
+      }
+    } else {
+      console.warn(`Quote does not have an associated userId`);
     }
 
-    // Step 2: Delete the associated user if the user ID exists in the quote
-    if (deletedQuote.userId) {
-      const deletedUser = await User.findByIdAndDelete(
-        deletedQuote.userId,
-        // { isDeleted: true },
-        { new: true, session } // Pass the session
+    // Step 4: Check and delete the associated call booking
+    const callBooking = await CallBooking.findOne({ userId: quote.userId }).session(session); // Find associated call booking
+    if (callBooking) {
+       await CallBooking.findOneAndDelete(
+        { userId: quote.userId },
+        { session } // Pass session for deletion
       );
-
-      if (!deletedUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
-      }
+    } else {
+      console.warn(`No call booking found for userId: ${quote.userId}`);
     }
 
     // Commit the transaction if all operations succeed
     await session.commitTransaction();
     session.endSession();
 
-    return deletedQuote;
+    return deletedQuote; // Return the deleted quote document
   } catch (error) {
     // Rollback the transaction if any operation fails
     await session.abortTransaction();
