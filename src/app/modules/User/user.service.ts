@@ -43,7 +43,7 @@ const getSingleUserIntoDB = async (id: string) => {
   return result;
 };
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false}), query)
+  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false, role: { $ne: 'superAdmin' }}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()
@@ -173,7 +173,7 @@ const updateUserIntoDB = async (id: string, payload: Partial<TUser>, file?: any)
 const deleteUserFromDB = async (id: string) => {
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
-
+ console.log(id, "id");
   try {
     // Step 1: Soft-delete the user
     const deletedUser = await User.findByIdAndDelete(
@@ -187,7 +187,7 @@ const deleteUserFromDB = async (id: string) => {
     }
 
     // Step 2: Soft-delete the associated quote
-    const deletedQuote = await Quote.findByIdAndDelete(
+    const deletedQuote = await Quote.findOneAndDelete(
       { userId: id }, // Find the single quote associated with the user
       // { isDeleted: true }, // Set isDeleted to true
       { new: true, session } // Pass the session
