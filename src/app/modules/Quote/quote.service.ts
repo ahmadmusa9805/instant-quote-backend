@@ -253,51 +253,100 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
   return updatedData;
 };
 
+// const deleteQuoteFromDB = async (id: string) => {
+//   const session = await mongoose.startSession(); // Start a session
+//   session.startTransaction(); // Start transaction
+//   try {
+//     // Step 1: Find and soft-delete the quote
+//     const deletedQuote = await Quote.findByIdAndDelete(
+//       id,
+//       // { isDeleted: true },
+//       { new: true, session } // Pass the session
+//     );
+
+//     if (!deletedQuote) {
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');
+//     }
+
+//     // Step 2: Delete the associated user if the user ID exists in the quote
+//     if (deletedQuote.userId) {
+//       const deletedUser = await User.findByIdAndDelete(
+//         deletedQuote.userId,
+//         // { isDeleted: true },
+//         { new: true, session } // Pass the session
+//       );
+
+//       if (!deletedUser) {
+//         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
+//       }
+
+//       const deletedCallBooking = await CallBooking.findOneAndDelete(
+//         { userId: deletedQuote.userId }, // Correct filter as an object
+//         // { isDeleted: true },
+//         { new: true, session } // Pass the session
+//       );
+
+
+//       if (!deletedCallBooking) {
+//         throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated CallBooking');
+//       }
+
+//     }
+
+//     // Commit the transaction if all operations succeed
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     return deletedQuote;
+//   } catch (error) {
+//     // Rollback the transaction if any operation fails
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error; // Propagate the error to be handled by the caller
+//   }
+// };
 const deleteQuoteFromDB = async (id: string) => {
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
-  try {
-    // Step 1: Find and soft-delete the quote
-    const deletedQuote = await Quote.findByIdAndDelete(
-      id,
-      // { isDeleted: true },
-      { new: true, session } // Pass the session
-    );
 
-    if (!deletedQuote) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Quote');
+  try {
+    // Step 1: Check if the quote exists
+    const quote = await Quote.findById(id).session(session); // Find the quote with the session
+    if (!quote) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Quote not found');
+    }
+    // Step 2: Delete the quote
+    const deletedQuote = await Quote.findByIdAndDelete(id, { session }); // Pass session for deletion
+
+    // Step 3: Check and delete the associated user
+    if (quote.userId) {
+      const user = await User.findById(quote.userId).session(session); // Find the associated user
+      if (user) {
+         await User.findByIdAndDelete(quote.userId, { session }); // Delete the user
+        
+      } else {
+        console.warn(`No user found for userId: ${quote.userId}`);
+      }
+    } else {
+      console.warn(`Quote does not have an associated userId`);
     }
 
-    // Step 2: Delete the associated user if the user ID exists in the quote
-    if (deletedQuote.userId) {
-      const deletedUser = await User.findByIdAndDelete(
-        deletedQuote.userId,
-        // { isDeleted: true },
-        { new: true, session } // Pass the session
+    // Step 4: Check and delete the associated call booking
+    const callBooking = await CallBooking.findOne({ userId: quote.userId }).session(session); // Find associated call booking
+    if (callBooking) {
+       await CallBooking.findOneAndDelete(
+        { userId: quote.userId },
+        { session } // Pass session for deletion
       );
-
-      if (!deletedUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated User');
-      }
-
-      const deletedCallBooking = await CallBooking.findOneAndDelete(
-        { userId: deletedQuote.userId }, // Correct filter as an object
-        // { isDeleted: true },
-        { new: true, session } // Pass the session
-      );
-
-
-      if (!deletedCallBooking) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete associated CallBooking');
-      }
-
+    } else {
+      console.warn(`No call booking found for userId: ${quote.userId}`);
     }
 
     // Commit the transaction if all operations succeed
     await session.commitTransaction();
     session.endSession();
 
-    return deletedQuote;
+    return deletedQuote; // Return the deleted quote document
   } catch (error) {
     // Rollback the transaction if any operation fails
     await session.abortTransaction();
