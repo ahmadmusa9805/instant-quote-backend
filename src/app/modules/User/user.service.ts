@@ -11,6 +11,7 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { Quote } from '../Quote/quote.model';
+import { CallBooking } from '../CallBooking/CallBooking.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
 
@@ -27,7 +28,6 @@ if(payload.role === 'admin'){
 }
     const newUser = await User.create(payload);
     if (!newUser) throw new Error('Failed to create user');
-
     
     return newUser;
 };
@@ -43,7 +43,7 @@ const getSingleUserIntoDB = async (id: string) => {
   return result;
 };
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false}), query)
+  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false, role: { $ne: 'superAdmin' }}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()
@@ -175,34 +175,42 @@ const deleteUserFromDB = async (id: string) => {
   session.startTransaction(); // Start transaction
 
   try {
-    // Step 1: Soft-delete the user
-    const deletedUser = await User.findByIdAndDelete(
-      id,
-      // { isDeleted: true },
-      { new: true, session } // Pass the session
-    );
-
-    if (!deletedUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');
+    // Step 1: Check if the user exists
+    const user = await User.findById(id).session(session); // Find user with session
+    if (!user) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
     }
 
-    // Step 2: Soft-delete the associated quote
-    const deletedQuote = await Quote.findByIdAndDelete(
-      { userId: id }, // Find the single quote associated with the user
-      // { isDeleted: true }, // Set isDeleted to true
-      { new: true, session } // Pass the session
-    );
+    // Step 2: Delete the user
+    const deletedUser = await User.findByIdAndDelete(id, { session }); // Pass session for deletion
 
-    // Optional: Validate that a quote was found and updated
-    if (!deletedQuote) {
-      console.warn(`No quote found for user with ID ${id}`);
+    // Step 3: Check if a quote exists for the user
+    const quote = await Quote.findOne({ userId: id }).session(session); // Check for quote with userId
+    if (quote) {
+     await Quote.findOneAndDelete(
+        { userId: id },
+        { session } // Pass session for deletion
+      );
+    } else {
+      console.log(`No quote found for user with ID ${id}`);
+    }
+
+    // Step 4: Check if a call booking exists for the user
+    const callBooking = await CallBooking.findOne({ userId: id }).session(session); // Check for call booking with userId
+    if (callBooking) {
+     await CallBooking.findOneAndDelete(
+        { userId: id },
+        { session } // Pass session for deletion
+      );
+    } else {
+      console.log(`No call booking found for user with ID ${id}`);
     }
 
     // Commit the transaction if all operations succeed
     await session.commitTransaction();
     session.endSession();
 
-    return deletedUser;
+    return deletedUser; // Return the deleted user document
   } catch (error) {
     // Rollback the transaction if any operation fails
     await session.abortTransaction();
