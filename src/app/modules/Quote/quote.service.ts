@@ -25,7 +25,7 @@ import { Window } from '../Window/Window.model';
 import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 // import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
-import { emailValidate } from '../../utils/emailValidate';
+// import { emailValidate } from '../../utils/emailValidate';
 import { SendEmail } from '../../utils/sendEmail';
 import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
@@ -47,7 +47,7 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
       payload.file = file?.location;
     }
 
-     await emailValidate(payload.email);
+    //  await emailValidate(payload.email);
 
 
 
