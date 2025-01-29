@@ -31,6 +31,8 @@ import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
+
+
   const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
     password,

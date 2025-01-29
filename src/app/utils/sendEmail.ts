@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import nodemailer from 'nodemailer';
 import config from '../config';
+import fs from 'fs';
+// import path from 'path';
+import dotenv from 'dotenv';
+import * as path from 'path';
 
+dotenv.config();
 
 export class SendEmail {
   private static transporter = nodemailer.createTransport({
@@ -31,12 +36,16 @@ export class SendEmail {
   }
   static async sendQuoteEmailToClient(email: string): Promise<void> {
 
+  // Read the HTML template file
+  const templatePath = path.join(process.cwd(), 'src', 'app', 'utils', 'quotationTemplate.html');
+  const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+
     const mailOptions = {
       // from: process.env.EMAIL_USER, // Sender email address
       from: config.admin_email_user, // Sender email address
       to: email, // Recipient email
       subject: 'Your Accoount And Quote Is Created',
-      text: `Your Account and Quote is created. With Email: ${email}.`,
+      html:htmlTemplate,
     };
     try {
       await this.transporter.sendMail(mailOptions);
