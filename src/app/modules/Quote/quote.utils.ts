@@ -61,7 +61,8 @@ export const calculateOtherPrices = async (payload:any) => {
       
         const refurbishCost = refurbishSize.quantity * refurbishSize.price * refurbishType.percentage * finishLevel.percentage;
         const extendCost = extendSize.quantity * extendSize.price * finishLevel.percentage;
-        const bathroomCost = bathrooms.price * bathrooms.quantity || 0;
+        const bathroom = bathrooms.price * bathrooms.quantity || 0;
+        const bathroomCost = bathroom * finishLevel.percentage;
         const windowCost = windowSize.quantity * windowSize.price;
         const extendRefurbishArea = refurbishSize.quantity + extendSize.quantity;
       
@@ -85,7 +86,6 @@ export const calculateOtherPrices = async (payload:any) => {
         payload.startTimePrice = startTimePrice;
         payload.services = finalServices;
         payload.total = grandTotal; // Ensure total is explicitly set
-
 
     return payload;
 };
