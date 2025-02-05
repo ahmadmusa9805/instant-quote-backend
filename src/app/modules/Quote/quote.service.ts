@@ -31,7 +31,7 @@ import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-
+console.log(payload, "payload-musa");	
 
   const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
@@ -50,9 +50,6 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     }
 
     //  await emailValidate(payload.email);
-
-
-
     // Validate the email
     // const { valid, flag } = await emailValidate(payload.email);
     // if (!valid) {
