@@ -5,6 +5,7 @@ export type TService = {
   name: string;
   price: number;
   hotChoice: boolean;
+  info: string;
   isDeleted: boolean;
 };
 
