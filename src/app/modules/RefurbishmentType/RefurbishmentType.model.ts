@@ -5,6 +5,7 @@ import { Schema, model } from 'mongoose';
         title: { type: String, required: true },
         subtitle: { type: String },
         price: { type: Number, required: true },
+        info: { type: String },
         isDeleted: { type: Boolean, default: false },
       });
       

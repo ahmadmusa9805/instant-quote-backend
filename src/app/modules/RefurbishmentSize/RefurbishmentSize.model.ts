@@ -5,6 +5,7 @@ const RefurbishmentSizeSchema = new Schema<TRefurbishmentSize, RefurbishmentSize
   name: { type: String, required: true },
   squareMeterSize: { type: String },
   price: { type: Number, required: true },
+  info: { type: String },
   isDeleted: { type: Boolean, default: false },
 });
 

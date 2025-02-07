@@ -38,12 +38,28 @@ const getMe = async (userEmail: string) => {
   return result;
 };
 const getSingleUserIntoDB = async (id: string) => {
-  const result = await User.findOne({ _id: id, isDeleted: false });
+  const result = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(id), isDeleted: false } },
+    {
+      $lookup: {
+        from: 'quotes', // The MongoDB collection name (usually lowercase plural)
+        localField: '_id',
+        foreignField: 'userId',
+        as: 'quotes',
+      },
+    },
+  ]);
 
-  return result;
+  return result.length ? result[0] : null;
 };
+
+// const getSingleUserIntoDB = async (id: string) => {
+//   const result = await User.findOne({ _id: id, isDeleted: false }).populate('Quote');
+
+//   return result;
+// };
 const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active', isDeleted: false, role: { $ne: 'superAdmin' }}), query)
+  const studentQuery = new QueryBuilder(User.find({ isDeleted: false, role: { $ne: 'superAdmin' }}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()

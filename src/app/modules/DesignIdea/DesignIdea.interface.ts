@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 
 export type TDesignIdea = {
   clarity: string;
+  info: string;
   isDeleted: boolean;
 };
 

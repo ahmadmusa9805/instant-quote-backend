@@ -10,6 +10,7 @@ export const createUserValidationSchema = z.object({
       email: z.string().email('Invalid email format'),
       contactNo: z.string(),
       profileImg: z.string().optional(), // Optional field for file
+      status: z.string().optional(), // Optional field with default value
       isDeleted: z.boolean().optional(), // Optional field with default value
     }),
   }),

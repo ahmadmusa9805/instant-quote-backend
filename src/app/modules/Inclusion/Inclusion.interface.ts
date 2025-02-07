@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 
 export type TInclusion = {
   title: string;
+  info: string;
   isDeleted: boolean;
 };
 

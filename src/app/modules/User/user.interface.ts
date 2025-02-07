@@ -13,8 +13,10 @@ export interface TUser {
   contactNo: string;
   profileImg?: string;
   otpVerified: boolean;
+  propertyAddress: string;
+  propertyPostCode: string;
   role: 'client' | 'superAdmin' | 'admin';
-  status?: 'active' | 'blocked';
+  status?: 'contacted' | 'interested' | 'agreed' | 'notInterested';
   isDeleted: boolean;
 }
 export interface UserModel extends Model<TUser> {

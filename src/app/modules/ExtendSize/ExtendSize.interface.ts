@@ -5,6 +5,7 @@ export type TExtendSize = {
   name: string;
   squareMeterSize: string;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 

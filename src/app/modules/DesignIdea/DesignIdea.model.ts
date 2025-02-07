@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const DesignIdeaSchema = new Schema<TDesignIdea, DesignIdeaModel>({
         clarity: { type: String, required: true },
+        info: { type: String},
         isDeleted: { type: Boolean, default: false },
       });
       
