@@ -15,6 +15,7 @@ export const createExtendSizeValidationSchema = z.object({
 export const updateExtendSizeValidationSchema = z.object({
   body: z.object({
     extendSize: z.object({
+      info: z.string().optional(),
       name: z.string().optional(),
       squareMeterSize: z.string().optional(),
       price: z.number().optional(),

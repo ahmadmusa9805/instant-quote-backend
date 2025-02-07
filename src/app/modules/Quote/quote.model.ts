@@ -150,6 +150,9 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       type: Boolean,
       default: false,
     },
+    note: {
+      type: String,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

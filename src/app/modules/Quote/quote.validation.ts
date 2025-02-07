@@ -47,6 +47,7 @@ export const createQuoteValidationSchema = z.object({
       propertyPostCode: z.string(),
       propertyAddress: z.string(),
       isRead: z.boolean().optional().default(false),
+      note: z.string().optional(),
       isDeleted: z.boolean().optional().default(false),
     }),
   }),

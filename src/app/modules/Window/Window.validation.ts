@@ -16,6 +16,7 @@ export const updateWindowValidationSchema = z.object({
     window: z.object({
       windowSquareMeters: z.number().optional(),
       price: z.number().optional(),
+      info: z.string().optional(),
       isDeleted: z.boolean().optional(),
     }),
   }),

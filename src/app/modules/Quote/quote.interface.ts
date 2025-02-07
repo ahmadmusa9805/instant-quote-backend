@@ -48,6 +48,7 @@ export type  TQuote = {
   propertyAddress: string;
   propertyPostCode: string;
   services: TService[];
+  note: string;
   // services: Array<Record<string, number>>;
   extendCost: number;
   refurbishCost: number;

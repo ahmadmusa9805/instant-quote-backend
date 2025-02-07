@@ -14,6 +14,7 @@ export const createFinishLevelValidationSchema = z.object({
 export const updateFinishLevelValidationSchema = z.object({
   body: z.object({
     finishLevel: z.object({
+      info: z.string().optional(),
       level: z.string().optional(),
       price: z.number().optional(),    
       isDeleted: z.boolean().optional(),
