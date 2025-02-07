@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 
 export type TExclusion = {
   title: string;
+  info: string;
   isDeleted: boolean;
 };
 
