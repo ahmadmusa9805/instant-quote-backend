@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 export type TProperty = {
   name: string;
   image: string;
+  info: string;
   isDeleted: boolean;
 };
 

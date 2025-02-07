@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 export type TFinishLevel = {
   level: string;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 

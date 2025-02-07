@@ -30,6 +30,10 @@ router.get(
   '/get-all-quote-elements',
   QuoteControllers.getAllQuotesElements);
 
+router.patch(
+  '/:id',
+  QuoteControllers.quoteReadStateUpdate,
+);
 router.get(
   '/:id',
   QuoteControllers.getSingleQuote,

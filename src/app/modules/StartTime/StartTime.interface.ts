@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 export type TStartTime = {
   startTime: string;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 

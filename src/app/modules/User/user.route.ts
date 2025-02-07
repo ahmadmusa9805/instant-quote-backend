@@ -70,7 +70,7 @@ router.delete(
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
   uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {

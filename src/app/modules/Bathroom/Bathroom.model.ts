@@ -4,6 +4,7 @@ import { Schema, model } from 'mongoose';
       const BathroomSchema = new Schema<TBathroom, BathroomModel>({
         bathroomQuantity: { type: Number, required: true },
         price: { type: Number, required: true },
+        info: { type: String},
         isDeleted: { type: Boolean, default: false },
       });
       

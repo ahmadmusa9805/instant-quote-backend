@@ -4,6 +4,7 @@ import { Schema, model } from 'mongoose';
       const FinishLevelSchema = new Schema<TFinishLevel, FinishLevelModel>({
         level: { type: String, required: true },
         price: { type: Number, required: true },
+        info: { type: String},
         isDeleted: { type: Boolean, default: false },
       });
       

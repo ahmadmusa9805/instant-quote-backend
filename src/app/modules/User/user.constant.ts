@@ -10,4 +10,6 @@ export const usersSearchableFields = [
   'address',
 ];
 
+
 export const UserStatus = ['active', 'blocked'];
+export const userState = ['contacted', 'interested', 'agreed', 'notInterested'];

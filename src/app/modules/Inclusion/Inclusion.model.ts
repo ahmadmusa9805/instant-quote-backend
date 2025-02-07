@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const InclusionSchema = new Schema<TInclusion, InclusionModel>({
         title: { type: String, required: true },
+        info: { type: String},
         isDeleted: { type: Boolean, default: false },
       });
       

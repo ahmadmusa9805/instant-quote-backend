@@ -5,6 +5,7 @@ import { Schema, model } from 'mongoose';
         name: { type: String, required: true },
         squareMeterSize: { type: String },
         price: { type: Number, required: true },
+        info: { type: String},
         isDeleted: { type: Boolean, default: false },
       });
       

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 export type TWindow = {
   windowSquareMeters: number;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 
