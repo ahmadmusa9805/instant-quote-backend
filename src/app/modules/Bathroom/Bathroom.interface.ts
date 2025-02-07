@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 export type TBathroom = {
   bathroomQuantity: number;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 

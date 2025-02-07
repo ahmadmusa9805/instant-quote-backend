@@ -5,6 +5,7 @@ export const createBathroomValidationSchema = z.object({
     bathroom: z.object({
       bathroomQuantity: z.number(),
       price: z.number(),
+      info: z.string().optional(),
       isDeleted: z.boolean().default(false),
     }),
   }),

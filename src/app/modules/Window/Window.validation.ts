@@ -5,6 +5,7 @@ export const createWindowValidationSchema = z.object({
     window: z.object({
       windowSquareMeters: z.number({ required_error: 'Window square meters is required' }),
       price: z.number({ required_error: 'Price is required' }),
+      info: z.string().optional(),
       isDeleted: z.boolean().default(false),
     }),
   }),
