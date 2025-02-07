@@ -29,11 +29,11 @@ const loginUser = async (payload: TLoginUser) => {
 
   // checking if the user is blocked
 
-  const userStatus = user?.status;
+  // const userStatus = user?.status;
 
-  if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
+  // if (userStatus === 'blocked') {
+  //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  // }
 
   //checking if the password is correct
 
@@ -123,12 +123,12 @@ const refreshToken = async (token: string) => {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
-  // checking if the user is blocked
-  const userStatus = user?.status;
+  // // checking if the user is blocked
+  // const userStatus = user?.status;
 
-  if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
+  // if (userStatus === 'blocked') {
+  //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  // }
 
   if (
     user.passwordChangedAt &&
@@ -169,11 +169,11 @@ const forgetPassword = async (userEmail: string) => {
   }
 
   // checking if the user is blocked
-  const userStatus = user?.status;
+  // const userStatus = user?.status;
 
-  if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
+  // if (userStatus === 'blocked') {
+  //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  // }
   
   const jwtPayload = {
     userEmail: user.email,
@@ -223,11 +223,11 @@ const resetPassword = async (
   }
 
   // checking if the user is blocked
-  const userStatus = user?.status;
+  // const userStatus = user?.status;
 
-  if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
+  // if (userStatus === 'blocked') {
+  //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  // }
 
   const decoded = jwt.verify(
     token,
