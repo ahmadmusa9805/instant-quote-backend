@@ -138,6 +138,18 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
         default: 0, 
       },
     // },
+    propertyPostCode: {
+      type: String,
+      required: true,
+    },
+    propertyAddress: {
+      type: String,
+      required: true,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

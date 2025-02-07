@@ -31,7 +31,6 @@ import { CallBooking } from '../CallBooking/CallBooking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-console.log(payload, "payload-musa");	
 
   const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
@@ -40,7 +39,11 @@ console.log(payload, "payload-musa");
     email: payload.email,
     contactNo: payload.contactNo,
     name: payload.name,
+    propertyAddress: payload.propertyAddress, 
+    propertyPostCode: payload.propertyPostCode,
+    status: payload.status
   };
+
 
   const session = await mongoose.startSession();
   try {
@@ -48,7 +51,6 @@ console.log(payload, "payload-musa");
     if (file) {
       payload.file = file?.location;
     }
-
     //  await emailValidate(payload.email);
     // Validate the email
     // const { valid, flag } = await emailValidate(payload.email);
@@ -58,11 +60,21 @@ console.log(payload, "payload-musa");
 
     const user = await User.findOne({ email: payload.email , isDeleted: false});
     if (user) {
-      
       const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
-
       if(quote){
-        throw new Error('User Have already Created a Quote');
+        // throw new Error('User Have already Created a Quote');
+         
+     const updatedData = await Quote.findOneAndUpdate( { _id: quote._id },
+         payload,
+         { new: true, runValidators: true },
+      );
+
+  if (!updatedData) {
+    throw new Error('Quote not found after update');
+  } 
+    
+        return updatedData
+
       }
     }
    
@@ -221,9 +233,25 @@ const getAllQuotesElementsFromDB = async () => {
 
 
 const getSingleQuoteFromDB = async (id: string) => {
-  const result = await Quote.findOne({ _id: id, isDeleted: false }).populate('userId');
+  const result = await Quote.findOneAndUpdate(
+    { _id: id, isDeleted: false }, // Find the quote
+    // { $set: { isRead: true } }, // Update isRead to true
+    { new: true } // Return the updated document
+  ).populate('userId');
+
   return result;
 };
+
+const quoteReadStateUpdateFromDB = async (id: string) => {
+  const result = await Quote.findOneAndUpdate(
+    { _id: id, isDeleted: false }, // Find the quote
+    { $set: { isRead: true } }, // Update isRead to true
+    { new: true } // Return the updated document
+  ).populate('userId');
+
+  return result;
+};
+
 
 const updateQuoteIntoDB = async (id: string, payload: any) => {
   const isDeletedService = await mongoose.connection
@@ -361,5 +389,6 @@ export const QuoteServices = {
   updateQuoteIntoDB,
   deleteQuoteFromDB,
   getAllQuotesByUserFromDB,
-  getAllQuotesElementsFromDB
+  getAllQuotesElementsFromDB,
+  quoteReadStateUpdateFromDB
 };

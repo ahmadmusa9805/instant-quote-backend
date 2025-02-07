@@ -4,6 +4,7 @@ export const createPropertyValidationSchema = z.object({
   body: z.object({
     property: z.object({
       name: z.string(),
+      info: z.string().optional(),
       isDeleted: z.boolean().default(false),
     }),
   }),

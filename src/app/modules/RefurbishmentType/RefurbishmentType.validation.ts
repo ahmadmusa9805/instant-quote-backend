@@ -6,6 +6,7 @@ export const createRefurbishmentTypeValidationSchema = z.object({
     title: z.string(),
     subtitle: z.string().optional(),
     price: z.number(),
+    info: z.string().optional(),
     isDeleted: z.boolean().default(false),
   }),
 });

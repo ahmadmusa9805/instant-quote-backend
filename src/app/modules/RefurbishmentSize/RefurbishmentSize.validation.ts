@@ -6,6 +6,7 @@ export const createRefurbishmentSizeValidationSchema = z.object({
       name: z.string(),
       squareMeterSize: z.string(),
       price: z.number(),
+      info: z.string().optional(),
       isDeleted: z.boolean().default(false),
     }),
   }),

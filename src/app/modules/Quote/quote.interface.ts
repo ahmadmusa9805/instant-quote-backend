@@ -52,6 +52,7 @@ export type  TQuote = {
   extendCost: number;
   refurbishCost: number;
   total: number;
+  isRead: boolean;
   isDeleted: boolean;
 }
 

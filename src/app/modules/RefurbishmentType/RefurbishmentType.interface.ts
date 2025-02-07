@@ -5,6 +5,7 @@ export type TRefurbishmentType = {
   title: string;
   subtitle: string;
   price: number;
+  info: string;
   isDeleted: boolean;
 };
 

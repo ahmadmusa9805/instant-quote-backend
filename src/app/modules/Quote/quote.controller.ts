@@ -6,7 +6,7 @@ import { QuoteServices } from './quote.service';
 
 const createQuote = catchAsync(async (req, res) => {
   const { quote: quoteData } = req.body;
-
+   console.log(req.file, 'req.file');
   const result = await QuoteServices.createQuoteIntoDB(quoteData, req.file);
 
   sendResponse(res, {
@@ -25,6 +25,17 @@ const getSingleQuote = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Quote is retrieved successfully',
+    data: result,
+  });
+});
+const quoteReadStateUpdate = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await QuoteServices.quoteReadStateUpdateFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Quote Read State update successfully',
     data: result,
   });
 });
@@ -96,5 +107,6 @@ export const QuoteControllers = {
   getAllQuotes,
   updateQuote,
   getAllQuotesByUser,
-  getAllQuotesElements
+  getAllQuotesElements,
+  quoteReadStateUpdate
 };
