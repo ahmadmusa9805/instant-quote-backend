@@ -29,7 +29,9 @@ const getSingleQuote = catchAsync(async (req, res) => {
 });
 const quoteReadStateUpdate = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await QuoteServices.quoteReadStateUpdateFromDB(id);
+  const { quote: quoteData } = req.body;
+
+  const result = await QuoteServices.quoteReadStateUpdateFromDB(id, quoteData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -77,7 +79,10 @@ const getAllQuotesElements = catchAsync(async (req, res) => {
 
 const updateQuote = catchAsync(async (req, res) => {
   const { id } = req.params;
+  console.log(req.body, "req.body", id);
   const { quote: quoteData } = req.body;
+  console.log(quoteData, "quoteData", id);
+
   const result = await QuoteServices.updateQuoteIntoDB(id, quoteData);
 
   sendResponse(res, {
