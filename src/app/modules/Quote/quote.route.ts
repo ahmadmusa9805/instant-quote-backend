@@ -30,20 +30,34 @@ router.get(
   '/get-all-quote-elements',
   QuoteControllers.getAllQuotesElements);
 
+
+  
 router.patch(
-  '/:id',
+  '/is-read/:id',
   QuoteControllers.quoteReadStateUpdate,
 );
+
 router.get(
   '/:id',
   QuoteControllers.getSingleQuote,
 );
-
 router.patch(
   '/:id',
+  uploadFileS3(true).single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.data) {
+    try {
+      req.body = JSON.parse(req.body.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+  next();
+},
   // validateRequest(QuoteValidation.updateQuoteValidationSchema),
   QuoteControllers.updateQuote,
 );
+
 
 router.delete(
   '/:id',
@@ -56,9 +70,5 @@ router.get(
 router.get(
   '/user/:id',
   QuoteControllers.getAllQuotesByUser,);
-
-
-
-
 
 export const QuoteRoutes = router;
