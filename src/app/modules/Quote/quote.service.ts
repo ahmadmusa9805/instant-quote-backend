@@ -22,7 +22,8 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
+import { calculateOtherPrices } from './quote.utils';
+// import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 // import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
 // import { emailValidate } from '../../utils/emailValidate';
@@ -32,7 +33,8 @@ import { CallBooking } from '../CallBooking/CallBooking.model';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
 
-  const password = payload.password || generateRandomPassword();
+  const password = payload.password;
+  // const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
     password,
     role: 'client',
@@ -60,22 +62,23 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 
     const user = await User.findOne({ email: payload.email , isDeleted: false});
     if (user) {
-      const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
-      if(quote){
-        // throw new Error('User Have already Created a Quote');
+      payload.userId = user._id
+  //     const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
+  //     if(quote){
+  //       // throw new Error('User Have already Created a Quote');
          
-     const updatedData = await Quote.findOneAndUpdate( { _id: quote._id },
-         payload,
-         { new: true, runValidators: true },
-      );
+  //    const updatedData = await Quote.findOneAndUpdate( { _id: quote._id },
+  //        payload,
+  //        { new: true, runValidators: true },
+  //     );
 
-  if (!updatedData) {
-    throw new Error('Quote not found after update');
-  } 
+  // if (!updatedData) {
+  //   throw new Error('Quote not found after update');
+  // } 
     
-        return updatedData
+  //       return updatedData
 
-      }
+  //     }
     }
    
    if(!user){
@@ -242,10 +245,10 @@ const getSingleQuoteFromDB = async (id: string) => {
   return result;
 };
 
-const quoteReadStateUpdateFromDB = async (id: string) => {
+const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
   const result = await Quote.findOneAndUpdate(
     { _id: id, isDeleted: false }, // Find the quote
-    { $set: { isRead: true } }, // Update isRead to true
+    { $set: { isRead: payload } }, // Update isRead to true
     { new: true } // Return the updated document
   ).populate('userId');
 
@@ -254,14 +257,15 @@ const quoteReadStateUpdateFromDB = async (id: string) => {
 
 
 const updateQuoteIntoDB = async (id: string, payload: any) => {
+
   const isDeletedService = await mongoose.connection
     .collection('quotes')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, title: 1 } },
+      // { projection: { isDeleted: 1} },
     );
 
-  if (!isDeletedService?.title) {
+  if (!isDeletedService) {
     throw new Error('Quote not found');  }
 
   if (isDeletedService.isDeleted) {
@@ -272,6 +276,7 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
     payload,
     { new: true, runValidators: true },
   );
+
 
   if (!updatedData) {
     throw new Error('Quote not found after update');
