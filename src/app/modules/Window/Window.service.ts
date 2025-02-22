@@ -97,9 +97,8 @@ const updateWindowIntoDB = async (id: string, payload: any) => {
 };
 
 const deleteWindowFromDB = async (id: string) => {
-  const deletedService = await Window.findByIdAndUpdate(
+  const deletedService = await Window.findByIdAndDelete(
     id,
-    { isDeleted: true },
     { new: true },
   );
 
