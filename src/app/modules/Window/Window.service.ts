@@ -68,14 +68,15 @@ const getSingleWindowFromDB = async (id: string) => {
 };
 
 const updateWindowIntoDB = async (id: string, payload: any) => {
+
   const isDeletedService = await mongoose.connection
     .collection('windows')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, windowSquareMeters: 1 } },
+      // { projection: { isDeleted: 1, windowSquareMeters: 1 } },
     );
 
-  if (!isDeletedService?.windowSquareMeters) {
+  if (!isDeletedService) {
     throw new Error('Window not found');
   }
 
