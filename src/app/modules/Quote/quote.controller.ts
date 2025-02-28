@@ -79,9 +79,7 @@ const getAllQuotesElements = catchAsync(async (req, res) => {
 
 const updateQuote = catchAsync(async (req, res) => {
   const { id } = req.params;
-  console.log(req.body, "req.body", id);
   const { quote: quoteData } = req.body;
-  console.log(quoteData, "quoteData", id);
 
   const result = await QuoteServices.updateQuoteIntoDB(id, quoteData);
 

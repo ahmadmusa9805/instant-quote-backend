@@ -56,6 +56,7 @@ function calculateTotalValues(data: Record<string, number>): number {
 
 
 export const calculateOtherPrices = async (payload:any) => {
+
         const { refurbishSize, refurbishType, extendSize, finishLevel, bathrooms, windowSize, service, startTime } = payload;
         // const service = convertKeysToCamelCase(servicePayload);
       
