@@ -244,6 +244,15 @@ const getSingleQuoteFromDB = async (id: string) => {
 
   return result;
 };
+// const getLastQuoteFromDB = async () => {
+//   const result = await Quote.findOneAndUpdate(
+//     { isDeleted: false }, // Find the quote
+//     // { $set: { isRead: true } }, // Update isRead to true
+//     { new: true } // Return the updated document
+//   ).populate('userId');
+
+//   return result;
+// };
 
 const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
   const result = await Quote.findOneAndUpdate(
@@ -258,29 +267,45 @@ const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
 
 const updateQuoteIntoDB = async (id: string, payload: any) => {
 
-  const isDeletedService = await mongoose.connection
-    .collection('quotes')
-    .findOne(
-      { _id: new mongoose.Types.ObjectId(id) },
-      // { projection: { isDeleted: 1} },
-    );
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error("Invalid ID format");
+  }
+
+  const isDeletedService = await Quote.findOne({
+    _id: new mongoose.Types.ObjectId(id),
+    isDeleted: false,
+  });
+
 
   if (!isDeletedService) {
-    throw new Error('Quote not found');  }
-
-  if (isDeletedService.isDeleted) {
-    throw new Error('Cannot update a deleted Quote');
+    throw new Error("Quote not found");
   }
 
-  const updatedData = await Quote.findByIdAndUpdate(    { _id: id },
-    payload,
-    { new: true, runValidators: true },
+  const modifyPayload = await calculateOtherPrices(payload);
+
+  const updatedData = await Quote.findByIdAndUpdate(
+    id,
+    modifyPayload,
+    { new: true, runValidators: true }
   );
 
-
   if (!updatedData) {
-    throw new Error('Quote not found after update');
+    throw new Error("Quote not found after update");
   }
+
+  await NotificationServices.createNotificationIntoDB({
+    type: "quote",
+    message: `New quote created with Email: ${payload.email}`,
+    isDeleted: false,
+    isRead: false,
+    createdAt: new Date(),
+  });
+
+      // if(!user){
+    //   await SendEmail.sendQuoteEmailToClient(
+    //     payload.email,
+    //   );
+    // }
 
   return updatedData;
 };
@@ -395,5 +420,6 @@ export const QuoteServices = {
   deleteQuoteFromDB,
   getAllQuotesByUserFromDB,
   getAllQuotesElementsFromDB,
-  quoteReadStateUpdateFromDB
+  quoteReadStateUpdateFromDB,
+  // getLastQuoteFromDB
 };
