@@ -13,8 +13,8 @@ export interface TUser {
   contactNo: string;
   profileImg?: string;
   otpVerified: boolean;
-  propertyAddress: string;
-  propertyPostCode: string;
+  propertyAddress?: string;
+  propertyPostCode?: string;
   role: 'client' | 'superAdmin' | 'admin';
   status?: 'contacted' | 'interested' | 'agreed' | 'notInterested';
   isDeleted: boolean;
