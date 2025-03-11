@@ -30,7 +30,6 @@ const getSingleQuote = catchAsync(async (req, res) => {
 const quoteReadStateUpdate = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { quote: quoteData } = req.body;
-
   const result = await QuoteServices.quoteReadStateUpdateFromDB(id, quoteData);
 
   sendResponse(res, {
