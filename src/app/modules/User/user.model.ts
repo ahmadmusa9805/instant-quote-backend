@@ -50,11 +50,9 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     propertyPostCode: {
       type: String,
-      required: true,
     },
     propertyAddress: {
       type: String,
-      required: true,
     },
     status: {
       type: String,

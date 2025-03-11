@@ -39,7 +39,7 @@ app.use(express.json({ verify: (req: any, res, buf) => { req.rawBody = buf.toStr
 app.use('/api/v1', router);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome To Property API!');
+  res.send('Welcome To Property-Development API !');
 });
 
 // app.post('/upload/single',  uploadFileS3(true).single('img'), (req: Request, res: Response) => {

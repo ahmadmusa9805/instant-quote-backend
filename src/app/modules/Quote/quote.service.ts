@@ -255,9 +255,18 @@ const getSingleQuoteFromDB = async (id: string) => {
 // };
 
 const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
+  console.log(payload, id);
+
+// Ensure payload is a boolean value, not an object
+const isRead = payload.isRead ?? payload;  // Extract isRead if payload is an object
+
+if (typeof isRead !== 'boolean') {
+  throw new Error('isRead must be a boolean value');
+}
+
   const result = await Quote.findOneAndUpdate(
     { _id: id, isDeleted: false }, // Find the quote
-    { $set: { isRead: payload } }, // Update isRead to true
+    { $set: { isRead: isRead } }, // Update isRead to true
     { new: true } // Return the updated document
   ).populate('userId');
 
