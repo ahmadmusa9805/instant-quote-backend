@@ -14,7 +14,6 @@ import { Quote } from '../Quote/quote.model';
 import { CallBooking } from '../CallBooking/CallBooking.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
-  console.log(payload, "payload");
 
 if(payload.role === 'client'){
   if(!payload.password){
