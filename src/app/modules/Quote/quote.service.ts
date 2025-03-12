@@ -149,6 +149,7 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
   // Step 4: Fetch the Quotes with Pagination
   const quotes = await Quote.find(baseQuery)
     .populate(populateQuery)
+    .sort({ createdAt: -1 }) // Sort by createdAt in descending order
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize);
 
@@ -255,8 +256,6 @@ const getSingleQuoteFromDB = async (id: string) => {
 // };
 
 const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
-  console.log(payload, id);
-
 // Ensure payload is a boolean value, not an object
 const isRead = payload.isRead ?? payload;  // Extract isRead if payload is an object
 
