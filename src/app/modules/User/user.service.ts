@@ -75,7 +75,7 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
   };
 };
 const getAllAdminUsersFromDB = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(User.find({status: 'active',role: 'admin', isDeleted: false}), query)
+  const studentQuery = new QueryBuilder(User.find({role: 'admin', isDeleted: false}), query)
     .search(usersSearchableFields)
     .filter()
     .sort()
