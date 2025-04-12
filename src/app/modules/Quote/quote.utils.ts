@@ -65,9 +65,10 @@ export const calculateOtherPrices = async (payload:any) => {
         const bathroom = bathrooms.price * bathrooms.quantity || 0;
         const bathroomCost = bathroom * finishLevel.percentage;
         const windowCost = windowSize.quantity * windowSize.price;
-        const extendRefurbishArea = refurbishSize.quantity + extendSize.quantity;
+        const extendArea = extendSize.quantity;
+        // const extendRefurbishArea = refurbishSize.quantity + extendSize.quantity;
       
-        const services = calculateScaledValues(extendRefurbishArea, service);
+        const services = calculateScaledValues(extendArea, service);
         const startTimeCost = Number(startTime.percentage);
         const serviceTotal = calculateTotalValues(services);
       
