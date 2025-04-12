@@ -8,7 +8,7 @@ const CallAvailabilitySchema = new Schema<TCallAvailability, CallAvailabilityMod
         day: { type: String, required: true },
         startTime : { type: String, required: true },
         endTime: { type: String, required: true },
-        date: { type: Date, required: true },
+        date: { type: Date },
         isDeleted: { type: Boolean, default: false },
 });
       
