@@ -5,6 +5,7 @@ import { CallBookingServices } from './CallBooking.service';
 
 const createCallBooking = catchAsync(async (req, res) => {
   const { callBooking: CallBookingData } = req.body;
+  console.log(CallBookingData, "test from controller");
   const result = await CallBookingServices.createCallBookingIntoDB(CallBookingData);
 
   sendResponse(res, {

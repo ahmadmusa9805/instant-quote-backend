@@ -7,10 +7,10 @@ export type TCallBooking = {
   userId: Types.ObjectId;
   quoteId: Types.ObjectId;
   day: string;
-  date: Date;
   startTime: string;
-  state: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   endTime: string;
+  date: Date;
+  state: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   isDeleted: boolean;
 };
 
