@@ -175,33 +175,40 @@ const forgetPassword = async (userEmail: string) => {
   //   throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   // }
   
-  const jwtPayload = {
-    userEmail: user.email,
-    role: user.role,
-  };
+  // const jwtPayload = {
+  //   userEmail: user.email,
+  //   role: user.role,
+  // };
 
-  const resetToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    '10m',
-  );
+  // const resetToken = createToken(
+  //   jwtPayload,
+  //   config.jwt_access_secret as string,
+  //   '10m',
+  // );
 
   // const resetUILink = `${config.reset_pass_ui_link}?email=${user.email}&token=${resetToken} `;
   // // console.log(resetUILink, 'resetUILink');
 
   // SendEmail.sendResetLinkToEmail(user.email, resetUILink);
           // console.log(newCustomer, 'newCustomer');
-          if(user.role === 'admin' || user.role === 'superAdmin'){
-            const otp = await OtpServices.generateAndSendOTP(user.email);
+  // if(user.role === 'admin' || user.role === 'superAdmin'){
+  //   const otp = await OtpServices.generateAndSendOTP(user.email);
+  //     if (!otp) {
+  //         throw new AppError(httpStatus.FORBIDDEN, 'Otp not created ! !');
+  //       }
+  //   return {otp, resetToken};
+  //  }
 
-            if (!otp) {
-              throw new AppError(httpStatus.FORBIDDEN, 'Otp not created ! !');
-            }
-  
-            return {otp, resetToken};
-          }
+  // return {resetToken};
 
-          return {resetToken};
+
+
+    const otp = await OtpServices.generateAndSendOTP(user.email);
+      if (!otp) {
+          throw new AppError(httpStatus.FORBIDDEN, 'Otp not created ! !');
+        }
+    return "OTP sent to the email succesfully!";
+   
    
 };
 

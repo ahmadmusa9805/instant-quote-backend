@@ -11,6 +11,10 @@ router.post(
   '/generate-otp',
   OtpControllers.generateOtp,
 );
+router.post(
+  '/verify-forget-password',
+  OtpControllers.otpVeryfyForgetPassword,
+);
 
 // router.patch(
 //   '/:id',
