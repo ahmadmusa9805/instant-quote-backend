@@ -76,7 +76,6 @@ const updatePropertyIntoDB = async (id: string, payload: any, file: any) => {
  if (file) {
     payload.image = file.location as string;
   }
-
   const property = await mongoose.connection
   .collection('properties')
   .findOne(

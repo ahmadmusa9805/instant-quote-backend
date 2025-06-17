@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types} from 'mongoose';
 
 export type TPropertyPart = {
   name: string;
+  subscriberId: Types.ObjectId;
   image: string;
   info: string;
   isDeleted: boolean;
