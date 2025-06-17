@@ -11,13 +11,6 @@ import { UserValidation } from './user.validation';
 import { uploadFileS3 } from '../../utils/UploaderS3';
 
 const router = express.Router();
-// router.post(
-//   '/create-actor',
-//   validateRequest(createActorValidationSchema),
-//   UserControllers.createActor,
-// );
-
-
 router.post(
   '/create-user',
   // auth(USER_ROLE.superAdmin),
@@ -27,50 +20,50 @@ router.post(
 
 router.get(
   '/me',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client, USER_ROLE.subscriber),
   UserControllers.getMe,
 );
 
 router.get(
   '/admin',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   UserControllers.getAllAdminUsers,
 );
 
 router.get(
   '/users-monthly',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   UserControllers.getUsersMonthly,
 );
 
 router.get(
   '/:id',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   UserControllers.getSingleUser,
 );
 
 router.post(
   '/change-status/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
 //   validateRequest(UserValidation.changeStatusValidationSchema),
   UserControllers.changeStatus,
 );
 
 router.get(
   '/',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   UserControllers.getAllUsers,
 );
 
 router.delete(
   '/:id',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   UserControllers.deleteUser,
 );
 
 router.patch(
   '/:id',
-  // auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.client, USER_ROLE.subscriber),
   uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
