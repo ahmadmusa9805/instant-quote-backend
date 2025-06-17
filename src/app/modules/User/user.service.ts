@@ -15,6 +15,8 @@ import { CallBooking } from '../CallBooking/CallBooking.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
 
+  
+
 if(payload.role === 'client'){
   if(!payload.password){
     payload.password = 'client12345';
@@ -91,13 +93,14 @@ const getAllAdminUsersFromDB = async (query: Record<string, unknown>) => {
   };
 };
 const getUsersMonthlyFromDB = async () => {
+  console.log('test now sertvice');
   const startOfYear = new Date(new Date().getFullYear(), 0, 1); // January 1st, current year
   const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1); // January 1st, next year
+  console.log(startOfYear, 'endOfYear', endOfYear);
 
   const result = await User.aggregate([
     {
       $match: {
-        status: 'active',
         isDeleted: false,
         createdAt: { $gte: startOfYear, $lt: endOfYear } // Filter users created in the current year
       }
@@ -113,14 +116,63 @@ const getUsersMonthlyFromDB = async () => {
     }
   ]);
 
+  console.log(result, 'result');
+
+
   // Format result to include month names (optional)
   const formattedResult = result.map(item => ({
     month: new Date(0, item._id - 1).toLocaleString('default', { month: 'long' }),
     count: item.count
   }));
 
+  console.log(formattedResult, 'formattedResult');
+
+
   return formattedResult;
 };
+// const getUsersMonthlyFromDB = async () => {
+//   console.log('test now service');
+
+//   const now = new Date();
+//   const startOfYear = new Date(Date.UTC(now.getFullYear(), 0, 1));
+//   const endOfYear = new Date(Date.UTC(now.getFullYear() + 1, 0, 1));
+
+//   console.log('startOfYear:', startOfYear, 'endOfYear:', endOfYear);
+
+//   const result = await User.aggregate([
+//     {
+//       $match: {
+//         // status: 'active',
+//         isDeleted: false,
+//         createdAt: { $gte: startOfYear, $lt: endOfYear }
+//       }
+//     },
+//     {
+//       $group: {
+//         _id: { $month: "$createdAt" },    
+//         count: { $sum: 1 }
+//       }
+//     },
+//     {
+//       $sort: { _id: 1 }
+//     }
+//   ]);
+
+//   console.log('aggregation result:', result);
+
+//   const allMonths = Array.from({ length: 12 }, (_, i) => ({
+//     month: new Date(0, i).toLocaleString('default', { month: 'long' }),
+//     count: 0
+//   }));
+
+//   result.forEach(item => {
+//     allMonths[item._id - 1].count = item.count;
+//   });
+
+//   console.log('formattedResult:', allMonths);
+//   return allMonths;
+// };
+
 
 
 const changeStatus = async (id: string, payload: { status: string }) => {
