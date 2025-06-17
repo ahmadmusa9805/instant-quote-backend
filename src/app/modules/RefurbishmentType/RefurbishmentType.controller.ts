@@ -5,7 +5,7 @@ import { RefurbishmentTypeServices } from './RefurbishmentType.service';
 
 const createRefurbishmentType = catchAsync(async (req, res) => {
   const { refurbishmentType: RefurbishmentTypeData } = req.body;
-  const result = await RefurbishmentTypeServices.createRefurbishmentTypeIntoDB(RefurbishmentTypeData);
+  const result = await RefurbishmentTypeServices.createRefurbishmentTypeIntoDB(RefurbishmentTypeData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleRefurbishmentType = catchAsync(async (req, res) => {
 });
 
 const getAllRefurbishmentTypes = catchAsync(async (req, res) => {
-  const result = await RefurbishmentTypeServices.getAllRefurbishmentTypesFromDB(req.query);
+  const result = await RefurbishmentTypeServices.getAllRefurbishmentTypesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

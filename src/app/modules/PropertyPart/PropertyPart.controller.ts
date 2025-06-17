@@ -5,7 +5,7 @@ import { PropertyPartServices } from './PropertyPart.service';
 
 const createPropertyPart = catchAsync(async (req, res) => {
   const { propertyPart: PropertyPartData } = req.body;
-  const result = await PropertyPartServices.createPropertyPartIntoDB(PropertyPartData, req.file);
+  const result = await PropertyPartServices.createPropertyPartIntoDB(PropertyPartData, req.file, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
 
       const RefurbishmentTypeSchema = new Schema<TRefurbishmentType, RefurbishmentTypeModel>({
         title: { type: String, required: true },
+        subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         subtitle: { type: String },
         price: { type: Number, required: true },
         info: { type: String },

@@ -10,8 +10,15 @@ import { User } from '../User/user.model';
 
 const createPropertyPartIntoDB = async (
   payload: TPropertyPart,
-  file: any
+  file: any, 
+  user: any
 ) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
+
   if (file) {
     payload.image = file.location as string;
   }
@@ -49,7 +56,6 @@ const getAllPropertyPartsFromDB = async (query: Record<string, unknown>, user:an
 };
 
 const getSinglePropertyPartFromDB = async (id: string) => {
-   console.log(id, "yes");
   const propertyPart = await mongoose.connection
   .collection('propertyparts')
   .findOne(

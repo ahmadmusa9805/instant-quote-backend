@@ -11,8 +11,15 @@ import { User } from '../User/user.model';
 
 const createPropertyIntoDB = async (
   payload: TProperty,
-  file: any
+  file: any,
+  user: any
 ) => {
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   if (file) {
     payload.image = file.location as string;
   }
