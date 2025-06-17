@@ -8,6 +8,9 @@ export const USER_ROLE = {
 export const usersSearchableFields = [
   'email',
   'address',
+  'name.firstName',
+  'name.lastName',
+  'name'
 ];
 
 

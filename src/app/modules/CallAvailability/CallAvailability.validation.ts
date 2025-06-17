@@ -7,7 +7,7 @@ export const createCallAvailabilityValidationSchema = z.object({
       adminId: z.string().min(1),
       startTime : z.string().min(1),
       endTime: z.string().min(1),
-      date: z.preprocess((val) => new Date( val as string), z.date()),
+      date: z.preprocess((val) => new Date( val as string), z.date()).optional(),
       isDeleted: z.boolean().default(false),
     }),
   }),
