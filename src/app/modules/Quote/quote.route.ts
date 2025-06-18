@@ -7,6 +7,9 @@ import { QuoteControllers } from './quote.controller';
 import {  QuoteValidation } from './quote.validation';
 
 import { uploadFileS3 } from '../../utils/UploaderS3';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from '../User/user.constant';
+// import { USER_ROLE } from './quote.constant';
 
 const router = express.Router();
 router.post(
@@ -34,15 +37,18 @@ router.get(
   
 router.patch(
   '/is-read/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
   QuoteControllers.quoteReadStateUpdate,
 );
 
 router.get(
   '/:id',
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber, USER_ROLE.client),
   QuoteControllers.getSingleQuote,
 );
 router.patch(
   '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber, USER_ROLE.client),
   uploadFileS3(true).single('file'),
   (req: Request, res: Response, next: NextFunction) => {
   if (req.body.data) {
@@ -54,21 +60,26 @@ router.patch(
   }
   next();
 },
-  // validateRequest(QuoteValidation.updateQuoteValidationSchema),
+  validateRequest(QuoteValidation.updateQuoteValidationSchema),
   QuoteControllers.updateQuote,
 );
 
 
 router.delete(
   '/:id',
-  QuoteControllers.deleteQuote,);
+    auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber, USER_ROLE.client),
+  QuoteControllers.deleteQuote,
+);
 
 router.get(
   '/',
-  QuoteControllers.getAllQuotes,);
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
+  QuoteControllers.getAllQuotes,
+);
 
 router.get(
   '/user/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber, USER_ROLE.client),
   QuoteControllers.getAllQuotesByUser,);
 
 export const QuoteRoutes = router;

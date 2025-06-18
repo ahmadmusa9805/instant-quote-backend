@@ -46,8 +46,8 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
-const getAllAdminUsers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllAdminUsersFromDB(req.query);
+const getAllUsersForSubscriber = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUsersForSubscriberFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -70,7 +70,6 @@ const getAllUsers = catchAsync(async (req, res) => {
 });
 
 const getUsersMonthly = catchAsync(async (req, res) => {
-  console.log('test now');
   const result = await UserServices.getUsersMonthlyFromDB(req.user);
 
   sendResponse(res, {
@@ -119,7 +118,7 @@ const deleteUser = catchAsync(async (req, res) => {
 });
 
 export const UserControllers = {
-  getAllAdminUsers,
+  getAllUsersForSubscriber,
   getSingleUser,
   getUsersMonthly,
   deleteUser,

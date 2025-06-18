@@ -41,7 +41,7 @@ const quoteReadStateUpdate = catchAsync(async (req, res) => {
 });
 
 const getAllQuotes = catchAsync(async (req, res) => {
-  const result = await QuoteServices.getAllQuotesFromDB(req.query);
+  const result = await QuoteServices.getAllQuotesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -92,7 +92,7 @@ const updateQuote = catchAsync(async (req, res) => {
 
 const deleteQuote = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await QuoteServices.deleteQuoteFromDB(id);
+  const result = await QuoteServices.deleteQuoteFromDB(id, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

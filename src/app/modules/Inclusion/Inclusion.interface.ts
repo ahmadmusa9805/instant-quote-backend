@@ -3,7 +3,7 @@ import { Model,Types } from 'mongoose';
 
 export type TInclusion = {
   title: string;
-    subscriberId: Types.ObjectId;
+  subscriberId: Types.ObjectId;
   info: string;
   isDeleted: boolean;
 };
