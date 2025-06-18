@@ -122,18 +122,24 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
 };
 
 const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => {
-
-
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
+
 
   // Step 1: Extract searchTerm, page, and limit from the query
   const { searchTerm, page = 1, limit = 10 } = query;
   const pageNumber = Number(page) || 1;
   const pageSize = Number(limit) || 10;
-
+ 
   // Step 2: Base Query
-  const baseQuery = { isDeleted: false }; // Ensure only non-deleted quotes are fetched
+  let baseQuery = {}; // Ensure only non-deleted quotes are fetched
+   
+  if(userData?.role === 'subscriber'){
+   baseQuery = { isDeleted: false, subscriberId: userData?._id }; // Ensure only non-deleted quotes are fetched
+  }else{
+    baseQuery = { isDeleted: false };
+  }
+
 
   // Step 3: Add search logic for `userId` fields
   const populateQuery: any = {
@@ -152,7 +158,7 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => 
   }
 
   // Step 4: Fetch the Quotes with Pagination
-  const quotes = await Quote.find(baseQuery,{subscriberId: userData?._id})
+  const quotes = await Quote.find(baseQuery)
     .populate(populateQuery)
     .sort({ createdAt: -1 }) // Sort by createdAt in descending order
     .skip((pageNumber - 1) * pageSize)
@@ -160,6 +166,7 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => 
 
   // Step 5: Count total quotes (considering search filter on user fields)
   const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
+  console.log(totalQuotes, 'totalQuotes');
 
   // Step 6: Filter out quotes where `userId` doesn't match the search
   const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
