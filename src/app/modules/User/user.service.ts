@@ -89,9 +89,16 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
-const getAllAdminUsersFromDB = async (query: Record<string, unknown>) => {
+const getAllUsersForSubscriberFromDB = async (query: Record<string, unknown>, user:any) => {
+
+    const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
+ if(userData?.role === 'superAdmin') return getAllUsersFromDB(query);
+
+
   const studentQuery = new QueryBuilder(
-    User.find({ role: 'admin', isDeleted: false }),
+    User.find({ role: { $ne: 'superAdmin' }, isDeleted: false, subscriberId: userData?._id }),
     query,
   )
     .search(usersSearchableFields)
@@ -171,8 +178,6 @@ const getUsersMonthlyFromDB = async (userEmailAndRole: any) => {
 
 
   if(user.role === 'superAdmin'){
-
-
   const result = await User.aggregate([
     {
       $match: {
@@ -383,7 +388,7 @@ const deleteUserFromDB = async (id: string) => {
 };
 
 export const UserServices = {
-  getAllAdminUsersFromDB,
+  getAllUsersForSubscriberFromDB,
   getSingleUserIntoDB,
   getUsersMonthlyFromDB,
   deleteUserFromDB,

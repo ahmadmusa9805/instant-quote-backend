@@ -6,10 +6,17 @@ import { EXCLUSION_SEARCHABLE_FIELDS } from './Exclusion.constant';
 import mongoose from 'mongoose';
 import { TExclusion } from './Exclusion.interface';
 import { Exclusion } from './Exclusion.model';
+import { User } from '../User/user.model';
 
 const createExclusionIntoDB = async (
   payload: TExclusion,
+  user: any
 ) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+    payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await Exclusion.create(payload);
   
   if (!result) {
@@ -19,9 +26,12 @@ const createExclusionIntoDB = async (
   return result;
 };
 
-const getAllExclusionsFromDB = async (query: Record<string, unknown>) => {
+const getAllExclusionsFromDB = async (query: Record<string, unknown>, user: any) => {
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const ExclusionQuery = new QueryBuilder(
-    Exclusion.find({isDeleted: false}),
+    Exclusion.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(EXCLUSION_SEARCHABLE_FIELDS)

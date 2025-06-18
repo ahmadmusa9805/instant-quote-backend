@@ -121,14 +121,25 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   }
 };
 
-const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
+const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => {
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
+
   // Step 1: Extract searchTerm, page, and limit from the query
   const { searchTerm, page = 1, limit = 10 } = query;
   const pageNumber = Number(page) || 1;
   const pageSize = Number(limit) || 10;
-
+ 
   // Step 2: Base Query
-  const baseQuery = { isDeleted: false }; // Ensure only non-deleted quotes are fetched
+  let baseQuery = {}; // Ensure only non-deleted quotes are fetched
+   
+  if(userData?.role === 'subscriber'){
+   baseQuery = { isDeleted: false, subscriberId: userData?._id }; // Ensure only non-deleted quotes are fetched
+  }else{
+    baseQuery = { isDeleted: false };
+  }
+
 
   // Step 3: Add search logic for `userId` fields
   const populateQuery: any = {
@@ -155,6 +166,7 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>) => {
 
   // Step 5: Count total quotes (considering search filter on user fields)
   const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
+  console.log(totalQuotes, 'totalQuotes');
 
   // Step 6: Filter out quotes where `userId` doesn't match the search
   const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
@@ -370,16 +382,37 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
 //     throw error; // Propagate the error to be handled by the caller
 //   }
 // };
-const deleteQuoteFromDB = async (id: string) => {
+const deleteQuoteFromDB = async (id: string, user: any) => { 
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+const quotes = (await Quote.find({ userId: userData?._id })).length;  
+
+  if (!quotes) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Quote DB is empty');
+  }
+
+      // Step 1: Check if the quote exists
+    const quote = await Quote.findById(id); // Find the quote with the session
+    if (!quote) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Quote not found');
+    }
+
+
+if(quotes > 1){
+    // console.log('User has more than one quote');
+   const deletedQuote = await Quote.findByIdAndDelete(id); // Pass session for deletion
+   return deletedQuote
+}else{
   const session = await mongoose.startSession(); // Start a session
   session.startTransaction(); // Start transaction
 
   try {
-    // Step 1: Check if the quote exists
-    const quote = await Quote.findById(id).session(session); // Find the quote with the session
-    if (!quote) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Quote not found');
-    }
+    // // Step 1: Check if the quote exists
+    // const quote = await Quote.findById(id).session(session); // Find the quote with the session
+    // if (!quote) {
+    //   throw new AppError(httpStatus.BAD_REQUEST, 'Quote not found');
+    // }
     // Step 2: Delete the quote
     const deletedQuote = await Quote.findByIdAndDelete(id, { session }); // Pass session for deletion
 
@@ -418,6 +451,10 @@ const deleteQuoteFromDB = async (id: string) => {
     session.endSession();
     throw error; // Propagate the error to be handled by the caller
   }
+}
+
+
+
 };
 
 export const QuoteServices = {

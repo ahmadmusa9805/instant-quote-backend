@@ -5,7 +5,7 @@ import { DesignIdeaServices } from './DesignIdea.service';
 
 const createDesignIdea = catchAsync(async (req, res) => {
   const { designIdea: DesignIdeaData } = req.body;
-  const result = await DesignIdeaServices.createDesignIdeaIntoDB(DesignIdeaData);
+  const result = await DesignIdeaServices.createDesignIdeaIntoDB(DesignIdeaData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleDesignIdea = catchAsync(async (req, res) => {
 });
 
 const getAllDesignIdeas = catchAsync(async (req, res) => {
-  const result = await DesignIdeaServices.getAllDesignIdeasFromDB(req.query);
+  const result = await DesignIdeaServices.getAllDesignIdeasFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

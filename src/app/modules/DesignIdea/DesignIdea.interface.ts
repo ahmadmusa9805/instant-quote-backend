@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types} from 'mongoose';
 
 export type TDesignIdea = {
   clarity: string;
+  subscriberId: Types.ObjectId;
   info: string;
   isDeleted: boolean;
 };

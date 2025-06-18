@@ -5,7 +5,7 @@ import { ServiceServices } from './Service.service';
 
 const createService = catchAsync(async (req, res) => {
   const { service: ServiceData } = req.body;
-  const result = await ServiceServices.createServiceIntoDB(ServiceData);
+  const result = await ServiceServices.createServiceIntoDB(ServiceData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,9 @@ const getSingleService = catchAsync(async (req, res) => {
 });
 
 const getAllServices = catchAsync(async (req, res) => {
-  const result = await ServiceServices.getAllServicesFromDB(req.query);
+
+
+  const result = await ServiceServices.getAllServicesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

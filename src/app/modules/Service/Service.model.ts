@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const ServiceSchema = new Schema<TService, ServiceModel>({
         name: { type: String, required: true },
+        subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         price: { type: Number, required: true },
         hotChoice: { type: Boolean, default: false },
         info: { type: String},

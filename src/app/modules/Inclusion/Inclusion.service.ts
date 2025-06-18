@@ -6,11 +6,17 @@ import { INCLUSION_SEARCHABLE_FIELDS } from './Inclusion.constant';
 import mongoose from 'mongoose';
 import { TInclusion } from './Inclusion.interface';
 import { Inclusion } from './Inclusion.model';
+import { User } from '../User/user.model';
 
 const createInclusionIntoDB = async (
   payload: TInclusion,
+  user: any
 ) => {
   
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await Inclusion.create(payload);
   
   if (!result) {
@@ -20,9 +26,14 @@ const createInclusionIntoDB = async (
   return result;
 };
 
-const getAllInclusionsFromDB = async (query: Record<string, unknown>) => {
+const getAllInclusionsFromDB = async (query: Record<string, unknown>,   user: any) => {
+
+  
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const InclusionQuery = new QueryBuilder(
-    Inclusion.find({isDeleted: false}),
+    Inclusion.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(INCLUSION_SEARCHABLE_FIELDS)

@@ -5,7 +5,7 @@ import { InclusionServices } from './Inclusion.service';
 
 const createInclusion = catchAsync(async (req, res) => {
   const { inclusion: InclusionData } = req.body;
-  const result = await InclusionServices.createInclusionIntoDB(InclusionData);
+  const result = await InclusionServices.createInclusionIntoDB(InclusionData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleInclusion = catchAsync(async (req, res) => {
 });
 
 const getAllInclusions = catchAsync(async (req, res) => {
-  const result = await InclusionServices.getAllInclusionsFromDB(req.query);
+  const result = await InclusionServices.getAllInclusionsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

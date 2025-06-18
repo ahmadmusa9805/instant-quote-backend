@@ -24,6 +24,11 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       required: [true, 'User id is required'],
       ref: 'User',
     },
+    subscriberId: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      ref: 'User',
+    },
     property: {
       type: String,
       required: true, 

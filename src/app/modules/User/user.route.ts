@@ -25,9 +25,9 @@ router.get(
 );
 
 router.get(
-  '/admin',
+  '/for-subscriber',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
-  UserControllers.getAllAdminUsers,
+  UserControllers.getAllUsersForSubscriber,
 );
 
 router.get(

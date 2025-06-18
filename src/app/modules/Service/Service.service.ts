@@ -7,12 +7,18 @@ import mongoose from 'mongoose';
 import { TService } from './Service.interface';
 import { Service } from './Service.model';
 import { SERVICE_SEARCHABLE_FIELDS } from './Service.constant';
+import { User } from '../User/user.model';
 
 const createServiceIntoDB = async (
   payload: TService,
+  user: any
 ) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await Service.create(payload);
-  
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Service');
   }
@@ -20,9 +26,16 @@ const createServiceIntoDB = async (
   return result;
 };
 
-const getAllServicesFromDB = async (query: Record<string, unknown>) => {
+const getAllServicesFromDB = async (query: Record<string, unknown>, user: any) => {
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
+
+
   const ServiceQuery = new QueryBuilder(
-    Service.find({isDeleted: false}),
+    Service.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(SERVICE_SEARCHABLE_FIELDS)

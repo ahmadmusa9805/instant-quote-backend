@@ -9,6 +9,7 @@ export type TService = {
 
 export type  TQuote = {
   userId: Types.ObjectId;
+  subscriberId: Types.ObjectId;
   property: string;
   propertyPart: string;
   refurbishType: {
