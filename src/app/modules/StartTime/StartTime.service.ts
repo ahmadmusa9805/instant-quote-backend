@@ -6,10 +6,17 @@ import mongoose from 'mongoose';
 import { TStartTime } from './StartTime.interface';
 import { StartTime } from './StartTime.model';
 import { STARTTIME_SEARCHABLE_FIELDS } from './StartTime.constant';
+import { User } from '../User/user.model';
 
 const createStartTimeIntoDB = async (
   payload: TStartTime,
+  user:any
 ) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+    payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await StartTime.create(payload);
   
   if (!result) {
@@ -19,9 +26,13 @@ const createStartTimeIntoDB = async (
   return result;
 };
 
-const getAllStartTimesFromDB = async (query: Record<string, unknown>) => {
+const getAllStartTimesFromDB = async (query: Record<string, unknown>, user:any) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const StartTimeQuery = new QueryBuilder(
-    StartTime.find({isDeleted: false}),
+    StartTime.find({isDeleted: false, subscriberId:userData?._id}),
     query,
   )
     .search(STARTTIME_SEARCHABLE_FIELDS)

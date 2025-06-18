@@ -5,7 +5,7 @@ import { StartTimeServices } from './StartTime.service';
 
 const createStartTime = catchAsync(async (req, res) => {
   const { startTime: StartTimeData } = req.body;
-  const result = await StartTimeServices.createStartTimeIntoDB(StartTimeData);
+  const result = await StartTimeServices.createStartTimeIntoDB(StartTimeData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleStartTime = catchAsync(async (req, res) => {
 });
 
 const getAllStartTimes = catchAsync(async (req, res) => {
-  const result = await StartTimeServices.getAllStartTimesFromDB(req.query);
+  const result = await StartTimeServices.getAllStartTimesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
