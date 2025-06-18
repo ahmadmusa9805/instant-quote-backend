@@ -6,10 +6,17 @@ import { DESIGNIDEA_SEARCHABLE_FIELDS } from './DesignIdea.constant';
 import mongoose from 'mongoose';
 import { TDesignIdea } from './DesignIdea.interface';
 import { DesignIdea } from './DesignIdea.model';
+import { User } from '../User/user.model';
 
 const createDesignIdeaIntoDB = async (
   payload: TDesignIdea,
+  user:any
 ) => {
+
+const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await DesignIdea.create(payload);
   
   if (!result) {
@@ -19,9 +26,13 @@ const createDesignIdeaIntoDB = async (
   return result;
 };
 
-const getAllDesignIdeasFromDB = async (query: Record<string, unknown>) => {
+const getAllDesignIdeasFromDB = async (query: Record<string, unknown>, user:any) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
   const DesignIdeaQuery = new QueryBuilder(
-    DesignIdea.find({isDeleted: false}),
+    DesignIdea.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(DESIGNIDEA_SEARCHABLE_FIELDS)
