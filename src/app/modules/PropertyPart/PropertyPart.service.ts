@@ -6,14 +6,20 @@ import mongoose from 'mongoose';
 import { TPropertyPart } from './PropertyPart.interface';
 import { PropertyPart } from './PropertyPart.model';
 import { PROPERTYPART_SEARCHABLE_FIELDS } from './PropertyPart.constant';
+import { User } from '../User/user.model';
 
 const createPropertyPartIntoDB = async (
   payload: TPropertyPart,
-  file: any
+  file: any, 
+  user: any
 ) => {
 
-  if (file) {
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
 
+
+  if (file) {
     payload.image = file.location as string;
   }
 
@@ -26,9 +32,13 @@ const createPropertyPartIntoDB = async (
   return result;
 };
 
-const getAllPropertyPartsFromDB = async (query: Record<string, unknown>) => {
+const getAllPropertyPartsFromDB = async (query: Record<string, unknown>, user:any) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const PropertyPartQuery = new QueryBuilder(
-    PropertyPart.find({isDeleted: false}),
+    PropertyPart.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(PROPERTYPART_SEARCHABLE_FIELDS)
@@ -46,19 +56,18 @@ const getAllPropertyPartsFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSinglePropertyPartFromDB = async (id: string) => {
-
-  const isDeletedCart = await mongoose.connection
+  const propertyPart = await mongoose.connection
   .collection('propertyparts')
   .findOne(
     { _id: new mongoose.Types.ObjectId(id) }, // Query
-    { projection: { isDeleted: 1 } } // Projection
+    // { projection: { isDeleted: 1 } } // Projection
   );
  
- if (!isDeletedCart) {
+ if (!propertyPart) {
    throw new Error('PropertyPart not found');
  }
 
- if (isDeletedCart.isDeleted) {
+ if (propertyPart.isDeleted) {
    throw new Error('Cannot retrieve a deleted PropertyPart');
  }
 
@@ -68,29 +77,29 @@ const getSinglePropertyPartFromDB = async (id: string) => {
   return result;
 };
 
-const updatePropertyPartIntoDB = async (id: string, payload: any) => {
+const updatePropertyPartIntoDB = async (id: string, payload: any, file: any) => {
  
-  console.log("testing");
+  if (file) {
 
-  const isDeletedService = await mongoose.connection
+    payload.image = file.location as string;
+  }
+
+  const propertyPart = await mongoose.connection
     .collection('propertyparts')
     .findOne(
       { _id: new mongoose.Types.ObjectId(id) },
-      { projection: { isDeleted: 1, name: 1 } },
+      // { projection: { isDeleted: 1, name: 1 } },
     );
 
-    console.log(isDeletedService?.name, "testing2");
 
-
-  if (!isDeletedService?.name) {
+  if (!propertyPart) {
     throw new Error('PropertyPart not found');
   }
 
-  if (isDeletedService.isDeleted) {
+  if (propertyPart.isDeleted) {
     throw new Error('Cannot update a deleted PropertyPart');
   }
 
-  console.log(payload, "testing3");
 
   const updatedData = await PropertyPart.findByIdAndUpdate(
     { _id: id },

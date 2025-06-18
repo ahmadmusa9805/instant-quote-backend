@@ -5,7 +5,7 @@ import { FinishLevelServices } from './FinishLevel.service';
 
 const createFinishLevel = catchAsync(async (req, res) => {
   const { finishLevel: FinishLevelData } = req.body;
-  const result = await FinishLevelServices.createFinishLevelIntoDB(FinishLevelData);
+  const result = await FinishLevelServices.createFinishLevelIntoDB(FinishLevelData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleFinishLevel = catchAsync(async (req, res) => {
 });
 
 const getAllFinishLevels = catchAsync(async (req, res) => {
-  const result = await FinishLevelServices.getAllFinishLevelsFromDB(req.query);
+  const result = await FinishLevelServices.getAllFinishLevelsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

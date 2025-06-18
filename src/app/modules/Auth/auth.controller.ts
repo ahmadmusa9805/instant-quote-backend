@@ -6,6 +6,7 @@ import sendResponse from '../../utils/sendResponse';
 import { AuthServices } from './auth.service';
 
 const loginUser = catchAsync(async (req, res) => {
+  console.log('test')
   const result = await AuthServices.loginUser(req.body);
 
   const { refreshToken, accessToken } = result;
@@ -60,12 +61,11 @@ const forgetPassword = catchAsync(async (req, res) => {
   const result = await AuthServices.forgetPassword(userEmail);
  
   // const { message } = result;
-  console.log(result);
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: result.otp ? 'OTP sent succesfully!' : 'Token generated succesfully!',
+    message: result,
+    // message: result.resetToken ? 'OTP sent to the email succesfully!' : 'Token generated succesfully!',
     data: result,
   });
 });

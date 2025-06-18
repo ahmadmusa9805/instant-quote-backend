@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
 
       const FinishLevelSchema = new Schema<TFinishLevel, FinishLevelModel>({
         level: { type: String, required: true },
+        subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         price: { type: Number, required: true },
         info: { type: String},
         isDeleted: { type: Boolean, default: false },

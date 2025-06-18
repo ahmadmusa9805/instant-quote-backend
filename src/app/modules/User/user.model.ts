@@ -2,7 +2,7 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { userState } from './user.constant';
+import {  UserStatus } from './user.constant';
 import { TUser, UserModel } from './user.interface';
 
 
@@ -27,6 +27,10 @@ const userSchema = new Schema<TUser, UserModel>(
       required: true,
       unique: true,
     },
+    subscriberId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
     password: {
       type: String,
       required: true,
@@ -37,7 +41,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['client', 'superAdmin', 'admin'],
+      enum: ['client', 'superAdmin', 'admin', 'subscriber'],
       default: 'client',
     },
     profileImg : {
@@ -56,8 +60,8 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     status: {
       type: String,
-      enum: Object.values(userState),
-      default: 'interested',
+      enum: Object.values(UserStatus),
+      default: 'active',
     },
     isDeleted: {
       type: Boolean,

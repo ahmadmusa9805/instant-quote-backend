@@ -6,18 +6,23 @@ import mongoose from 'mongoose';
 import { TProperty } from './Property.interface';
 import { Property } from './Property.model';
 import { PROPERTY_SEARCHABLE_FIELDS } from './Property.constant';
+import { User } from '../User/user.model';
 
 
 const createPropertyIntoDB = async (
   payload: TProperty,
-  file: any
+  file: any,
+  user: any
 ) => {
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
 
   if (file) {
     payload.image = file.location as string;
   }
-
-
   const result = await Property.create(payload);
   
   if (!result) {
@@ -27,10 +32,13 @@ const createPropertyIntoDB = async (
   return result;
 };
 
-const getAllPropertiesFromDB = async (query: Record<string, unknown>) => {
+const getAllPropertiesFromDB = async (query: Record<string, unknown>, user: any) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
 
   const PropertyQuery = new QueryBuilder(
-    Property.find({isDeleted: false}),
+    Property.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(PROPERTY_SEARCHABLE_FIELDS)
@@ -71,20 +79,22 @@ const getSinglePropertyFromDB = async (id: string) => {
   return result;
 };
 
-const updatePropertyIntoDB = async (id: string, payload: any) => {
-
-  const isDeletedCart = await mongoose.connection
+const updatePropertyIntoDB = async (id: string, payload: any, file: any) => {
+ if (file) {
+    payload.image = file.location as string;
+  }
+  const property = await mongoose.connection
   .collection('properties')
   .findOne(
     { _id: new mongoose.Types.ObjectId(id) }, // Query
-    { projection: { isDeleted: 1 } } // Projection
+    // { projection: { isDeleted: 1 } } // Projection
   );
  
- if (!isDeletedCart) {
+ if (!property) {
    throw new Error('Property not found');
  }
 
- if (isDeletedCart.isDeleted) {
+ if (property.isDeleted) {
    throw new Error('Cannot update a deleted Property');
  }
 
@@ -106,25 +116,25 @@ const updatePropertyIntoDB = async (id: string, payload: any) => {
 
 const deletePropertyFromDB = async (id: string) => {
 
-  const isDeletedCart = await mongoose.connection
+  const property = await mongoose.connection
   .collection('properties')
   .findOne(
     { _id: new mongoose.Types.ObjectId(id) }, // Query
-    { projection: { isDeleted: 1 } } // Projection
+    // { projection: { isDeleted: 1 } } // Projection
   );
  
- if (!isDeletedCart) {
+ if (!property) {
    throw new Error('Property not found');
  }
 
- if (isDeletedCart.isDeleted) {
+ if (property.isDeleted) {
    throw new Error('Cannot delete a deleted Property');
  }
 
 
-  const deletedService = await Property.findByIdAndUpdate(
+  const deletedService = await Property.findByIdAndDelete(
     id,
-    { isDeleted: true },
+    // { isDeleted: true },
     { new: true },
   );
 

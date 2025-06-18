@@ -7,10 +7,16 @@ import { TRefurbishmentType } from './RefurbishmentType.interface';
 import { RefurbishmentType } from './RefurbishmentType.model';
 import { REFURBISHMENTTYPE_SEARCHABLE_FIELDS } from './RefurbishmentType.constant';
 import httpStatus from 'http-status';
+import { User } from '../User/user.model';
 
 const createRefurbishmentTypeIntoDB = async (
   payload: TRefurbishmentType,
+  user: any
 ) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
   const result = await RefurbishmentType.create(payload);
   
   if (!result) {
@@ -20,9 +26,14 @@ const createRefurbishmentTypeIntoDB = async (
   return result;
 };
 
-const getAllRefurbishmentTypesFromDB = async (query: Record<string, unknown>) => {
+const getAllRefurbishmentTypesFromDB = async (query: Record<string, unknown>, user: any) => {
+
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const RefurbishmentTypeQuery = new QueryBuilder(
-    RefurbishmentType.find({isDeleted: false}),
+    RefurbishmentType.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(REFURBISHMENTTYPE_SEARCHABLE_FIELDS)

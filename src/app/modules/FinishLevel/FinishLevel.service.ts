@@ -6,10 +6,17 @@ import mongoose from 'mongoose';
 import { TFinishLevel } from './FinishLevel.interface';
 import { FinishLevel } from './FinishLevel.model';
 import { FINISHLEVEL_SEARCHABLE_FIELDS } from './FinishLevel.constant';
+import { User } from '../User/user.model';
 
 const createFinishLevelIntoDB = async (
   payload: TFinishLevel,
+  user: any
 ) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+    payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await FinishLevel.create(payload);
   
   if (!result) {
@@ -19,9 +26,12 @@ const createFinishLevelIntoDB = async (
   return result;
 };
 
-const getAllFinishLevelsFromDB = async (query: Record<string, unknown>) => {
+const getAllFinishLevelsFromDB = async (query: Record<string, unknown>, user: any) => {
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const FinishLevelQuery = new QueryBuilder(
-    FinishLevel.find({isDeleted: false}),
+    FinishLevel.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(FINISHLEVEL_SEARCHABLE_FIELDS)

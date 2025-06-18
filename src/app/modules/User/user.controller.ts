@@ -71,7 +71,7 @@ const getAllUsers = catchAsync(async (req, res) => {
 
 const getUsersMonthly = catchAsync(async (req, res) => {
   console.log('test now');
-  const result = await UserServices.getUsersMonthlyFromDB();
+  const result = await UserServices.getUsersMonthlyFromDB(req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

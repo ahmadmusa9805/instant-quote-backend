@@ -1,13 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { USER_ROLE } from './user.constant';
 
 export interface TUser {
+  // [x: string]: any;
   name: {
     firstName: string;
     lastName: string;
   };
   email: string;
+  subscriberId?: Types.ObjectId;
   password: string;
   passwordChangedAt?: Date;
   contactNo: string;
@@ -15,8 +17,8 @@ export interface TUser {
   otpVerified: boolean;
   propertyAddress?: string;
   propertyPostCode?: string;
-  role: 'client' | 'superAdmin' | 'admin';
-  status?: 'contacted' | 'interested' | 'agreed' | 'notInterested';
+  role: 'client' | 'superAdmin' | 'admin' | 'subscriber';
+  status?: 'active' | 'blocked';
   isDeleted: boolean;
 }
 export interface UserModel extends Model<TUser> {

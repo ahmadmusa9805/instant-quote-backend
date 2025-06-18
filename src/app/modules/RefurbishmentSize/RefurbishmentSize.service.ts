@@ -7,10 +7,18 @@ import httpStatus from 'http-status';
 import { TRefurbishmentSize } from './RefurbishmentSize.interface';
 import { RefurbishmentSize } from './RefurbishmentSize.model';
 import { REFURBISHMENTSIZE_SEARCHABLE_FIELDS } from './RefurbishmentSize.constant';
+import { User } from '../User/user.model';
 
 const createRefurbishmentSizeIntoDB = async (
   payload: TRefurbishmentSize,
+  user:any
 ) => {
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await RefurbishmentSize.create(payload);
   
   if (!result) {
@@ -20,9 +28,13 @@ const createRefurbishmentSizeIntoDB = async (
   return result;
 };
 
-const getAllRefurbishmentSizesFromDB = async (query: Record<string, unknown>) => {
+const getAllRefurbishmentSizesFromDB = async (query: Record<string, unknown>, user:any) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const RefurbishmentSizeQuery = new QueryBuilder(
-    RefurbishmentSize.find({isDeleted: false}),
+    RefurbishmentSize.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(REFURBISHMENTSIZE_SEARCHABLE_FIELDS)
@@ -81,9 +93,9 @@ const updateRefurbishmentSizeIntoDB = async (id: string, payload: any) => {
 };
 
 const deleteRefurbishmentSizeFromDB = async (id: string) => {
-  const deletedService = await RefurbishmentSize.findByIdAndUpdate(
+  const deletedService = await RefurbishmentSize.findByIdAndDelete(
     id,
-    { isDeleted: true },
+    // { isDeleted: true },
     { new: true },
   );
 

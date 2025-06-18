@@ -5,7 +5,7 @@ import { PropertyPartServices } from './PropertyPart.service';
 
 const createPropertyPart = catchAsync(async (req, res) => {
   const { propertyPart: PropertyPartData } = req.body;
-  const result = await PropertyPartServices.createPropertyPartIntoDB(PropertyPartData, req.file);
+  const result = await PropertyPartServices.createPropertyPartIntoDB(PropertyPartData, req.file, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSinglePropertyPart = catchAsync(async (req, res) => {
 });
 
 const getAllPropertyParts = catchAsync(async (req, res) => {
-  const result = await PropertyPartServices.getAllPropertyPartsFromDB(req.query);
+  const result = await PropertyPartServices.getAllPropertyPartsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -42,7 +42,7 @@ const getAllPropertyParts = catchAsync(async (req, res) => {
 const updatePropertyPart = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { propertyPart: PropertyPartData } = req.body;
-  const result = await PropertyPartServices.updatePropertyPartIntoDB(id, PropertyPartData);
+  const result = await PropertyPartServices.updatePropertyPartIntoDB(id, PropertyPartData, req.file);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

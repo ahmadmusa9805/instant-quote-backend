@@ -5,7 +5,7 @@ import { RefurbishmentSizeServices } from './RefurbishmentSize.service';
 
 const createRefurbishmentSize = catchAsync(async (req, res) => {
   const { refurbishmentSize: RefurbishmentSizeData } = req.body;
-  const result = await RefurbishmentSizeServices.createRefurbishmentSizeIntoDB(RefurbishmentSizeData);
+  const result = await RefurbishmentSizeServices.createRefurbishmentSizeIntoDB(RefurbishmentSizeData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleRefurbishmentSize = catchAsync(async (req, res) => {
 });
 
 const getAllRefurbishmentSizes = catchAsync(async (req, res) => {
-  const result = await RefurbishmentSizeServices.getAllRefurbishmentSizesFromDB(req.query);
+  const result = await RefurbishmentSizeServices.getAllRefurbishmentSizesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -5,7 +5,7 @@ import { ExtendSizeServices } from './ExtendSize.service';
 
 const createExtendSize = catchAsync(async (req, res) => {
   const { extendSize: ExtendSizeData } = req.body;
-  const result = await ExtendSizeServices.createExtendSizeIntoDB(ExtendSizeData);
+  const result = await ExtendSizeServices.createExtendSizeIntoDB(ExtendSizeData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleExtendSize = catchAsync(async (req, res) => {
 });
 
 const getAllExtendSizes = catchAsync(async (req, res) => {
-  const result = await ExtendSizeServices.getAllExtendSizesFromDB(req.query);
+  const result = await ExtendSizeServices.getAllExtendSizesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

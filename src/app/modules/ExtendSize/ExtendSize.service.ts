@@ -6,10 +6,17 @@ import mongoose from 'mongoose';
 import { TExtendSize } from './ExtendSize.interface';
 import { ExtendSize } from './ExtendSize.model';
 import { EXTENDSIZE_SEARCHABLE_FIELDS } from './ExtendSize.constant';
+import { User } from '../User/user.model';
 
 const createExtendSizeIntoDB = async (
   payload: TExtendSize,
+  user: any
 ) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await ExtendSize.create(payload);
   
   if (!result) {
@@ -19,9 +26,13 @@ const createExtendSizeIntoDB = async (
   return result;
 };
 
-const getAllExtendSizesFromDB = async (query: Record<string, unknown>) => {
+const getAllExtendSizesFromDB = async (query: Record<string, unknown>, user: any) => {
+
+    const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const ExtendSizeQuery = new QueryBuilder(
-    ExtendSize.find({isDeleted: false}),
+    ExtendSize.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(EXTENDSIZE_SEARCHABLE_FIELDS)

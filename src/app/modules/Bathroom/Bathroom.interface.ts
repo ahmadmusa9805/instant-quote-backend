@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type TBathroom = {
   bathroomQuantity: number;
+    subscriberId: Types.ObjectId;
   price: number;
   info: string;
   isDeleted: boolean;

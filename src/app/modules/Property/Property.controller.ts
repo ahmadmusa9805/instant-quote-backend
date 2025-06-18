@@ -5,7 +5,7 @@ import { PropertyServices } from './Property.service';
 
 const createProperty = catchAsync(async (req, res) => {
   const { property: PropertyData } = req.body;
-  const result = await PropertyServices.createPropertyIntoDB(PropertyData, req.file);
+  const result = await PropertyServices.createPropertyIntoDB(PropertyData, req.file, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleProperty = catchAsync(async (req, res) => {
 });
 
 const getAllPropertys = catchAsync(async (req, res) => {
-  const result = await PropertyServices.getAllPropertiesFromDB(req.query);
+  const result = await PropertyServices.getAllPropertiesFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -42,8 +42,7 @@ const getAllPropertys = catchAsync(async (req, res) => {
 const updateProperty = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { property: Property } = req.body;
-
-  const result = await PropertyServices.updatePropertyIntoDB(id, Property);
+  const result = await PropertyServices.updatePropertyIntoDB(id, Property, req.file);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
