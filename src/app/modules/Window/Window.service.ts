@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { TWindow } from './Window.interface';
 import { Window } from './Window.model';
 import { WINDOW_SEARCHABLE_FIELDS } from './Window.constant';
+import { User } from '../User/user.model';
 
 // const createWindowIntoDB = async (
 //   payload: TWindow,
@@ -21,9 +22,15 @@ import { WINDOW_SEARCHABLE_FIELDS } from './Window.constant';
 
 const createWindowIntoDB = async (
   payload: TWindow,
+  user:any
 ) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   // Check if a window already exists
-  const existingWindow = await Window.findOne();
+  const existingWindow = await Window.findOne({subscriberId:payload.subscriberId});
 
   if (existingWindow) {
     throw new AppError(
@@ -42,9 +49,13 @@ const createWindowIntoDB = async (
   return result;
 };
 
-const getAllWindowsFromDB = async (query: Record<string, unknown>) => {
+const getAllWindowsFromDB = async (query: Record<string, unknown>, user:any) => {
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
   const WindowQuery = new QueryBuilder(
-    Window.find({isDeleted: false}),
+    Window.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(WINDOW_SEARCHABLE_FIELDS)

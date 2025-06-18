@@ -5,7 +5,7 @@ import { WindowServices } from './Window.service';
 
 const createWindow = catchAsync(async (req, res) => {
   const { window: WindowData } = req.body;
-  const result = await WindowServices.createWindowIntoDB(WindowData);
+  const result = await WindowServices.createWindowIntoDB(WindowData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleWindow = catchAsync(async (req, res) => {
 });
 
 const getAllWindows = catchAsync(async (req, res) => {
-  const result = await WindowServices.getAllWindowsFromDB(req.query);
+  const result = await WindowServices.getAllWindowsFromDB(req.query,  req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

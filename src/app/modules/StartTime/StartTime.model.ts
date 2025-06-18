@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const StartTimeSchema = new Schema<TStartTime, StartTimeModel>({
         startTime: { type: String, required: true },
+         subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         price: { type: Number, required: true },
         info: { type: String},
         isDeleted: { type: Boolean, default: false },
