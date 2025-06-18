@@ -5,7 +5,7 @@ import { ExclusionServices } from './Exclusion.service';
 
 const createExclusion = catchAsync(async (req, res) => {
   const { exclusion: ExclusionData } = req.body;
-  const result = await ExclusionServices.createExclusionIntoDB(ExclusionData);
+  const result = await ExclusionServices.createExclusionIntoDB(ExclusionData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -28,7 +28,7 @@ const getSingleExclusion = catchAsync(async (req, res) => {
 });
 
 const getAllExclusions = catchAsync(async (req, res) => {
-  const result = await ExclusionServices.getAllExclusionsFromDB(req.query);
+  const result = await ExclusionServices.getAllExclusionsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
