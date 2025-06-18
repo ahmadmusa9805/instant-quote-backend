@@ -6,10 +6,18 @@ import mongoose from 'mongoose';
 import { TBathroom } from './Bathroom.interface';
 import { Bathroom } from './Bathroom.model';
 import { BATHROOM_SEARCHABLE_FIELDS } from './Bathroom.constant';
+import { User } from '../User/user.model';
 
 const createBathroomIntoDB = async (
   payload: TBathroom,
+  user: any
 ) => {
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
   const result = await Bathroom.create(payload);
   
   if (!result) {
@@ -19,9 +27,13 @@ const createBathroomIntoDB = async (
   return result;
 };
 
-const getAllBathroomsFromDB = async (query: Record<string, unknown>) => {
+const getAllBathroomsFromDB = async (query: Record<string, unknown>, user: any) => {
+
+      const {  userEmail } = user;
+    const userData = await User.findOne({ email: userEmail });
+
   const BathroomQuery = new QueryBuilder(
-    Bathroom.find({isDeleted: false}),
+    Bathroom.find({isDeleted: false, subscriberId: userData?._id}),
     query,
   )
     .search(BATHROOM_SEARCHABLE_FIELDS)

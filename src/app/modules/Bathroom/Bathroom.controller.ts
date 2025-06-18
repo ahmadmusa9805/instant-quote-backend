@@ -6,7 +6,7 @@ import { BathroomServices } from './Bathroom.service';
 const createBathroom = catchAsync(async (req, res) => {
   const { bathroom: BathroomData } = req.body;
 
-  const result = await BathroomServices.createBathroomIntoDB(BathroomData);
+  const result = await BathroomServices.createBathroomIntoDB(BathroomData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -29,7 +29,7 @@ const getSingleBathroom = catchAsync(async (req, res) => {
 });
 
 const getAllBathrooms = catchAsync(async (req, res) => {
-  const result = await BathroomServices.getAllBathroomsFromDB(req.query);
+  const result = await BathroomServices.getAllBathroomsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
