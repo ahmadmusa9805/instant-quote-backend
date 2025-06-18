@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose';
       
       const WindowSchema = new Schema<TWindow, WindowModel>({
         windowSquareMeters: { type: Number, required: true },
+        subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         price: { type: Number, required: true },  
         info: { type: String},
         isDeleted: { type: Boolean, default: false },
