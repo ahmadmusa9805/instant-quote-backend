@@ -6,7 +6,7 @@ import { createCallAvailabilityValidationSchema, updateCallAvailabilityValidatio
 const router = express.Router();
 
 router.post(
-  '/create-call-availability',
+  '/create-availability',
   validateRequest(createCallAvailabilityValidationSchema),
   CallAvailabilityControllers.createCallAvailability,
 );
