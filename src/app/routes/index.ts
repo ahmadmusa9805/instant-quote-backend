@@ -32,8 +32,7 @@ import { WeDoRoutes } from '../modules/WeDo/WeDo.route';
 import { ContactRoutes } from '../modules/Contact/Contact.route';
 import { QuotePricingRoutes } from '../modules/QuotePricing/QuotePricing.route';
 import { NotificationRoutes } from '../modules/Notification/Notification.route';
-import { AvailabilityRoutes } from '../modules/Availability/Availability.route';
-import { BookingRoutes } from '../modules/Booking/Booking.route';
+import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -107,11 +106,11 @@ const moduleRoutes = [
   },
   {
     path: '/call-availabilities',
-    route: AvailabilityRoutes,
+    route: CallAvailabilityRoutes,
   },
   {
     path: '/call-bookings',
-    route: BookingRoutes,
+    route: CallBookingRoutes,
   },
   {
     path: '/projects',

@@ -4,9 +4,8 @@ import sendResponse from '../../utils/sendResponse';
 import { CallBookingServices } from './CallBooking.service';
 
 const createCallBooking = catchAsync(async (req, res) => {
-  const { callBooking: CallBookingData } = req.body;
-  console.log(CallBookingData, "test from controller");
-  const result = await CallBookingServices.createCallBookingIntoDB(CallBookingData);
+  const CallBookingData = req.body;
+  const result = await CallBookingServices.createCallBookingIntoDB(CallBookingData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

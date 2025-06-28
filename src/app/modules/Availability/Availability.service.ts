@@ -23,7 +23,7 @@ const createAvailabilityIntoDB = async (
       payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
       payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
   }else if(userData?.role==='admin'){
-         payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
+          payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
           payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
 
   }else{
@@ -31,6 +31,13 @@ const createAvailabilityIntoDB = async (
   }
 
 
+  // Check if a term already exists based on a unique field (e.g., term name or code)
+  const existingAvailability = await Availability.find({ }); // or use another unique field like 'code'
+  if (existingAvailability[0]) {
+    // If a term exists, update it with the new payload
+    const updatedAvailability = await Availability.findByIdAndUpdate(existingAvailability[0]._id, payload, { new: true });
+    return updatedAvailability;  // Return the updated term
+  }
 
 
 

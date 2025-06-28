@@ -39,6 +39,7 @@ const getAllBookings = catchAsync(async (req, res) => {
   });
 });
 
+
 const updateBooking = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { Booking } = req.body;

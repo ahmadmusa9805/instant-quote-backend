@@ -15,6 +15,9 @@ export class SendEmail {
       pass: config.email_app_password, // Your email password
       user: config.admin_email_user, // Your email
     },
+    tls: {
+    rejectUnauthorized: false, // <-- allows self-signed certs
+  },
   });
 
   static async sendOTPEmail(email: string, otp: string): Promise<void> {
@@ -35,7 +38,7 @@ export class SendEmail {
     }
   }
   static async sendQuoteEmailToClient(email: string): Promise<void> {
-
+   console.log('email=======musa', email);
   // Read the HTML template file
   const templatePath = path.join(process.cwd(), 'src', 'app', 'utils', 'quotationTemplate.html');
   const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
@@ -48,11 +51,13 @@ export class SendEmail {
       html:htmlTemplate,
     };
     try {
+         console.log('mailOptions=======musa', mailOptions);
+
       await this.transporter.sendMail(mailOptions);
       console.log(`OTP sent to ${email}`);
     } catch (error) {
       console.error('Error sending email:', error);
-      throw new Error('Failed to send OTP email.');
+      throw new Error('Failed to send email.');
     }
   }
   static async sendResetLinkToEmail(email: string, resetLink: string): Promise<void> {

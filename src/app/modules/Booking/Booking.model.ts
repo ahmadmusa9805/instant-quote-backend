@@ -8,6 +8,8 @@ const BookingSchema = new Schema<TBooking, BookingModel>(
     end: { type: String, required: true },
     bookedBy: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     subscriberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    quoteId: { type: Schema.Types.ObjectId, ref: 'Quote', required: true },
+    state: { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
   },
   { timestamps: true },
 );
