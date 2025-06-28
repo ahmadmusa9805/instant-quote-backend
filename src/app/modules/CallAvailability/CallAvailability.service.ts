@@ -7,72 +7,63 @@ import { CALLAVAILABILITY_SEARCHABLE_FIELDS } from './CallAvailability.constant'
 import { TCallAvailability } from './CallAvailability.interface';
 import { CallAvailability } from './CallAvailability.model';
 import mongoose from 'mongoose';
+import { User } from '../User/user.model';
+import { CallBooking } from '../CallBooking/CallBooking.model';
 
-const createCallAvailabilityIntoDB = async (payload: TCallAvailability) => {
-  const { day, startTime, endTime } = payload;
-  // const { day, startTime, endTime, date } = payload;
-  
-// Get the current date
-// const currentDate = new Date();
+const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: any) => {
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  // console.log('userData', userData);
 
-// Convert the date from the payload to a Date object
-// const inputDate = new Date(date as any);
 
-// Check if the input date is in the past
-// if (inputDate < currentDate) {
-//     throw new Error("The date is in the past. Please provide a future date.");
-// }
+  if(userData?.role==='subscriber'){
+      payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+      payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
+  }else if(userData?.role==='admin'){
+          payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
+          payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
+
+  }else{
+      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can create availability');
+  }
+
 
   // Utility function to parse time strings like "09:00 AM" into Date objects
-  const parseTime = (time: string | any) => {
-    const [hours, minutes] = time.match(/(\d+):(\d+)/).slice(1, 3);
-    const period = time.match(/AM|PM/)[0];
-    let hour = parseInt(hours, 10);
-    if (period === 'PM' && hour !== 12) hour += 12;
-    if (period === 'AM' && hour === 12) hour = 0;
+  // const parseTime = (time: string | any) => {
+  //   const [hours, minutes] = time.match(/(\d+):(\d+)/).slice(1, 3);
+  //   const period = time.match(/AM|PM/)[0];
+  //   let hour = parseInt(hours, 10);
+  //   if (period === 'PM' && hour !== 12) hour += 12;
+  //   if (period === 'AM' && hour === 12) hour = 0;
 
-    return new Date(1970, 0, 1, hour, parseInt(minutes, 10));
-  };
+  //   return new Date(1970, 0, 1, hour, parseInt(minutes, 10));
+  // };
 
-  // Convert startTime and endTime to Date objects for comparison
-  const newStartTime = parseTime(startTime);
-  const newEndTime = parseTime(endTime);
+  // // Convert startTime and endTime to Date objects for comparison
+  // const newStartTime = parseTime(payload.timeSlots[0].start);
+  // const newEndTime = parseTime(payload.timeSlots[0].end);
 
-  if (newEndTime <= newStartTime) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "End time must be after start time"
-    );
-  }
-
-  // Check for overlapping time slots
-  const existingRecords = await CallAvailability.find({ day, isDeleted: false });
-
-  for (const record of existingRecords) {
-    const recordStartTime = parseTime(record.startTime);
-    const recordEndTime = parseTime(record.endTime);
+  // if (newEndTime <= newStartTime) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "End time must be after start time"
+  //   );
+  // }
 
 
-    if (
-      (newStartTime >= recordStartTime && newStartTime < recordEndTime) || // Overlaps at the start
-      (newEndTime > recordStartTime && newEndTime <= recordEndTime) || // Overlaps at the end
-      (newStartTime <= recordStartTime && newEndTime >= recordEndTime) // Fully contains the existing slot
-    ) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        `Time slot ${startTime} to ${endTime} overlaps with an existing slot`
-      );
+
+    // Check if a Availability already exists
+    const existingAvailability = await CallAvailability.find({ }); // or use another unique field like 'code'
+    if (existingAvailability[0]) {
+      // If a term exists, update it with the new payload
+      const updatedAvailability = await CallAvailability.findByIdAndUpdate(existingAvailability[0]._id, payload, { new: true });
+      return updatedAvailability;  // Return the updated term
     }
-  }
 
-  // If no overlap, create the new record
-  const result = await CallAvailability.create(payload);
-
+      const result = await CallAvailability.create(payload);
+  
   if (!result) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Failed to create CallAvailability"
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Availability');
   }
 
   return result;
@@ -81,7 +72,7 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability) => {
 
 const getAllCallAvailabilitysFromDB = async (query: Record<string, unknown>) => {
   const CallAvailabilityQuery = new QueryBuilder(
-    CallAvailability.find({isDeleted: false}).populate('adminId'),
+    CallAvailability.find({isDeleted: false}).populate('subscriberId'),
     query,
   )
     .search(CALLAVAILABILITY_SEARCHABLE_FIELDS)
@@ -98,8 +89,106 @@ const getAllCallAvailabilitysFromDB = async (query: Record<string, unknown>) => 
   };
 };
 
+const getAvailabilityFromDB = async () => {
+  const result = await CallAvailability.findOne();
+
+  return result;
+};
+
+const getCalenderAvailabilityFromDB = async (month: any, year: any, user: any) => {
+let rule;
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  // console.log('user', userData);
+
+  if(userData?.role==='superAdmin'){
+      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can get availability');
+  }else if(userData?.role==='admin' || userData?.role==='client'){
+       rule = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+  }else{
+      rule = await CallAvailability.findOne({ subscriberId: userData?._id });
+  }
+  // payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
+
+  // console.log('Service: Calendar Availability');
+
+
+  // console.log(rule,'rule');
+
+  if (!rule) throw new Error('No availability rule found.');
+
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate(); // e.g. 31 for July
+    // console.log('daysInMonth', daysInMonth);
+
+  const results: any[] = [];
+
+  for (let day = 1; day <= daysInMonth; day++) {
+      //  console.log('<<<<<<<Start>>>>>>>>', );
+
+      // console.log('day', day);
+
+
+    
+    const currentDate = new Date(Date.UTC(year, month, day)); // Create date in UTC
+              // console.log('currentDate', currentDate);
+
+    const dayOfWeek = currentDate.getUTCDay(); // Get day of week in UTC (0 = Sun ... 6 = Sat)
+          // console.log('dayOfWeek', dayOfWeek);
+          // console.log('rule.daysOfWeek.includes(dayOfWeek)', rule.daysOfWeek.includes(dayOfWeek));
+    if (rule.daysOfWeek.includes(dayOfWeek)) {
+            // console.log('currentDate.toISOString().split', currentDate.toISOString().split('T')[0]);
+
+      const dateStr = currentDate.toISOString().split('T')[0];
+          // console.log('dateStr', dateStr);
+
+      const appointments = await CallBooking.find({ date: dateStr });
+          // console.log('appointments', appointments);
+
+      const availableSlots = [];
+      const bookedSlots = [];
+
+      for (const slot of rule.timeSlots) {
+          // console.log('rule.timeSlots', rule.timeSlots);
+          // console.log('slot', slot);
+        const isBooked = appointments.find(
+          a => a.start === slot.start && a.end === slot.end
+        );
+      //  console.log('isBooked', isBooked);
+        if (isBooked) {
+          bookedSlots.push(slot);
+                //  console.log('bookedSlots', bookedSlots);
+
+        } else {
+          availableSlots.push(slot);
+                //  console.log('availableSlots', availableSlots);
+
+        }
+
+      }
+
+        //  console.log('dateStr', dateStr);
+        //   console.log('availableSlots', availableSlots);
+        //   console.log('bookedSlots', bookedSlots);
+
+      results.push({
+        date: dateStr,
+        availableSlots,
+        bookedSlots,
+      });
+    }
+  
+  
+        //  console.log('<<<<<<<end>>>>>>>>', );
+
+  }
+
+  return results;
+};
+
+
 const getSingleCallAvailabilityFromDB = async (id: string) => {
-  const result = await CallAvailability.findOne({ _id: id, isDeleted: false }).populate('adminId');
+  const result = await CallAvailability.findOne({ _id: id, isDeleted: false }).populate('subscriberId');
 
   return result;
 };
@@ -153,8 +242,8 @@ if (!day || !startTime || !endTime) {
   const existingRecords = await CallAvailability.find({ day, isDeleted: false });
 
   for (const record of existingRecords) {
-    const recordStartTime = parseTime(record.startTime);
-    const recordEndTime = parseTime(record.endTime);
+    const recordStartTime = parseTime(record.timeSlots[0].start);
+    const recordEndTime = parseTime(record.timeSlots[0].end);
 
 
     if (
@@ -206,4 +295,6 @@ export const CallAvailabilityServices = {
   getSingleCallAvailabilityFromDB,
   updateCallAvailabilityIntoDB,
   deleteCallAvailabilityFromDB,
+  getAvailabilityFromDB,
+  getCalenderAvailabilityFromDB
 };

@@ -27,12 +27,13 @@ import { calculateOtherPrices } from './quote.utils';
 // import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
 // import { emailValidate } from '../../utils/emailValidate';
-import { SendEmail } from '../../utils/sendEmail';
-import { CallBooking } from '../CallBooking/CallBooking.model';
+// import { SendEmail } from '../../utils/sendEmail';
+// import { CallBooking } from '../CallBooking/CallBooking.model';
+import { Booking } from '../Booking/Booking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-
+console.log('payload test', payload);
   const password = payload.password;
   // const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
@@ -42,10 +43,12 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     contactNo: payload.contactNo,
     name: payload.name,
     propertyAddress: payload.propertyAddress, 
+    subscriberId: payload.subscriberId, 
     propertyPostCode: payload.propertyPostCode,
     status: payload.status
   };
 
+console.log('userData test', userData);
 
   const session = await mongoose.startSession();
   try {
@@ -61,8 +64,12 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     // }
 
     const user = await User.findOne({ email: payload.email , isDeleted: false});
+    console.log('user test', user);
+
     if (user) {
       payload.userId = user._id
+          console.log('user test inside' , user );
+
   //     const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
   //     if(quote){
   //       // throw new Error('User Have already Created a Quote');
@@ -82,11 +89,14 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     }
    
    if(!user){
+    console.log('user not test' , user );
     const newUser = await User.create([userData], { session });
 
     if (!newUser.length) throw new Error('Failed to create user');
 
     payload.userId = newUser[0]._id;
+        console.log('newUser[0]  test' , newUser[0] );
+
   }
 
 
@@ -95,20 +105,22 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
     // const newQuote = await Quote.create(payload);
     const newQuote = await Quote.create([modifyPayload], { session });
     if (!newQuote.length) throw new Error('Failed to create Client');
+        console.log('newQuote  test' , newQuote );
 
     await NotificationServices.createNotificationIntoDB({
       type: 'quote',
       message: `New quote created with Email: ${payload.email}`,
       isDeleted: false,
       isRead: false,
+      subscriberId: payload.subscriberId,
       createdAt: new Date(),
     });
 
-    if(!user){
-      await SendEmail.sendQuoteEmailToClient(
-        payload.email,
-      );
-    }
+    // if(!user){
+    //   await SendEmail.sendQuoteEmailToClient(
+    //     payload.email,
+    //   );
+    // }
 
     await session.commitTransaction();
     await session.endSession();
@@ -318,6 +330,7 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
     message: `New quote created with Email: ${payload.email}`,
     isDeleted: false,
     isRead: false,
+    subscriberId: updatedData.subscriberId,
     createdAt: new Date(),
   });
 
@@ -430,9 +443,9 @@ if(quotes > 1){
     }
 
     // Step 4: Check and delete the associated call booking
-    const callBooking = await CallBooking.findOne({ userId: quote.userId }).session(session); // Find associated call booking
+    const callBooking = await Booking.findOne({ userId: quote.userId }).session(session); // Find associated call booking
     if (callBooking) {
-       await CallBooking.findOneAndDelete(
+       await Booking.findOneAndDelete(
         { userId: quote.userId },
         { session } // Pass session for deletion
       );

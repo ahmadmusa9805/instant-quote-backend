@@ -19,7 +19,7 @@ import { ServiceRoutes } from '../modules/Service/Service.route';
 import { DesignIdeaRoutes } from '../modules/DesignIdea/DesignIdea.route';
 import { InclusionRoutes } from '../modules/Inclusion/Inclusion.route';
 import { ExclusionRoutes } from '../modules/Exclusion/Exclusion.route';
-import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
+// import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 import { CallBookingRoutes } from '../modules/CallBooking/CallBooking.route';
 import { ProjectRoutes } from '../modules/Project/Project.route';
 import { BlogRoutes } from '../modules/Blog/Blog.route';
@@ -32,6 +32,7 @@ import { WeDoRoutes } from '../modules/WeDo/WeDo.route';
 import { ContactRoutes } from '../modules/Contact/Contact.route';
 import { QuotePricingRoutes } from '../modules/QuotePricing/QuotePricing.route';
 import { NotificationRoutes } from '../modules/Notification/Notification.route';
+import { CallAvailabilityRoutes } from '../modules/CallAvailability/CallAvailability.route';
 const router = Router();
 
 const moduleRoutes = [

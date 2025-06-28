@@ -2,13 +2,27 @@ import express from 'express';
 import { CallAvailabilityControllers } from './CallAvailability.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { createCallAvailabilityValidationSchema, updateCallAvailabilityValidationSchema } from './CallAvailability.validation';
+import { USER_ROLE } from '../User/user.constant';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
 router.post(
   '/create-call-availability',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   validateRequest(createCallAvailabilityValidationSchema),
   CallAvailabilityControllers.createCallAvailability,
+);
+
+router.get(
+  '/get-availability',
+  CallAvailabilityControllers.getAvailability,
+);
+
+router.get(
+  '/calender-availability',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber, USER_ROLE.client),
+  CallAvailabilityControllers.getCalenderAvailability,
 );
 
 router.get(

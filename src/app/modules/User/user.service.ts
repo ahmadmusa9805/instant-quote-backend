@@ -11,7 +11,8 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { Quote } from '../Quote/quote.model';
-import { CallBooking } from '../CallBooking/CallBooking.model';
+// import { CallBooking } from '../CallBooking/CallBooking.model';
+import { Booking } from '../Booking/Booking.model';
 
 export const createUserIntoDB = async (payload: TUser) => {
   if (payload.role === 'client') {
@@ -362,11 +363,11 @@ const deleteUserFromDB = async (id: string) => {
     }
 
     // Step 4: Check if a call booking exists for the user
-    const callBooking = await CallBooking.findOne({ userId: id }).session(
+    const callBooking = await Booking.findOne({ userId: id }).session(
       session,
     ); // Check for call booking with userId
     if (callBooking) {
-      await CallBooking.findOneAndDelete(
+      await Booking.findOneAndDelete(
         { userId: id },
         { session }, // Pass session for deletion
       );
