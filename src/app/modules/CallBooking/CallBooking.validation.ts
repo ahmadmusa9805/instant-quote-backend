@@ -16,7 +16,7 @@ export const createCallBookingValidationSchema = z.object({
       date: z.string().min(1),
       start: z.string().min(1),
       end: z.string().min(1),
-      day: z.string(),
+      // day: z.string(),
       // bookedBy: z.string().min(1),
       subscriberId: z.string().min(1),
       quoteId: z.string().min(1),

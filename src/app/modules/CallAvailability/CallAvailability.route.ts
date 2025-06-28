@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post(
   '/create-call-availability',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
   validateRequest(createCallAvailabilityValidationSchema),
   CallAvailabilityControllers.createCallAvailability,
 );

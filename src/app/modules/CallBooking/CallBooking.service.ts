@@ -10,35 +10,71 @@ import { CallBooking } from './CallBooking.model';
 import { NotificationServices } from '../Notification/Notification.service';
 import { User } from '../User/user.model';
 
+// function normalizeTime(time: string): string {
+//   const [h, m] = time.split(':');
+//   return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+// }
 
 const createCallBookingIntoDB = async (payload: TCallBooking,   user: any) => {
-  console.log(payload, "payload");
+  // console.log(payload, "payload");
+const date = new Date(payload.date);
+const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+  // console.log(day, "dayName");
 
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
     payload.bookedBy = userData?._id ?? new mongoose.Types.ObjectId();
+    payload.day = day;
+  //     const overlappingBooking = await CallBooking.findOne({
+  //     date: payload.date,
+  //     day: day,
+  //   // isDeleted: false, // Optionally exclude deleted records
+  //    $or: [
+  //     // Case 1: The new booking starts within an existing booking
+  //     {
+  //       startTime: { $lte: payload.start },
+  //       endTime: { $gt: payload.start },
+  //     },
+  //     // Case 2: The new booking ends within an existing booking
+  //     {
+  //       startTime: { $lt: payload.end },
+  //       endTime: { $gte: payload.end },
+  //     },
+  //     // Case 3: The new booking fully contains an existing booking
+  //     {
+  //       startTime: { $gte: payload.start },
+  //       endTime: { $lte: payload.end },
+  //     }
+  //   ],
+  // });
 
-      const overlappingBooking = await CallBooking.findOne({
-    day: payload.day,
-    isDeleted: false, // Optionally exclude deleted records
-    $or: [
-      // Case 1: The new booking starts within an existing booking
-      {
-        startTime: { $lte: payload.start },
-        endTime: { $gt: payload.start },
-      },
-      // Case 2: The new booking ends within an existing booking
-      {
-        startTime: { $lt: payload.end },
-        endTime: { $gte: payload.end },
-      },
-      // Case 3: The new booking fully contains an existing booking
-      {
-        startTime: { $gte: payload.start },
-        endTime: { $lte: payload.end },
-      }
-    ],
-  });
+  // Before checking in DB
+// Utility functions
+function normalizeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toISOString().split('T')[0]; // returns '2025-07-02'
+}
+
+function normalizeTime(time: string): string {
+  const [h, m] = time.split(':');
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`; // '09:00'
+}
+
+// Normalize input
+payload.date = normalizeDate(payload.date);
+payload.start = normalizeTime(payload.start);
+payload.end = normalizeTime(payload.end);
+
+// Overlap check
+const overlappingBooking = await CallBooking.findOne({
+  date: payload.date,
+  start: payload.start,
+  end: payload.end,
+  subscriberId: payload.subscriberId,
+});
+
+console.log(overlappingBooking, "overlappingBooking");
+console.log(payload, "payload");
 
   if (overlappingBooking) {
     throw new AppError(
@@ -62,7 +98,6 @@ const createCallBookingIntoDB = async (payload: TCallBooking,   user: any) => {
     isRead: false,
     createdAt: new Date(), 
   });
-
   return createdCallBooking;
 
   // Check for existing bookings with overlapping times on the same day
