@@ -2,90 +2,101 @@
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
-import { CALLBOOKING_SEARCHABLE_FIELDS } from './CallBooking.constant';
+import {
+  CALLBOOKING_SEARCHABLE_FIELDS,
+  dayNames,
+  normalizeDate,
+  normalizeTime
+} from './CallBooking.constant';
 import mongoose from 'mongoose';
 import { TCallBooking } from './CallBooking.interface';
 import { CallBooking } from './CallBooking.model';
 // import { CallAvailability } from '../CallAvailability/CallAvailability.model';
 import { NotificationServices } from '../Notification/Notification.service';
 import { User } from '../User/user.model';
+import { CallAvailability } from '../CallAvailability/CallAvailability.model';
 
-// function normalizeTime(time: string): string {
-//   const [h, m] = time.split(':');
-//   return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
-// }
+const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
+  const date = new Date(payload.date);
+  const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+  const dayNumber = date.getDay();
 
-const createCallBookingIntoDB = async (payload: TCallBooking,   user: any) => {
-  // console.log(payload, "payload");
-const date = new Date(payload.date);
-const day = date.toLocaleDateString('en-US', { weekday: 'long' });
-  // console.log(day, "dayName");
+  // New: Check day availability
+  const callAvailabilityData = await CallAvailability.findOne({
+    subscriberId: payload.subscriberId,
+  });
 
-    const {  userEmail } = user;
-    const userData = await User.findOne({ email: userEmail });
-    payload.bookedBy = userData?._id ?? new mongoose.Types.ObjectId();
-    payload.day = day;
-  //     const overlappingBooking = await CallBooking.findOne({
-  //     date: payload.date,
-  //     day: day,
-  //   // isDeleted: false, // Optionally exclude deleted records
-  //    $or: [
-  //     // Case 1: The new booking starts within an existing booking
-  //     {
-  //       startTime: { $lte: payload.start },
-  //       endTime: { $gt: payload.start },
-  //     },
-  //     // Case 2: The new booking ends within an existing booking
-  //     {
-  //       startTime: { $lt: payload.end },
-  //       endTime: { $gte: payload.end },
-  //     },
-  //     // Case 3: The new booking fully contains an existing booking
-  //     {
-  //       startTime: { $gte: payload.start },
-  //       endTime: { $lte: payload.end },
-  //     }
-  //   ],
-  // });
+  if (!callAvailabilityData) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'No availability set for this subscriber.',
+    );
+  }
 
-  // Before checking in DB
-// Utility functions
-function normalizeDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toISOString().split('T')[0]; // returns '2025-07-02'
-}
+  if (!callAvailabilityData.daysOfWeek.includes(dayNumber)) {
+    const availableDayNames = callAvailabilityData.daysOfWeek
+      .map((d) => dayNames[d])
+      .join(', ');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Booking not allowed on ${payload.date} (${day}). Available booking days are: ${availableDayNames}.`,
+    );
+  }
 
-function normalizeTime(time: string): string {
-  const [h, m] = time.split(':');
-  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`; // '09:00'
-}
+  const { userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  payload.bookedBy = userData?._id ?? new mongoose.Types.ObjectId();
+  payload.day = day;
 
-// Normalize input
-payload.date = normalizeDate(payload.date);
-payload.start = normalizeTime(payload.start);
-payload.end = normalizeTime(payload.end);
+  // Normalize input
+  payload.date = normalizeDate(payload.date);
+  payload.start = normalizeTime(payload.start);
+  payload.end = normalizeTime(payload.end);
 
-// Overlap check
-const overlappingBooking = await CallBooking.findOne({
-  date: payload.date,
-  start: payload.start,
-  end: payload.end,
-  subscriberId: payload.subscriberId,
-});
+  // Time logic validation
+  if (payload.start >= payload.end) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Invalid time range: start time (${payload.start}) must be before end time (${payload.end}).`,
+    );
+  }
 
-console.log(overlappingBooking, "overlappingBooking");
-console.log(payload, "payload");
+  // Overlap check
+  const overlappingBookings = await CallBooking.findOne({
+    date: payload.date,
+    subscriberId: payload.subscriberId,
+    $or: [
+      {
+        start: { $lt: payload.end },
+        end: { $gt: payload.start },
+      },
+    ],
+  });
+
+  if (overlappingBookings) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'A booking already exists that overlaps with the specified time range.',
+    );
+  }
+
+  // Overlap check
+  const overlappingBooking = await CallBooking.findOne({
+    date: payload.date,
+    start: payload.start,
+    end: payload.end,
+    subscriberId: payload.subscriberId,
+  });
 
   if (overlappingBooking) {
     throw new AppError(
       httpStatus.CONFLICT,
-      'A booking already exists that overlaps with the specified time range.'
+      'A booking already exists that overlaps with the specified date and time range.',
     );
   }
 
-
   const createdCallBooking = await CallBooking.create(payload);
-  
+
   if (!createdCallBooking) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
   }
@@ -96,78 +107,43 @@ console.log(payload, "payload");
     isDeleted: false,
     subscriberId: payload.subscriberId,
     isRead: false,
-    createdAt: new Date(), 
+    createdAt: new Date(),
   });
+
   return createdCallBooking;
-
-  // Check for existing bookings with overlapping times on the same day
-  // const callAvailability = await CallAvailability.find()
-//   const callAvailability = await CallAvailability.find({day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false})
-//   console.log(callAvailability, "callAvailability");
-
-//   // return null
-//  if (!callAvailability.length) {
-//     throw new AppError(
-//       httpStatus.CONFLICT,
-//       'Call availability not found for the specified day.'
-//     );
-//   }
-  // const overlappingBooking = await CallBooking.findOne({
-  //   day: payload.day,
-  //   isDeleted: false, // Optionally exclude deleted records
-  //   $or: [
-  //     // Case 1: The new booking starts within an existing booking
-  //     {
-  //       startTime: { $lte: payload.start },
-  //       endTime: { $gt: payload.start },
-  //     },
-  //     // Case 2: The new booking ends within an existing booking
-  //     {
-  //       startTime: { $lt: payload.end },
-  //       endTime: { $gte: payload.end },
-  //     },
-  //     // Case 3: The new booking fully contains an existing booking
-  //     {
-  //       startTime: { $gte: payload.start },
-  //       endTime: { $lte: payload.end },
-  //     }
-  //   ],
-  // });
-
-  // if (overlappingBooking) {
-  //   throw new AppError(
-  //     httpStatus.CONFLICT,
-  //     'A booking already exists that overlaps with the specified time range.'
-  //   );
-  // }
-  
-  // const callBookingExists = await CallBooking.findOne({ userId: payload.userId });
-  // if(callBookingExists){
-  //   throw new Error('User Have already Call Booked');
-  // }
-
-
-  // Create the new booking if no conflict is found
-  // const result = await CallBooking.create(payload);
-
-  // if (!result) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create CallBooking');
-  // }
-
-
-
-  // const deletedCallAvailability = await CallAvailability.findOneAndUpdate(
-  //   // { day: payload.day, isDeleted: false },
-  //   { day: payload.day, startTime: payload.startTime, endTime: payload.endTime, isDeleted: false },
-  //   { isDeleted: true },
-  //   { new: true },
-  // );
-
-  // if (!deletedCallAvailability) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete CallAvailability');
-  // }
-  // return result;
 };
+
+//     const overlappingBookings = await CallBooking.findOne({
+//     date: payload.date,
+//     day: day,
+//   // isDeleted: false, // Optionally exclude deleted records
+//    $or: [
+//     // Case 1: The new booking starts within an existing booking
+//     {
+//       start: { $lte: payload.start },
+//       end: { $gt: payload.start },
+//     },
+//     // Case 2: The new booking ends within an existing booking
+//     {
+//       start: { $lt: payload.end },
+//       end: { $gte: payload.end },
+//     },
+//     // Case 3: The new booking fully contains an existing booking
+//     {
+//       start: { $gte: payload.start },
+//       end: { $lte: payload.end },
+//     }
+//   ],
+// });
+
+// Before checking in DB
+// Utility functions
+// if (overlappingBookings) {
+//   throw new AppError(
+//     httpStatus.CONFLICT,
+//     'A booking already exists that overlaps with the specified slots.'
+//   );
+// }
 
 const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const CallBookingQuery = new QueryBuilder(
@@ -184,7 +160,7 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const result = await CallBookingQuery.modelQuery;
   const meta = await CallBookingQuery.countTotal();
 
-    console.log(result, "resul-musa");
+  console.log(result, 'resul-musa');
 
   return {
     result,
@@ -192,9 +168,12 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
-const getAllCallBookingsByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
+const getAllCallBookingsByUserFromDB = async (
+  query: Record<string, unknown>,
+  userId: string,
+) => {
   const CallBookingQuery = new QueryBuilder(
-    CallBooking.find({userId, isDeleted: false}),
+    CallBooking.find({ userId, isDeleted: false }),
     query,
   )
     .search(CALLBOOKING_SEARCHABLE_FIELDS)
@@ -266,5 +245,5 @@ export const CallBookingServices = {
   getSingleCallBookingFromDB,
   updateCallBookingIntoDB,
   deleteCallBookingFromDB,
-  getAllCallBookingsByUserFromDB
+  getAllCallBookingsByUserFromDB,
 };

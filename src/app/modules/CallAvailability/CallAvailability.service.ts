@@ -102,18 +102,19 @@ let rule;
   // console.log('user', userData);
 
   if(userData?.role==='superAdmin'){
-      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can get availability');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Not Allowed for super admin');
   }else if(userData?.role==='admin' || userData?.role==='client'){
-       rule = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+    console.log('userData', userData)
+    console.log('client')
+     const  result = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+    console.log('result', result)
+
+       rule = result
   }else{
       rule = await CallAvailability.findOne({ subscriberId: userData?._id });
   }
   // payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-
-
   // console.log('Service: Calendar Availability');
-
-
   // console.log(rule,'rule');
 
   if (!rule) throw new Error('No availability rule found.');
