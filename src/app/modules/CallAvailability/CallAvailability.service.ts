@@ -22,9 +22,8 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: 
   }else if(userData?.role==='admin'){
           payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
           payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
-
   }else{
-      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can create availability');
+      throw new AppError(httpStatus.BAD_REQUEST, 'super admin not allowed');
   }
 
 
@@ -53,10 +52,10 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: 
 
 
     // Check if a Availability already exists
-    const existingAvailability = await CallAvailability.find({ }); // or use another unique field like 'code'
-    if (existingAvailability[0]) {
+    const existingAvailability = await CallAvailability.findOne({subscriberId: payload.subscriberId }); // or use another unique field like 'code'
+    if (existingAvailability) {
       // If a term exists, update it with the new payload
-      const updatedAvailability = await CallAvailability.findByIdAndUpdate(existingAvailability[0]._id, payload, { new: true });
+      const updatedAvailability = await CallAvailability.findByIdAndUpdate(existingAvailability._id, payload, { new: true });
       return updatedAvailability;  // Return the updated term
     }
 

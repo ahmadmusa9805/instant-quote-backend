@@ -103,11 +103,9 @@ const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
 
   await NotificationServices.createNotificationIntoDB({
     type: 'callBooking',
+    readBy: [],
     message: `New call booking created for ${payload.day} at ${payload.start} - ${payload.end}`,
-    isDeleted: false,
     subscriberId: payload.subscriberId,
-    isRead: false,
-    createdAt: new Date(),
   });
 
   return createdCallBooking;
