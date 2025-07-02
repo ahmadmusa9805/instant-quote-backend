@@ -5,7 +5,6 @@ export type TNotification = {
   type: string;
   message: string;
   isRead: boolean;
-  createdAt: Date;
   subscriberId: Types.ObjectId;
   isDeleted: boolean;
 };

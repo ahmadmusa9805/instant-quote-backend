@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { NotificationServices } from './Notification.service';
 
 const createNotification = catchAsync(async (req, res) => {
-  const { notification } = req.body;
+  const notification = req.body;
   const result = await NotificationServices.createNotificationIntoDB(notification);
 
   sendResponse(res, {
@@ -36,6 +36,7 @@ const markNotificationAsRead = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 
 export const NotificationControllers = {
   createNotification,

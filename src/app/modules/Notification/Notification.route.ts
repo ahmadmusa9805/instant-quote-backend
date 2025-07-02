@@ -17,5 +17,9 @@ router.get(
   '/unread',
   NotificationControllers.getAllUnreadNotifications,
 );
+router.patch(
+  '/:id/read',
+  NotificationControllers.markNotificationAsRead,
+);
 
 export const NotificationRoutes = router;
