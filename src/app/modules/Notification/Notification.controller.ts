@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { NotificationServices } from './Notification.service';
 
 const createNotification = catchAsync(async (req, res) => {
-  const { notification } = req.body;
+  const notification = req.body;
   const result = await NotificationServices.createNotificationIntoDB(notification);
 
   sendResponse(res, {
@@ -17,28 +17,41 @@ const createNotification = catchAsync(async (req, res) => {
 
 
 const getAllUnreadNotifications = catchAsync(async (req, res) => {
-  const result = await NotificationServices.getAllUnreadNotificationsFromDB();
+
+  const result = await NotificationServices.getAllUnreadNotificationsFromDB(req.query,req.user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Notifications are retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.response,
   });
 });
 
 const markNotificationAsRead = catchAsync(async (req, res) => {
-  const result = await NotificationServices.markNotificationAsReadIntoDB();
-
+  const { id } = req.params;
+  const result = await NotificationServices.markNotificationAsReadIntoDB(id, req.user);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Notification is updated successfully',
+    message: 'Notification marked as read.',
+    data: result,
+  });
+});
+const markNotificationsAsRead = catchAsync(async (req, res) => {
+  const result = await NotificationServices.markNotificationsAsReadIntoDB(req.user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Notification marked as read.',
     data: result,
   });
 });
 
+
 export const NotificationControllers = {
   createNotification,
   getAllUnreadNotifications,
-  markNotificationAsRead,
+  markNotificationsAsRead,
+  markNotificationAsRead
 };

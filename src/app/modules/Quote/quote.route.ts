@@ -5,7 +5,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { QuoteControllers } from './quote.controller';
 import {  QuoteValidation } from './quote.validation';
-
 import { uploadFileS3 } from '../../utils/UploaderS3';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../User/user.constant';
@@ -31,10 +30,8 @@ router.post(
 
 router.get(
   '/get-all-quote-elements',
-  QuoteControllers.getAllQuotesElements);
+  QuoteControllers.getAllQuotesElements);  
 
-
-  
 router.patch(
   '/is-read/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),

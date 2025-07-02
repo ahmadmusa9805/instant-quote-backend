@@ -9,7 +9,7 @@ export type TCallAvailability = {
   // date?: Date;
   // isDeleted: boolean;
 
-    daysOfWeek: number[]; // 0=Sun, 1=Mon, ...
+  daysOfWeek: number[]; // 0=Sun, 1=Mon, ...
   timeSlots: {
     start: string; // "09:00"
     end: string;   // "10:00"
