@@ -33,7 +33,6 @@ import { Booking } from '../Booking/Booking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
-console.log('payload test', payload);
   const password = payload.password;
   // const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {
@@ -47,8 +46,6 @@ console.log('payload test', payload);
     propertyPostCode: payload.propertyPostCode,
     status: payload.status
   };
-
-console.log('userData test', userData);
 
   const session = await mongoose.startSession();
   try {
@@ -64,12 +61,9 @@ console.log('userData test', userData);
     // }
 
     const user = await User.findOne({ email: payload.email , isDeleted: false});
-    console.log('user test', user);
 
     if (user) {
       payload.userId = user._id
-          console.log('user test inside' , user );
-
   //     const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
   //     if(quote){
   //       // throw new Error('User Have already Created a Quote');
@@ -89,31 +83,22 @@ console.log('userData test', userData);
     }
    
    if(!user){
-    console.log('user not test' , user );
     const newUser = await User.create([userData], { session });
-
     if (!newUser.length) throw new Error('Failed to create user');
-
     payload.userId = newUser[0]._id;
-        console.log('newUser[0]  test' , newUser[0] );
-
   }
 
 
   const modifyPayload = await calculateOtherPrices(payload);
-
     // const newQuote = await Quote.create(payload);
     const newQuote = await Quote.create([modifyPayload], { session });
     if (!newQuote.length) throw new Error('Failed to create Client');
-        console.log('newQuote  test' , newQuote );
 
     await NotificationServices.createNotificationIntoDB({
       type: 'quote',
       message: `New quote created with Email: ${payload.email}`,
-      isDeleted: false,
-      isRead: false,
+      readBy: [],
       subscriberId: payload.subscriberId,
-      createdAt: new Date(),
     });
 
     // if(!user){
@@ -328,10 +313,8 @@ const updateQuoteIntoDB = async (id: string, payload: any) => {
   await NotificationServices.createNotificationIntoDB({
     type: "quote",
     message: `New quote created with Email: ${payload.email}`,
-    isDeleted: false,
-    isRead: false,
-    subscriberId: updatedData.subscriberId,
-    createdAt: new Date(),
+    readBy: [],
+    subscriberId: updatedData.subscriberId
   });
 
       // if(!user){

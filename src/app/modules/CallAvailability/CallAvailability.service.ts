@@ -22,9 +22,8 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: 
   }else if(userData?.role==='admin'){
           payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
           payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
-
   }else{
-      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can create availability');
+      throw new AppError(httpStatus.BAD_REQUEST, 'super admin not allowed');
   }
 
 
@@ -53,10 +52,10 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: 
 
 
     // Check if a Availability already exists
-    const existingAvailability = await CallAvailability.find({ }); // or use another unique field like 'code'
-    if (existingAvailability[0]) {
+    const existingAvailability = await CallAvailability.findOne({subscriberId: payload.subscriberId }); // or use another unique field like 'code'
+    if (existingAvailability) {
       // If a term exists, update it with the new payload
-      const updatedAvailability = await CallAvailability.findByIdAndUpdate(existingAvailability[0]._id, payload, { new: true });
+      const updatedAvailability = await CallAvailability.findByIdAndUpdate(existingAvailability._id, payload, { new: true });
       return updatedAvailability;  // Return the updated term
     }
 
@@ -102,18 +101,19 @@ let rule;
   // console.log('user', userData);
 
   if(userData?.role==='superAdmin'){
-      throw new AppError(httpStatus.BAD_REQUEST, 'Only subscriber can get availability');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Not Allowed for super admin');
   }else if(userData?.role==='admin' || userData?.role==='client'){
-       rule = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+    console.log('userData', userData)
+    console.log('client')
+     const  result = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+    console.log('result', result)
+
+       rule = result
   }else{
       rule = await CallAvailability.findOne({ subscriberId: userData?._id });
   }
   // payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-
-
   // console.log('Service: Calendar Availability');
-
-
   // console.log(rule,'rule');
 
   if (!rule) throw new Error('No availability rule found.');

@@ -2,11 +2,14 @@
 import { Model, Types } from 'mongoose';
 
 export type TNotification = {
-  type: string;
+  type: 'quote' | 'callBooking';
   message: string;
+<<<<<<< HEAD
   isRead: boolean;
+=======
+  readBy: [],
+>>>>>>> 76b68698a34be75d59b4035e95777cea403c2702
   subscriberId: Types.ObjectId;
-  isDeleted: boolean;
 };
 
 export interface NotificationModel extends Model<TNotification> {
