@@ -118,29 +118,91 @@ export const createQuoteIntoDB = async (payload: any, file: any) => {
   }
 };
 
-const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => {
-  const {  userEmail } = user;
-  const userData = await User.findOne({ email: userEmail });
 
+// const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => {
+//   const {  userEmail } = user;
+//   const userData = await User.findOne({ email: userEmail });
+
+
+//   // Step 1: Extract searchTerm, page, and limit from the query
+//   const { searchTerm, page = 1, limit = 10 } = query;
+//   const pageNumber = Number(page) || 1;
+//   const pageSize = Number(limit) || 10;
+ 
+//   // Step 2: Base Query
+//   let baseQuery = {}; // Ensure only non-deleted quotes are fetched
+   
+//   if(userData?.role === 'subscriber'){
+//    baseQuery = { isDeleted: false, subscriberId: userData?._id }; // Ensure only non-deleted quotes are fetched
+//   }else{
+//     baseQuery = { isDeleted: false };
+//   }
+
+
+//   // Step 3: Add search logic for `userId` fields
+//   const populateQuery: any = {
+//     path: 'userId',
+//     match: {},
+//   };
+
+//   if (searchTerm) {
+//     populateQuery.match = {
+//       $or: [
+//         { 'name.firstName': { $regex: searchTerm, $options: 'i' } },
+//         { 'name.lastName': { $regex: searchTerm, $options: 'i' } },
+//         { email: { $regex: searchTerm, $options: 'i' } },
+//       ],
+//     };
+//   }
+
+//   // Step 4: Fetch the Quotes with Pagination
+//   const quotes = await Quote.find(baseQuery)
+//     .populate(populateQuery)
+//     .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+//     .skip((pageNumber - 1) * pageSize)
+//     .limit(pageSize);
+
+//   // Step 5: Count total quotes (considering search filter on user fields)
+//   const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
+//   console.log(totalQuotes, 'totalQuotes');
+
+//   // Step 6: Filter out quotes where `userId` doesn't match the search
+//   const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
+
+//   // Step 7: Return result and metadata
+//   return {
+//     result: filteredQuotes,
+//     meta: {
+//       page: pageNumber,
+//       limit: pageSize,
+//       total: totalQuotes, // Reflect total quotes that match the query
+//       totalPage: Math.ceil(totalQuotes / pageSize),
+//     },
+//   };
+// };
+
+const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => {
+  const { userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
 
   // Step 1: Extract searchTerm, page, and limit from the query
   const { searchTerm, page = 1, limit = 10 } = query;
   const pageNumber = Number(page) || 1;
   const pageSize = Number(limit) || 10;
- 
+
   // Step 2: Base Query
   let baseQuery = {}; // Ensure only non-deleted quotes are fetched
-   
-  if(userData?.role === 'subscriber'){
-   baseQuery = { isDeleted: false, subscriberId: userData?._id }; // Ensure only non-deleted quotes are fetched
-  }else{
-    baseQuery = { isDeleted: false };
-  }
 
+  if (userData?.role === 'subscriber') {
+    baseQuery = { isDeleted: false, subscriberId: userData?._id }; // Ensure only non-deleted quotes are fetched
+  } else if (userData?.role === 'admin') {
+    baseQuery = { isDeleted: false, subscriberId: userData?.subscriberId }; // Ensure only non-deleted quotes are fetched
+  }
 
   // Step 3: Add search logic for `userId` fields
   const populateQuery: any = {
     path: 'userId',
+    select: 'firstName lastName email', // Only populate necessary fields from the user document
     match: {},
   };
 
@@ -163,14 +225,18 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => 
 
   // Step 5: Count total quotes (considering search filter on user fields)
   const totalQuotes = await Quote.find(baseQuery).populate(populateQuery).countDocuments();
-  console.log(totalQuotes, 'totalQuotes');
 
-  // Step 6: Filter out quotes where `userId` doesn't match the search
-  const filteredQuotes = quotes.filter((quote) => quote.userId !== null);
+  // Step 6: Check if a quote is read
+  const response = quotes.map((quote: any) => ({
+    ...quote.toObject(),
+    isRead: quote.readBy?.some(
+      (entry: any) => entry.toString() === userData?._id.toString()
+    ),
+  }));
 
   // Step 7: Return result and metadata
   return {
-    result: filteredQuotes,
+    result: response,
     meta: {
       page: pageNumber,
       limit: pageSize,
@@ -179,7 +245,6 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => 
     },
   };
 };
-
 
 
 const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: string) => {
@@ -264,22 +329,41 @@ const getSingleQuoteFromDB = async (id: string) => {
 //   return result;
 // };
 
-const quoteReadStateUpdateFromDB = async (id: string, payload: any) => {
-// Ensure payload is a boolean value, not an object
-const isRead = payload.isRead ?? payload;  // Extract isRead if payload is an object
+const quoteReadStateUpdateFromDB = async (id: string, user: any) => {
 
-if (typeof isRead !== 'boolean') {
-  throw new Error('isRead must be a boolean value');
+  const {userEmail} = user;
+  const currentUser = await User.findOne({email: userEmail});
+  if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+
+
+const notification = await Quote.findById(id);
+if (!notification) {throw new AppError(404, 'Notification not found.')}
+
+if(currentUser.role === 'admin'){
+// Protect against cross-subscriber access
+if (notification.subscriberId.toString() !== currentUser?.subscriberId?.toString()) {
+  throw new AppError(403, 'Access denied');
 }
 
-  const result = await Quote.findOneAndUpdate(
-    { _id: id, isDeleted: false }, // Find the quote
-    { $set: { isRead: isRead } }, // Update isRead to true
-    { new: true } // Return the updated document
-  ).populate('userId');
+}else if(currentUser.role === 'subscriber'){
+  if (notification.subscriberId.toString() !== currentUser?._id?.toString()) {
+    throw new AppError(403, 'Access denied');
+  }
+}
+
+
+// Mark as read if not already
+if (!notification.readBy.includes(currentUser?._id)) {
+  notification.readBy.push(currentUser?._id);
+  const result =  await notification.save();
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to mark Notification as read');
+  }
 
   return result;
 };
+}
 
 
 const updateQuoteIntoDB = async (id: string, payload: any) => {

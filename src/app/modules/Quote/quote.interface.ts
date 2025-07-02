@@ -32,7 +32,6 @@ export type  TQuote = {
     quantity: number;
     price: number;
   };
-
   bathroomsPrice: number;
   windowSize: {
     quantity: number;
@@ -54,7 +53,8 @@ export type  TQuote = {
   extendCost: number;
   refurbishCost: number;
   total: number;
-  isRead: boolean;
+  // isRead: boolean;
+  readBy: Types.ObjectId[],
   isDeleted: boolean;
 }
 

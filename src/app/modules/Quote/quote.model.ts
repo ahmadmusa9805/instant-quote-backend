@@ -151,10 +151,12 @@ const quoteSchema = new Schema<TQuote, QuoteModel>(
       type: String,
       required: true,
     },
-    isRead: {
-      type: Boolean,
-      default: false,
-    },
+    readBy: [
+       {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      },
+    ],
     note: {
       type: String,
     },

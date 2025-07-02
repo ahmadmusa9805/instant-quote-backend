@@ -51,7 +51,6 @@ const createNotificationIntoDB = async (
 //   };
 // };
 const getAllUnreadNotificationsFromDB = async (query: Record<string, unknown>, user: any) => {
-  console.log('user', user);
 
   const { userEmail } = user;
   const currentUser = await User.findOne({ email: userEmail });
@@ -65,7 +64,6 @@ if(currentUser.role === 'admin'){
   sId =  currentUser._id;
 }
 
-
   const FinishLevelQuery = new QueryBuilder(
     Notification.find({ subscriberId: sId }),
     query,
@@ -76,10 +74,7 @@ if(currentUser.role === 'admin'){
     .paginate()
     .fields();
 
-   console.log('user2');
-
   const notifications = await FinishLevelQuery.modelQuery.lean();
-     console.log('user3', notifications);
 
   // const response = notifications.map((notif: any) => ({
   //   ...notif,
@@ -93,11 +88,8 @@ if(currentUser.role === 'admin'){
     (entry: any) => entry.toString() === currentUser._id.toString()
   ),
 }));
-     console.log('user4');
 
   const meta = await FinishLevelQuery.countTotal();
-   console.log('user2');
-
 
   return {
     meta,
@@ -118,7 +110,6 @@ if(currentUser.role === 'admin'){
 export const getUnreadNotifications = async () => {
   return await Notification.find({ isRead: false }).sort({ createdAt: -1 });
 };
-
 
 export const markNotificationsAsReadIntoDB = async (user: any) => {
   // return await Notification.updateMany(
