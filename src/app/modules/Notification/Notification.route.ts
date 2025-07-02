@@ -10,23 +10,20 @@ router.post(
   NotificationControllers.createNotification,
 );
 
-router.put(
-  '/mark-all-as-read',
-  NotificationControllers.markNotificationsAsRead,
+router.get(
+  '/unread',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
+  NotificationControllers.getAllUnreadNotifications,
 );
 router.patch(
   '/:id/read',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
   NotificationControllers.markNotificationAsRead,
 );
+router.put(
+  '/mark-all-as-read',
+  NotificationControllers.markNotificationsAsRead,
+);
 
-router.get(
-  '/unread',
-  NotificationControllers.getAllUnreadNotifications,
-);
-router.patch(
-  '/:id/read',
-  NotificationControllers.markNotificationAsRead,
-);
 
 export const NotificationRoutes = router;
