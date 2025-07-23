@@ -15,8 +15,15 @@ const createExclusionIntoDB = async (
 
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
-    payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
 
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+        payload.subscriberId = userData._id;
+  }else{
+        payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  }
   const result = await Exclusion.create(payload);
   
   if (!result) {
@@ -30,8 +37,17 @@ const getAllExclusionsFromDB = async (query: Record<string, unknown>, user: any)
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
 
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+    
   const ExclusionQuery = new QueryBuilder(
-    Exclusion.find({isDeleted: false, subscriberId: userData?._id}),
+    Exclusion.find({ subscriberId: subscriberIdValue}),
     query,
   )
     .search(EXCLUSION_SEARCHABLE_FIELDS)

@@ -28,7 +28,7 @@ const getSingleCallBooking = catchAsync(async (req, res) => {
 });
 
 const getAllCallBookings = catchAsync(async (req, res) => {
-  const result = await CallBookingServices.getAllCallBookingsFromDB(req.query);
+  const result = await CallBookingServices.getAllCallBookingsFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

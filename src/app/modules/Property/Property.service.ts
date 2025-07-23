@@ -8,37 +8,95 @@ import { Property } from './Property.model';
 import { PROPERTY_SEARCHABLE_FIELDS } from './Property.constant';
 import { User } from '../User/user.model';
 
-
 const createPropertyIntoDB = async (
   payload: TProperty,
   file: any,
-  user: any
+  user: any,
 ) => {
-
-
-  const {  userEmail } = user;
+  const { userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
-  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
 
-  if (file) {
-    payload.image = file.location as string;
-  }
-  const result = await Property.create(payload);
-  
-  if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create PropertyPart');
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+        payload.subscriberId = userData._id;
+  }else{
+        payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
   }
 
-  return result;
+    if (file) {
+      payload.image = file.location as string;
+    }
+    const result = await Property.create(payload);
+
+    if (!result) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Failed to create PropertyPart',
+      );
+    }
+
+    return result;
 };
 
-const getAllPropertiesFromDB = async (query: Record<string, unknown>, user: any) => {
 
-  const {  userEmail } = user;
+const getAllPropertiesFromDB = async (
+  query: Record<string, unknown>,
+  user: any,
+) => {
+  const { userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 
-  const PropertyQuery = new QueryBuilder(
-    Property.find({isDeleted: false, subscriberId: userData?._id}),
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+
+// if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+//  const PropertyQuery = new QueryBuilder(
+//     Property.find({  subscriberId: userData?._id }),
+//     query,
+//   )
+//     .search(PROPERTY_SEARCHABLE_FIELDS)
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const result = await PropertyQuery.modelQuery;
+//   const meta = await PropertyQuery.countTotal();
+//   return {
+//     result,
+//     meta,
+//   };
+// }
+
+// if(userData?.role === 'admin'){
+//   const PropertyQuery = new QueryBuilder(
+//     Property.find({ subscriberId: userData?.subscriberId }),
+//     query,
+//   )
+//     .search(PROPERTY_SEARCHABLE_FIELDS)
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const result = await PropertyQuery.modelQuery;
+//   const meta = await PropertyQuery.countTotal();
+//   return {
+//     result,
+//     meta,
+//   };
+// } 
+  
+const PropertyQuery = new QueryBuilder(
+    Property.find({  subscriberId: subscriberIdValue }),
     query,
   )
     .search(PROPERTY_SEARCHABLE_FIELDS)
@@ -56,23 +114,20 @@ const getAllPropertiesFromDB = async (query: Record<string, unknown>, user: any)
 };
 
 const getSinglePropertyFromDB = async (id: string) => {
+  const isDeletedCart = await mongoose.connection
+    .collection('properties')
+    .findOne(
+      { _id: new mongoose.Types.ObjectId(id) }, // Query
+      { projection: { isDeleted: 1 } }, // Projection
+    );
 
+  if (!isDeletedCart) {
+    throw new Error('Property not found');
+  }
 
- const isDeletedCart = await mongoose.connection
-  .collection('properties')
-  .findOne(
-    { _id: new mongoose.Types.ObjectId(id) }, // Query
-    { projection: { isDeleted: 1 } } // Projection
-  );
- 
- if (!isDeletedCart) {
-   throw new Error('Property not found');
- }
-
- if (isDeletedCart.isDeleted) {
-   throw new Error('Cannot retrieve a deleted Property');
- }
-
+  if (isDeletedCart.isDeleted) {
+    throw new Error('Cannot retrieve a deleted Property');
+  }
 
   const result = await Property.findById(id);
 
@@ -80,32 +135,26 @@ const getSinglePropertyFromDB = async (id: string) => {
 };
 
 const updatePropertyIntoDB = async (id: string, payload: any, file: any) => {
- if (file) {
+  if (file) {
     payload.image = file.location as string;
   }
-  const property = await mongoose.connection
-  .collection('properties')
-  .findOne(
+  const property = await mongoose.connection.collection('properties').findOne(
     { _id: new mongoose.Types.ObjectId(id) }, // Query
     // { projection: { isDeleted: 1 } } // Projection
   );
- 
- if (!property) {
-   throw new Error('Property not found');
- }
 
- if (property.isDeleted) {
-   throw new Error('Cannot update a deleted Property');
- }
+  if (!property) {
+    throw new Error('Property not found');
+  }
 
+  if (property.isDeleted) {
+    throw new Error('Cannot update a deleted Property');
+  }
 
-  const updatedData = await Property.findByIdAndUpdate(
-    { _id: id },
-    payload,
-    { new: true, runValidators: true },
-  );
-
-
+  const updatedData = await Property.findByIdAndUpdate({ _id: id }, payload, {
+    new: true,
+    runValidators: true,
+  });
 
   if (!updatedData) {
     throw new Error('PropertyPart not found after update');
@@ -115,22 +164,18 @@ const updatePropertyIntoDB = async (id: string, payload: any, file: any) => {
 };
 
 const deletePropertyFromDB = async (id: string) => {
-
-  const property = await mongoose.connection
-  .collection('properties')
-  .findOne(
+  const property = await mongoose.connection.collection('properties').findOne(
     { _id: new mongoose.Types.ObjectId(id) }, // Query
     // { projection: { isDeleted: 1 } } // Projection
   );
- 
- if (!property) {
-   throw new Error('Property not found');
- }
 
- if (property.isDeleted) {
-   throw new Error('Cannot delete a deleted Property');
- }
+  if (!property) {
+    throw new Error('Property not found');
+  }
 
+  if (property.isDeleted) {
+    throw new Error('Cannot delete a deleted Property');
+  }
 
   const deletedService = await Property.findByIdAndDelete(
     id,

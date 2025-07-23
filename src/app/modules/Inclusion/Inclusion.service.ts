@@ -15,8 +15,14 @@ const createInclusionIntoDB = async (
   
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
-  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+        payload.subscriberId = userData._id;
+  }else{
+        payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  }
   const result = await Inclusion.create(payload);
   
   if (!result) {
@@ -32,8 +38,18 @@ const getAllInclusionsFromDB = async (query: Record<string, unknown>,   user: an
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
 
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+
+
   const InclusionQuery = new QueryBuilder(
-    Inclusion.find({isDeleted: false, subscriberId: userData?._id}),
+    Inclusion.find({ subscriberId: subscriberIdValue}),
     query,
   )
     .search(INCLUSION_SEARCHABLE_FIELDS)

@@ -143,9 +143,24 @@ const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
 //   );
 // }
 
-const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
+const getAllCallBookingsFromDB = async (query: Record<string, unknown>, user: any) => {
+
+  console.log('query-musa', query);
+  console.log('user-musa', user);
+
+  const { userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  let subscriberIdValue;
+
+  if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+    subscriberIdValue = userData?._id;
+  }
+  if(userData?.role === 'admin'){
+    subscriberIdValue = userData?.subscriberId;
+  }
+
   const CallBookingQuery = new QueryBuilder(
-    CallBooking.find().populate('bookedBy').populate('subscriberId'),
+    CallBooking.find({subscriberId:subscriberIdValue}).populate('bookedBy').populate('subscriberId'),
     // CallBooking.find({ status: 'completed' }).populate('userId').populate('adminId'),
     query,
   )
@@ -158,7 +173,6 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>) => {
   const result = await CallBookingQuery.modelQuery;
   const meta = await CallBookingQuery.countTotal();
 
-  console.log(result, 'resul-musa');
 
   return {
     result,
@@ -170,6 +184,8 @@ const getAllCallBookingsByUserFromDB = async (
   query: Record<string, unknown>,
   userId: string,
 ) => {
+
+
   const CallBookingQuery = new QueryBuilder(
     CallBooking.find({ userId, isDeleted: false }),
     query,

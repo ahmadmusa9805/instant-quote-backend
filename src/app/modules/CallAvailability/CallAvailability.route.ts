@@ -16,6 +16,7 @@ router.post(
 
 router.get(
   '/get-availability',
+    auth(USER_ROLE.superAdmin, USER_ROLE.subscriber, USER_ROLE.admin, USER_ROLE.client),
   CallAvailabilityControllers.getAvailability,
 );
 

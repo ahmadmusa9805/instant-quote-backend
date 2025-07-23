@@ -58,14 +58,14 @@ const getAllUsersForSubscriber = catchAsync(async (req, res) => {
   });
 });
 const getAllUsers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUsersFromDB(req.query);
+  const result = await UserServices.getAllUsersFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users are retrieved succesfully',
-    meta: result.meta,
-    data: result.result,
+    meta: result?.meta,
+    data: result?.result,
   });
 });
 

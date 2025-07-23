@@ -32,9 +32,14 @@ router.get(
 
 router.get(
   '/users-monthly',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   UserControllers.getUsersMonthly,
 );
+// router.get(
+//   '/users-monthly-subscriber',
+//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
+//   UserControllers.getUsersMonthlyForSubscriber,
+// );
 
 router.get(
   '/:id',

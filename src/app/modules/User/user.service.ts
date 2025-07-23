@@ -71,8 +71,58 @@ const getSingleUserIntoDB = async (id: string) => {
 
 //   return result;
 // };
-const getAllUsersFromDB = async (query: Record<string, unknown>) => {
+const getAllUsersFromDB = async (query: Record<string, unknown>, usr:any) => {
+
+const {  userEmail } = usr;
+const userData = await User.findOne({ email: userEmail });
+
+if(usr?.role === 'subscriber'){
   const studentQuery = new QueryBuilder(
+    User.find({
+    role: { $nin: ['admin', 'superAdmin'] }, // Only client
+    subscriberId: userData?._id, // or userData?.subscriberId if admin
+  }),
+    query,
+  )
+    .search(usersSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
+ if(usr?.role === 'admin') {
+  const studentQuery = new QueryBuilder(
+    User.find({
+    role: { $nin: ['superAdmin'] }, // Only client
+    subscriberId: userData?.subscriberId, // or userData?.subscriberId if admin
+  }),
+    query,
+  )
+    .search(usersSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+}
+
+if(usr?.role === 'superAdmin') {
+    const studentQuery = new QueryBuilder(
     User.find({ isDeleted: false, role: { $ne: 'superAdmin' } }),
     query,
   )
@@ -90,16 +140,28 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+
+};
 const getAllUsersForSubscriberFromDB = async (query: Record<string, unknown>, user:any) => {
 
     const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 
- if(userData?.role === 'superAdmin') return getAllUsersFromDB(query);
+let subscriberId;
+
+
+ if(userData?.role === 'admin') {
+   subscriberId = userData?.subscriberId;
+ } else if(userData?.role === 'subscriber') {
+   subscriberId = userData?._id;
+ }else{
+//  if(userData?.role === 'superAdmin') return getAllUsersFromDB(query);
+ }
 
 
   const studentQuery = new QueryBuilder(
-    User.find({ role: { $ne: 'superAdmin' }, isDeleted: false, subscriberId: userData?._id }),
+    User.find({ role: { $ne: 'superAdmin' }, subscriberId }),
+    // User.find({ role: { $ne: 'superAdmin' }, subscriberId: userData?._id }),
     query,
   )
     .search(usersSearchableFields)

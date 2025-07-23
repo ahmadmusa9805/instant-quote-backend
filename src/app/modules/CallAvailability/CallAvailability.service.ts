@@ -16,15 +16,19 @@ const createCallAvailabilityIntoDB = async (payload: TCallAvailability,   user: 
   // console.log('userData', userData);
 
 
-  if(userData?.role==='subscriber'){
+  if(userData?.role==='subscriber' || userData?.role==='superAdmin'){
       payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
       payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
-  }else if(userData?.role==='admin'){
+  }
+  
+  if(userData?.role==='admin'){
           payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId();
           payload.createdBy = userData?._id ?? new mongoose.Types.ObjectId();
-  }else{
-      throw new AppError(httpStatus.BAD_REQUEST, 'super admin not allowed');
   }
+  
+  // else{
+  //     throw new AppError(httpStatus.BAD_REQUEST, 'super admin not allowed');
+  // }
 
 
   // Utility function to parse time strings like "09:00 AM" into Date objects
@@ -88,8 +92,24 @@ const getAllCallAvailabilitysFromDB = async (query: Record<string, unknown>) => 
   };
 };
 
-const getAvailabilityFromDB = async () => {
-  const result = await CallAvailability.findOne();
+const getAvailabilityFromDB = async (user: any) => {
+
+  const { userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+
+
+const result = await CallAvailability.findOne({subscriberId:subscriberIdValue}).populate('createdBy', 'name _id').populate('subscriberId', 'name _id');
+
+console.log('result', result);
 
   return result;
 };
@@ -276,9 +296,11 @@ if (!day || !startTime || !endTime) {
 };
 
 const deleteCallAvailabilityFromDB = async (id: string) => {
-  const deletedService = await CallAvailability.findByIdAndUpdate(
+
+
+  const deletedService = await CallAvailability.findByIdAndDelete(
     id,
-    { isDeleted: true },
+    // { isDeleted: true },
     { new: true },
   );
 
