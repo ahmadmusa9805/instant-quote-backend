@@ -13,7 +13,7 @@ import { uploadFileS3 } from '../../utils/UploaderS3';
 const router = express.Router();
 router.post(
   '/create-user',
-  // auth(USER_ROLE.superAdmin),
+  auth(USER_ROLE.superAdmin,  USER_ROLE.subscriber),
   validateRequest(UserValidation.createUserValidationSchema),
     UserControllers.createUser,
 );

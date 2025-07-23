@@ -145,8 +145,6 @@ const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
 
 const getAllCallBookingsFromDB = async (query: Record<string, unknown>, user: any) => {
 
-  console.log('query-musa', query);
-  console.log('user-musa', user);
 
   const { userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
@@ -160,7 +158,7 @@ const getAllCallBookingsFromDB = async (query: Record<string, unknown>, user: an
   }
 
   const CallBookingQuery = new QueryBuilder(
-    CallBooking.find({subscriberId:subscriberIdValue}).populate('bookedBy').populate('subscriberId'),
+    CallBooking.find({subscriberId:subscriberIdValue}).populate('bookedBy').populate('subscriberId').populate('quoteId'),
     // CallBooking.find({ status: 'completed' }).populate('userId').populate('adminId'),
     query,
   )

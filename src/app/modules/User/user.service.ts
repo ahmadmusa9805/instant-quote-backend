@@ -14,29 +14,55 @@ import { Quote } from '../Quote/quote.model';
 // import { CallBooking } from '../CallBooking/CallBooking.model';
 import { Booking } from '../Booking/Booking.model';
 
-export const createUserIntoDB = async (payload: TUser) => {
-  if (payload.role === 'client') {
-    if (!payload.password) {
-      payload.password = 'client12345';
-    }
+export const createUserIntoDB = async (payload: TUser, user: any) => {
 
-    if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
-  }
+console.log('user', user);
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+console.log('userData', userData);
 
-  if (payload.role === 'admin') {
-    if (!payload.password) {
-      payload.password = 'admin12345';
-    }
-    if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+    payload.subscriberId = userData._id;
+  } else {
+    payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  } 
 
-  }
-  if (payload.role === 'subscriber') {
-    if (!payload.password) {
-      payload.password = 'subscriber12345';
-    } 
-  }
+  console.log('payload final', payload);
+
+  
+    // if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+
+  // if (payload.role === 'client') {
+  //   if (!payload.password) {
+  //     payload.password = 'client12345';
+  //   }
+
+  //   if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+  // }
+
+  // if (payload.role === 'admin') {
+
+  // // console.log('payload musaaaa2222', payload);
+
+
+  //   if (!payload.password) {
+  //     payload.password = '12345';
+  //   }
+  //   if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+
+  // }
+  // if (payload.role === 'subscriber') {
+  //   if (!payload.password) {
+  //     payload.password = 'subscriber12345';
+  //   } 
+  // }
 
   const newUser = await User.create(payload);
+    console.log('newUser', newUser);
+
   if (!newUser) throw new Error('Failed to create user');
 
   return newUser;
@@ -376,6 +402,8 @@ const updateUserIntoDB = async (
   payload: Partial<TUser>,
   file?: any,
 ) => {
+
+
   const { name, ...userData } = payload;
 
   const modifiedUpdatedData: Record<string, unknown> = { ...userData };
