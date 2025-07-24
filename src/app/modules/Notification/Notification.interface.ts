@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 export type TNotification = {
   type: 'quote' | 'callBooking';
   message: string;
-  readBy: Types.ObjectId[],
+  readBy: Types.ObjectId[];
   subscriberId: Types.ObjectId;
 };
 

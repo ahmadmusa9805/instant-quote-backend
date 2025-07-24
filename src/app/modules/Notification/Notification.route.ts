@@ -10,19 +10,21 @@ router.post(
   NotificationControllers.createNotification,
 );
 
-router.get(
-  '/unread',
+router.put(
+  '/mark-all-as-read',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
-  NotificationControllers.getAllUnreadNotifications,
+  NotificationControllers.markNotificationsAsRead,
 );
 router.patch(
   '/:id/read',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
   NotificationControllers.markNotificationAsRead,
 );
-router.put(
-  '/mark-all-as-read',
-  NotificationControllers.markNotificationsAsRead,
+
+router.get(
+  '/unread',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber ),
+  NotificationControllers.getAllUnreadNotifications,
 );
 
 
