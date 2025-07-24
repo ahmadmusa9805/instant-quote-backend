@@ -16,21 +16,34 @@ import { Booking } from '../Booking/Booking.model';
 
 export const createUserIntoDB = async (payload: TUser, user: any) => {
 
-console.log('user', user);
+// console.log('payload', payload);
+// console.log('user', user);
+
+
+
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 console.log('userData', userData);
 
+
+
+
   if (
     (userData && userData?.role === 'superAdmin') ||
     userData?.role === 'subscriber'
-  ) {
-    payload.subscriberId = userData._id;
-  } else {
-    payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
-  } 
+  ){
 
-  console.log('payload final', payload);
+  if( payload.role === 'admin'){
+    payload.subscriberId = userData._id;
+  }
+
+  } 
+  
+  // else {
+  //   payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  // } 
+
+  // console.log('payload final', payload);
 
   
     // if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
@@ -61,7 +74,7 @@ console.log('userData', userData);
   // }
 
   const newUser = await User.create(payload);
-    console.log('newUser', newUser);
+    // console.log('newUser', newUser);
 
   if (!newUser) throw new Error('Failed to create user');
 
