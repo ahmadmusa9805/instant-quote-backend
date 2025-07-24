@@ -80,35 +80,6 @@ export const getUnreadNotifications = async () => {
   return await Notification.find({ isRead: false }).sort({ createdAt: -1 });
 };
 
-// export const markNotificationsAsReadIntoDB = async (user: any) => {
-//   // return await Notification.updateMany(
-//   //   { isRead: false }, // Only update unread notifications
-//   //   { isRead: true }   // Mark them as read
-//   // );
-
-// console.log('markNotificationsAsReadIntoDB', user);
-
-// const {userEmail} = user;
-// const currentUser = await User.findOne({email: userEmail});
-// if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-
-// await Notification.updateMany(
-//   {
-//     subscriberId: currentUser.subscriberId,
-//     'readBy.userId': { $ne: currentUser._id }, // not read yet
-//   },
-//   {
-//     $push: {
-//       readBy: {
-//         userId: currentUser._id,
-//         readAt: new Date(),
-//       },
-//     },
-//   }
-// );
-
-
-// };
 export const markNotificationsAsReadIntoDB = async (user: any) => {
   const { userEmail } = user;
   const currentUser = await User.findOne({ email: userEmail });
@@ -177,6 +148,8 @@ if (!notification.readBy.includes(currentUser!._id)) {
 
 }
 
+
+ }
 
 return 'Notification marked as read.'
  }
