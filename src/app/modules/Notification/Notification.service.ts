@@ -4,8 +4,6 @@ import AppError from '../../errors/AppError';
 import { TNotification } from './Notification.interface';
 import { Notification } from './Notification.model';
 import { User } from '../User/user.model';
-// import QueryBuilder from '../../builder/QueryBuilder';
-// import { NOTIFICATION_SEARCHABLE_FIELDS } from './Notification.constant';
 
 const createNotificationIntoDB = async (
   payload: TNotification,
@@ -55,25 +53,6 @@ if (currentUser.role === 'subscriber' || currentUser.role === 'superAdmin') {
   return response;
 }
 
-
-
-// const allNotifications = await Notification.find({
-//   subscriberId: currentUser.subscriberId,
-// }).sort({ createdAt: -1 }).lean().limit(20);
-
-// const response = allNotifications.map((notif) => ({
-//   ...notif,
-//   isRead: notif.readBy?.some(
-//     (entry: any) => entry.toString() === currentUser._id.toString()
-//   ),
-// }));
-
-//   const meta = await FinishLevelQuery.countTotal();
-
-//   return {
-//     meta,
-//     response,
-//   };
 };
 
 export const getUnreadNotifications = async () => {
@@ -148,11 +127,11 @@ if (!notification.readBy.includes(currentUser!._id)) {
 
 }
 
-
- }
-
 return 'Notification marked as read.'
  }
+
+
+ 
 
 
 
