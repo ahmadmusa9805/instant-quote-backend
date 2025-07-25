@@ -13,7 +13,7 @@ import { uploadFileS3 } from '../../utils/UploaderS3';
 const router = express.Router();
 router.post(
   '/create-user',
-  // auth(USER_ROLE.superAdmin),
+  auth(USER_ROLE.superAdmin,  USER_ROLE.subscriber),
   validateRequest(UserValidation.createUserValidationSchema),
     UserControllers.createUser,
 );
@@ -32,9 +32,14 @@ router.get(
 
 router.get(
   '/users-monthly',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   UserControllers.getUsersMonthly,
 );
+// router.get(
+//   '/users-monthly-subscriber',
+//   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.subscriber),
+//   UserControllers.getUsersMonthlyForSubscriber,
+// );
 
 router.get(
   '/:id',

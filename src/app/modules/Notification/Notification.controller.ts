@@ -18,13 +18,14 @@ const createNotification = catchAsync(async (req, res) => {
 
 const getAllUnreadNotifications = catchAsync(async (req, res) => {
 
-  const result = await NotificationServices.getAllUnreadNotificationsFromDB(req.query,req.user);
+  const result = await NotificationServices.getAllUnreadNotificationsFromDB(req.user);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Notifications are retrieved successfully',
-    meta: result.meta,
-    data: result.response,
+    // meta: result.meta,
+    data: result,
   });
 });
 
@@ -39,6 +40,7 @@ const markNotificationAsRead = catchAsync(async (req, res) => {
   });
 });
 const markNotificationsAsRead = catchAsync(async (req, res) => {
+
   const result = await NotificationServices.markNotificationsAsReadIntoDB(req.user);
   sendResponse(res, {
     statusCode: httpStatus.OK,

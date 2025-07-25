@@ -15,8 +15,14 @@ const createFinishLevelIntoDB = async (
 
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
-    payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-
+ if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+        payload.subscriberId = userData._id;
+  }else{
+        payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  }
   const result = await FinishLevel.create(payload);
   
   if (!result) {
@@ -30,8 +36,18 @@ const getAllFinishLevelsFromDB = async (query: Record<string, unknown>, user: an
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
 
+
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+
   const FinishLevelQuery = new QueryBuilder(
-    FinishLevel.find({isDeleted: false, subscriberId: userData?._id}),
+    FinishLevel.find({ subscriberId: subscriberIdValue}),
     query,
   )
     .search(FINISHLEVEL_SEARCHABLE_FIELDS)

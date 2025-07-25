@@ -4,8 +4,6 @@ import AppError from '../../errors/AppError';
 import { TNotification } from './Notification.interface';
 import { Notification } from './Notification.model';
 import { User } from '../User/user.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { NOTIFICATION_SEARCHABLE_FIELDS } from './Notification.constant';
 
 const createNotificationIntoDB = async (
   payload: TNotification,
@@ -18,173 +16,125 @@ const createNotificationIntoDB = async (
   return result;
 };
 
-// const getAllUnreadNotificationsFromDB = async (query: Record<string, unknown>,user: any) => {
-//   console.log('user', user);
+const getAllUnreadNotificationsFromDB = async (user: any) => {
 
-//   const {userEmail} = user;
-//   const currentUser = await User.findOne({email: userEmail});
-//   if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  const {userEmail} = user;
+  const currentUser = await User.findOne({email: userEmail});
+  if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
 
+ if (currentUser.role === 'admin') {
+  // Fetch notifications for the admin's subscriberId
+  const allNotifications = await Notification.find({
+    subscriberId: currentUser.subscriberId,
+  }).sort({ createdAt: -1 }).lean().limit(20);
 
-//     const FinishLevelQuery = new QueryBuilder(
-//     Notification.find({subscriberId: currentUser.subscriberId,}),
-//     query,
-//   )
-//     .search(NOTIFICATION_SEARCHABLE_FIELDS)
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
+  const response = allNotifications.map((notif) => ({
+    ...notif,
+    isRead: notif.readBy?.some(
+      (entry: any) => entry?.toString() === currentUser._id.toString()
+    ),
+  }));
 
-//   const notifications = await FinishLevelQuery.modelQuery;
-//   const response = notifications.map((notif: any) => ({
-//     ...notif,
-//     isRead: notif.readBy?.some(
-//       (entry: any) => entry?.userId.toString() === currentUser._id.toString()
-//     ),
-//   }));
-
-//   const meta = await FinishLevelQuery.countTotal();
-//   return {
-//     result: response,
-//     meta,
-//   };
-// };
-const getAllUnreadNotificationsFromDB = async (query: Record<string, unknown>, user: any) => {
-
-  const { userEmail } = user;
-  const currentUser = await User.findOne({ email: userEmail });
-  if (!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-
-let sId;
-
-if(currentUser.role === 'admin'){
-   sId = currentUser.subscriberId;
-}else if(currentUser.role === 'subscriber'){
-  sId =  currentUser._id;
+  return response;
 }
 
-  const FinishLevelQuery = new QueryBuilder(
-    Notification.find({ subscriberId: sId }),
-    query,
-  )
-    .search(NOTIFICATION_SEARCHABLE_FIELDS)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+if (currentUser.role === 'subscriber' || currentUser.role === 'superAdmin') {
+  // Fetch notifications for the subscriber
+  const allNotifications = await Notification.find({
+    subscriberId: currentUser._id,
+  }).sort({ createdAt: -1 }).lean().limit(20);  
 
-  const notifications = await FinishLevelQuery.modelQuery.lean();
+  const response = allNotifications.map((notif) => ({
+    ...notif,
+    isRead: notif.readBy?.some(
+      (entry: any) => entry?.toString() === currentUser._id.toString()
+    ),  
+  }))
+  return response;
+}
 
-  // const response = notifications.map((notif: any) => ({
-  //   ...notif,
-  //   isRead: notif.readBy?.some(
-  //     (entry: any) => entry?.userId.toString() === currentUser._id.toString()
-  //   ),
-  // }));
-  const response = notifications.map((notif: any) => ({
-  ...notif,
-  isRead: notif.readBy?.some(
-    (entry: any) => entry.toString() === currentUser._id.toString()
-  ),
-}));
-
-  const meta = await FinishLevelQuery.countTotal();
-
-  return {
-    meta,
-    response,
-  };
 };
-// const allNotifications = await Notification.find({
-//   subscriberId: currentUser.subscriberId,
-// }).sort({ createdAt: -1 }).lean().limit(20);
 
-// const response = allNotifications.map((notif) => ({
-//   ...notif,
-//   isRead: notif.readBy?.some(
-//     (entry:any) => entry?.userId.toString() === currentUser._id.toString()
-//   ),
-// }));
-//   return response;
 export const getUnreadNotifications = async () => {
   return await Notification.find({ isRead: false }).sort({ createdAt: -1 });
 };
 
 export const markNotificationsAsReadIntoDB = async (user: any) => {
-  // return await Notification.updateMany(
-  //   { isRead: false }, // Only update unread notifications
-  //   { isRead: true }   // Mark them as read
-  // );
-const {userEmail} = user;
-const currentUser = await User.findOne({email: userEmail});
-if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  const { userEmail } = user;
+  const currentUser = await User.findOne({ email: userEmail });
+  if (!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
 
-await Notification.updateMany(
-  {
-    subscriberId: currentUser.subscriberId,
-    'readBy.userId': { $ne: currentUser._id }, // not read yet
-  },
-  {
-    $push: {
-      readBy: {
-        userId: currentUser._id,
-        readAt: new Date(),
-      },
-    },
+  let targetSubscriberId;
+  let markAsReadId;
+
+  if (currentUser.role === 'admin') {
+    targetSubscriberId = currentUser.subscriberId;
+    markAsReadId = currentUser.subscriberId;
+  } else if (currentUser.role === 'subscriber' || currentUser.role === 'superAdmin') {
+    targetSubscriberId = currentUser._id;
+    markAsReadId = currentUser._id;
+  } else {
+    throw new AppError(httpStatus.FORBIDDEN, 'Invalid user role');
   }
-);
 
-
+  // Only add markAsReadId if not already present in readBy
+  await Notification.updateMany(
+    {
+      subscriberId: targetSubscriberId,
+      readBy: { $ne: markAsReadId },
+    },
+    {
+      $push: { readBy: markAsReadId },
+    }
+  );
 };
 
-
 export const markNotificationAsReadIntoDB = async (id: any, user: any) => {
+  // console.log('markNotificationAsReadIntoDB', id, user);
   const {userEmail} = user;
   const currentUser = await User.findOne({email: userEmail});
   if(!currentUser) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
 
-
-const notification = await Notification.findById(id);
+ const notification = await Notification.findById(id);
 if (!notification) {throw new AppError(404, 'Notification not found.')}
 
-if(currentUser.role === 'admin'){
-// Protect against cross-subscriber access
+
+
+ if(currentUser.role === 'subscriber' || currentUser.role === 'superAdmin') {
+     // Protect against cross-subscriber access
+if (notification.subscriberId.toString() !== currentUser?._id?.toString()) {
+  throw new AppError(403, 'Access denied');
+}
+
+if (!notification.readBy.includes(currentUser!._id)) {
+  notification.readBy.push(currentUser!._id);
+  await notification.save();
+}
+
+ }
+
+ 
+ if(currentUser.role === 'admin') {
+     // Protect against cross-subscriber access
 if (notification.subscriberId.toString() !== currentUser?.subscriberId?.toString()) {
   throw new AppError(403, 'Access denied');
 }
 
-}else if(currentUser.role === 'subscriber'){
-  if (notification.subscriberId.toString() !== currentUser?._id?.toString()) {
-    throw new AppError(403, 'Access denied');
-  }
+if (!notification.readBy.includes(currentUser!._id)) {
+  notification.readBy.push(currentUser!._id);
+  await notification.save();
 }
 
-
-// Mark as read if not already
-if (!notification.readBy.includes(currentUser?._id)) {
-  notification.readBy.push(currentUser?._id);
-  const result =  await notification.save();
-
-  if (!result) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to mark Notification as read');
-  }
-
-  return result;
 }
 
-// If already marked as read by user, do nothing
-// const alreadyRead = notification.readBy?.some(
-//   (r:any) => r.userId.toString() === currentUser._id.toString()
-// );
+return 'Notification marked as read.'
+ }
 
-// if (!alreadyRead) {
-// notification.readBy.push(currentUser?._id);
-//   await notification.save();
-// }
 
-// return 'Notification marked as read.'
-};
+ 
+
+
+
 
 
 

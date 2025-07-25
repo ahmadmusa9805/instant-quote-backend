@@ -16,8 +16,14 @@ const createServiceIntoDB = async (
 
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
-  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ) {
+        payload.subscriberId = userData._id;
+  }else{
+        payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  }
   const result = await Service.create(payload);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Service');
@@ -32,10 +38,18 @@ const getAllServicesFromDB = async (query: Record<string, unknown>, user: any) =
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
 
 
   const ServiceQuery = new QueryBuilder(
-    Service.find({isDeleted: false, subscriberId: userData?._id}),
+    Service.find({ subscriberId: subscriberIdValue}),
     query,
   )
     .search(SERVICE_SEARCHABLE_FIELDS)

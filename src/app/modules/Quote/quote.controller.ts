@@ -5,6 +5,7 @@ import sendResponse from '../../utils/sendResponse';
 import { QuoteServices } from './quote.service';
 
 const createQuote = catchAsync(async (req, res) => {
+  console.log(req.body, 'req.body in quote controller');
   const { quote: quoteData } = req.body;
   const result = await QuoteServices.createQuoteIntoDB(quoteData, req.file);
 

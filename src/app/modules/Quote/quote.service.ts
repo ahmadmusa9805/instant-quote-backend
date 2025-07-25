@@ -33,6 +33,9 @@ import { Booking } from '../Booking/Booking.model';
 // import { emailValidate } from '../../utils/emailValidate';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
+
+console.log(payload, 'payload in quote service mmmmmmmmmmmm');
+
   const password = payload.password;
   // const password = payload.password || generateRandomPassword();
   const userData: Partial<TUser> = {

@@ -14,29 +14,68 @@ import { Quote } from '../Quote/quote.model';
 // import { CallBooking } from '../CallBooking/CallBooking.model';
 import { Booking } from '../Booking/Booking.model';
 
-export const createUserIntoDB = async (payload: TUser) => {
-  if (payload.role === 'client') {
-    if (!payload.password) {
-      payload.password = 'client12345';
-    }
+export const createUserIntoDB = async (payload: TUser, user: any) => {
 
-    if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+// console.log('payload', payload);
+// console.log('user', user);
+
+
+
+  const {  userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+console.log('userData', userData);
+
+
+
+
+  if (
+    (userData && userData?.role === 'superAdmin') ||
+    userData?.role === 'subscriber'
+  ){
+
+  if( payload.role === 'admin'){
+    payload.subscriberId = userData._id;
   }
 
-  if (payload.role === 'admin') {
-    if (!payload.password) {
-      payload.password = 'admin12345';
-    }
-    if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+  } 
+  
+  // else {
+  //   payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+  // } 
 
-  }
-  if (payload.role === 'subscriber') {
-    if (!payload.password) {
-      payload.password = 'subscriber12345';
-    } 
-  }
+  // console.log('payload final', payload);
+
+  
+    // if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+
+  // if (payload.role === 'client') {
+  //   if (!payload.password) {
+  //     payload.password = 'client12345';
+  //   }
+
+  //   if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+  // }
+
+  // if (payload.role === 'admin') {
+
+  // // console.log('payload musaaaa2222', payload);
+
+
+  //   if (!payload.password) {
+  //     payload.password = '12345';
+  //   }
+  //   if(!payload.subscriberId) throw new AppError(httpStatus.BAD_REQUEST, 'Subscriber Id is required');
+
+  // }
+  // if (payload.role === 'subscriber') {
+  //   if (!payload.password) {
+  //     payload.password = 'subscriber12345';
+  //   } 
+  // }
 
   const newUser = await User.create(payload);
+    // console.log('newUser', newUser);
+
   if (!newUser) throw new Error('Failed to create user');
 
   return newUser;
@@ -71,8 +110,58 @@ const getSingleUserIntoDB = async (id: string) => {
 
 //   return result;
 // };
-const getAllUsersFromDB = async (query: Record<string, unknown>) => {
+const getAllUsersFromDB = async (query: Record<string, unknown>, usr:any) => {
+
+const {  userEmail } = usr;
+const userData = await User.findOne({ email: userEmail });
+
+if(usr?.role === 'subscriber'){
   const studentQuery = new QueryBuilder(
+    User.find({
+    role: { $nin: ['admin', 'superAdmin'] }, // Only client
+    subscriberId: userData?._id, // or userData?.subscriberId if admin
+  }),
+    query,
+  )
+    .search(usersSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
+ if(usr?.role === 'admin') {
+  const studentQuery = new QueryBuilder(
+    User.find({
+    role: { $nin: ['superAdmin'] }, // Only client
+    subscriberId: userData?.subscriberId, // or userData?.subscriberId if admin
+  }),
+    query,
+  )
+    .search(usersSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+}
+
+if(usr?.role === 'superAdmin') {
+    const studentQuery = new QueryBuilder(
     User.find({ isDeleted: false, role: { $ne: 'superAdmin' } }),
     query,
   )
@@ -90,16 +179,28 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
     result,
   };
 };
+
+};
 const getAllUsersForSubscriberFromDB = async (query: Record<string, unknown>, user:any) => {
 
     const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 
- if(userData?.role === 'superAdmin') return getAllUsersFromDB(query);
+let subscriberId;
+
+
+ if(userData?.role === 'admin') {
+   subscriberId = userData?.subscriberId;
+ } else if(userData?.role === 'subscriber') {
+   subscriberId = userData?._id;
+ }else{
+//  if(userData?.role === 'superAdmin') return getAllUsersFromDB(query);
+ }
 
 
   const studentQuery = new QueryBuilder(
-    User.find({ role: { $ne: 'superAdmin' }, isDeleted: false, subscriberId: userData?._id }),
+    User.find({ role: { $ne: 'superAdmin' }, subscriberId }),
+    // User.find({ role: { $ne: 'superAdmin' }, subscriberId: userData?._id }),
     query,
   )
     .search(usersSearchableFields)
@@ -314,6 +415,8 @@ const updateUserIntoDB = async (
   payload: Partial<TUser>,
   file?: any,
 ) => {
+
+
   const { name, ...userData } = payload;
 
   const modifiedUpdatedData: Record<string, unknown> = { ...userData };

@@ -28,7 +28,7 @@ const getSingleCallAvailability = catchAsync(async (req, res) => {
 });
 
 const getAvailability = catchAsync(async (req, res) => {
-  const result = await CallAvailabilityServices.getAvailabilityFromDB();
+  const result = await CallAvailabilityServices.getAvailabilityFromDB(req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

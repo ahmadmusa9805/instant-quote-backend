@@ -32,6 +32,7 @@ router.delete(
 
 router.get(
   '/',
+  auth(USER_ROLE.superAdmin, USER_ROLE.subscriber, USER_ROLE.admin, USER_ROLE.client),
   CallBookingControllers.getAllCallBookings,
 );
 router.get(

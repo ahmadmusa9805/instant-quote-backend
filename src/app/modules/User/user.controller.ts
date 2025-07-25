@@ -7,7 +7,7 @@ import { UserServices } from './user.service';
 
 const createUser = catchAsync(async (req, res) => {
   const { user: userData } = req.body;
-  const result = await UserServices.createUserIntoDB(userData);
+  const result = await UserServices.createUserIntoDB(userData, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -58,14 +58,14 @@ const getAllUsersForSubscriber = catchAsync(async (req, res) => {
   });
 });
 const getAllUsers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUsersFromDB(req.query);
+  const result = await UserServices.getAllUsersFromDB(req.query, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users are retrieved succesfully',
-    meta: result.meta,
-    data: result.result,
+    meta: result?.meta,
+    data: result?.result,
   });
 });
 

@@ -16,7 +16,15 @@ const createPropertyPartIntoDB = async (
 
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
-  payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
+
+    if (
+      (userData && userData?.role === 'superAdmin') ||
+      userData?.role === 'subscriber'
+    ) {
+          payload.subscriberId = userData._id;
+    }else{
+          payload.subscriberId = userData!.subscriberId ?? new mongoose.Types.ObjectId();
+    }
 
 
   if (file) {
@@ -37,8 +45,18 @@ const getAllPropertyPartsFromDB = async (query: Record<string, unknown>, user:an
     const {  userEmail } = user;
     const userData = await User.findOne({ email: userEmail });
 
+
+let subscriberIdValue;
+
+if(userData?.role === 'superAdmin' || userData?.role === 'subscriber'){
+  subscriberIdValue = userData?._id;
+}
+if(userData?.role === 'admin'){
+  subscriberIdValue = userData?.subscriberId;
+}
+
   const PropertyPartQuery = new QueryBuilder(
-    PropertyPart.find({isDeleted: false, subscriberId: userData?._id}),
+    PropertyPart.find({ subscriberId: subscriberIdValue}),
     query,
   )
     .search(PROPERTYPART_SEARCHABLE_FIELDS)
