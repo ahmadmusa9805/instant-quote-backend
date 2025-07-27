@@ -18,11 +18,14 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getMe = catchAsync(async (req, res) => {
+  // console.log('getMe called');
   const { userEmail } = req.user;
+  console.log('getMe called', userEmail);
   // const { userEmail, role } = req.user;
 
   const result = await UserServices.getMe(userEmail);
   // const result = await UserServices.getMe(userEmail, role);
+  console.log('getMe data', result);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

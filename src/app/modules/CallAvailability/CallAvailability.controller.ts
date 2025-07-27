@@ -39,6 +39,10 @@ const getAvailability = catchAsync(async (req, res) => {
 });
 
 const getCalenderAvailability = catchAsync(async (req, res) => {
+  
+  // console.log('getCalenderAvailability called with query:', req.query);
+  // console.log('getCalenderAvailability called with query:', req.user);
+
     const year = parseInt(req.query.year as string);
   const month = parseInt(req.query.month as string); // 0 = Jan, 6 = July
 

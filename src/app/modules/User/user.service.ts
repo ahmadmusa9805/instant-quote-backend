@@ -19,8 +19,6 @@ export const createUserIntoDB = async (payload: TUser, user: any) => {
 // console.log('payload', payload);
 // console.log('user', user);
 
-
-
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
 console.log('userData', userData);
@@ -72,7 +70,7 @@ console.log('userData', userData);
   //     payload.password = 'subscriber12345';
   //   } 
   // }
-
+  console.log('payload final', payload);
   const newUser = await User.create(payload);
     // console.log('newUser', newUser);
 
@@ -84,7 +82,7 @@ console.log('userData', userData);
 const getMe = async (userEmail: string) => {
   const result = await User.findOne({ email: userEmail  });
 
-  if(result?.status === 'blocked') throw new AppError(httpStatus.UNAUTHORIZED, 'User Is blocked!');
+  // if(result?.status === 'blocked') throw new AppError(httpStatus.UNAUTHORIZED, 'User Is blocked!');
   if(result?.isDeleted === true) throw new AppError(httpStatus.UNAUTHORIZED, 'User Is Deleted!');
 
   return result;

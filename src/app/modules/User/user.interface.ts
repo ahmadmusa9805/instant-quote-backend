@@ -18,7 +18,7 @@ export interface TUser {
   propertyAddress?: string;
   propertyPostCode?: string;
   role: 'client' | 'superAdmin' | 'admin' | 'subscriber';
-  status?: 'active' | 'blocked';
+  status?: 'contacted' | 'interested' | 'agreed' | 'notInterested';
   isDeleted: boolean;
 }
 export interface UserModel extends Model<TUser> {

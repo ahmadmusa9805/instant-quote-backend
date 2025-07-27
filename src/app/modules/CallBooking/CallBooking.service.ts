@@ -15,11 +15,24 @@ import { CallBooking } from './CallBooking.model';
 import { NotificationServices } from '../Notification/Notification.service';
 import { User } from '../User/user.model';
 import { CallAvailability } from '../CallAvailability/CallAvailability.model';
+import { Quote } from '../Quote/quote.model';
 
 const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
+  payload.date = payload.date.split('T')[0];
+
   const date = new Date(payload.date);
   const day = date.toLocaleDateString('en-US', { weekday: 'long' });
   const dayNumber = date.getDay();
+
+  const { userEmail } = user;
+  const userData = await User.findOne({ email: userEmail });
+  const quote = await Quote.findOne({ userId: userData?._id });
+
+
+  payload.quoteId = quote?._id ?? new mongoose.Types.ObjectId();
+  payload.bookedBy = userData?._id ?? new mongoose.Types.ObjectId();
+  payload.day = day; 
+  payload.subscriberId = userData?.subscriberId ?? new mongoose.Types.ObjectId(); 
 
   // New: Check day availability
   const callAvailabilityData = await CallAvailability.findOne({
@@ -43,10 +56,7 @@ const createCallBookingIntoDB = async (payload: TCallBooking, user: any) => {
     );
   }
 
-  const { userEmail } = user;
-  const userData = await User.findOne({ email: userEmail });
-  payload.bookedBy = userData?._id ?? new mongoose.Types.ObjectId();
-  payload.day = day;
+
 
   // Normalize input
   payload.date = normalizeDate(payload.date);
@@ -185,7 +195,11 @@ const getAllCallBookingsByUserFromDB = async (
 
 
   const CallBookingQuery = new QueryBuilder(
-    CallBooking.find({ userId, isDeleted: false }),
+    CallBooking.find({ 
+      // bookedBy: userId, state: 'confirmed' 
+       bookedBy: userId,
+  state: { $in: ["confirmed", "pending"] }, 
+    }),
     query,
   )
     .search(CALLBOOKING_SEARCHABLE_FIELDS)
@@ -196,6 +210,10 @@ const getAllCallBookingsByUserFromDB = async (
 
   const result = await CallBookingQuery.modelQuery;
   const meta = await CallBookingQuery.countTotal();
+
+    // console.log('result', result);
+
+
   return {
     result,
     meta,

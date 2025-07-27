@@ -2,7 +2,7 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import {  UserStatus } from './user.constant';
+import {  userState } from './user.constant';
 import { TUser, UserModel } from './user.interface';
 
 
@@ -60,8 +60,8 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     status: {
       type: String,
-      enum: Object.values(UserStatus),
-      default: 'active',
+      enum: Object.values(userState),
+      default: 'interested',
     },
     isDeleted: {
       type: Boolean,
