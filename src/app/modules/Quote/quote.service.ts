@@ -22,7 +22,7 @@ import { StartTime } from '../StartTime/StartTime.model';
 import { Service } from '../Service/Service.model';
 import { DesignIdea } from '../DesignIdea/DesignIdea.model';
 import { Window } from '../Window/Window.model';
-import { calculateOtherPrices } from './quote.utils';
+import { calculateOtherPrices, isValidObjectId } from './quote.utils';
 // import { calculateOtherPrices, generateRandomPassword } from './quote.utils';
 // import { SendEmail } from '../../utils/sendEmail';
 import { NotificationServices } from '../Notification/Notification.service';
@@ -34,7 +34,18 @@ import { Booking } from '../Booking/Booking.model';
 
 export const createQuoteIntoDB = async (payload: any, file: any) => {
 
-console.log(payload, 'payload in quote service mmmmmmmmmmmm');
+  console.log('payload musaaa', payload.subscriberId);
+
+
+if (!isValidObjectId(payload.subscriberId)){
+    if ( payload.subscriberId === 'default-subscriber-id') {
+     const superAdmin = await User.findOne({ role: 'superAdmin' });
+      payload.subscriberId = superAdmin?._id ?? new mongoose.Types.ObjectId();
+    }else{
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid ID And Url.');
+    }
+
+}
 
   const password = payload.password;
   // const password = payload.password || generateRandomPassword();
@@ -55,6 +66,7 @@ console.log(payload, 'payload in quote service mmmmmmmmmmmm');
     session.startTransaction();
     if (file) {
       payload.file = file?.location;
+
     }
     //  await emailValidate(payload.email);
     // Validate the email
@@ -63,10 +75,35 @@ console.log(payload, 'payload in quote service mmmmmmmmmmmm');
     //   userData.needs_review = true; // Flag the email if SMTP validation fails
     // }
 
+
+// if (!mongoose.Types.ObjectId.isValid(payload.subscriberId)){
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid ID format or Wrong Url.');
+// }
+
+
+// if (!isValidObjectId(payload.subscriberId)){
+
+//     if ( payload.subscriberId === 'default-subscriber-id') {
+//      const superAdmin = await User.findOne({ role: 'superAdmin' });
+//       payload.subscriberId = superAdmin?._id ?? new mongoose.Types.ObjectId();
+//     }else{
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid ID And Url.');
+//     }
+
+// }
+
+    const subscriber = await User.findOne({ _id: payload.subscriberId});
+
+    if (!subscriber) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Url Wrong, Subscriber not found.');
+    }
+
     const user = await User.findOne({ email: payload.email , isDeleted: false});
 
     if (user) {
       payload.userId = user._id
+      console.log( ' payload.userId', payload.userId);
+
   //     const quote = await Quote.findOne({ userId: user._id, isDeleted: false });
   //     if(quote){
   //       // throw new Error('User Have already Created a Quote');
@@ -87,12 +124,14 @@ console.log(payload, 'payload in quote service mmmmmmmmmmmm');
    
    if(!user){
     const newUser = await User.create([userData], { session });
+
     if (!newUser.length) throw new Error('Failed to create user');
     payload.userId = newUser[0]._id;
   }
 
 
   const modifyPayload = await calculateOtherPrices(payload);
+
     // const newQuote = await Quote.create(payload);
     const newQuote = await Quote.create([modifyPayload], { session });
     if (!newQuote.length) throw new Error('Failed to create Client');
@@ -103,6 +142,8 @@ console.log(payload, 'payload in quote service mmmmmmmmmmmm');
       readBy: [],
       subscriberId: payload.subscriberId,
     });
+
+
 
     // if(!user){
     //   await SendEmail.sendQuoteEmailToClient(
@@ -205,7 +246,7 @@ const getAllQuotesFromDB = async (query: Record<string, unknown>, user: any) => 
   // Step 3: Add search logic for `userId` fields
   const populateQuery: any = {
     path: 'userId',
-    select: 'firstName lastName email', // Only populate necessary fields from the user document
+    select: 'name.firstName name.lastName email', // Only populate necessary fields from the user document
     match: {},
   };
 

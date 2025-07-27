@@ -114,82 +114,104 @@ console.log('result', result);
   return result;
 };
 
+// const getCalenderAvailabilityFromDB = async (month: any, year: any, user: any) => {
+//   let rule;
+//   const {  userEmail } = user;
+//   const userData = await User.findOne({ email: userEmail });
+
+//   if(userData?.role==='superAdmin'){
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Not Allowed for super admin');
+//   }else if(userData?.role==='admin' || userData?.role==='client'){
+//      const  result = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
+//        rule = result
+//   }else{
+//       rule = await CallAvailability.findOne({ subscriberId: userData?._id });
+//   }
+
+//   if (!rule) throw new Error('No availability rule found.');
+//   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate(); // e.g. 31 for July
+//   const results: any[] = [];
+
+//   for (let day = 1; day <= daysInMonth; day++) {
+//     const currentDate = new Date(Date.UTC(year, month, day)); // Create date in UTC
+//     const dayOfWeek = currentDate.getUTCDay(); // Get day of week in UTC (0 = Sun ... 6 = Sat)
+//     if (rule.daysOfWeek.includes(dayOfWeek)) {
+//       const dateStr = currentDate.toISOString().split('T')[0];
+//       const appointments = await CallBooking.find({ date: dateStr });
+//       const availableSlots = [];
+//       const bookedSlots = [];
+//       for (const slot of rule.timeSlots) {
+//         const isBooked = appointments.find(
+//           a => a.start === slot.start && a.end === slot.end
+//         );
+//         if (isBooked) {
+//           bookedSlots.push(slot);
+
+//         } else {
+//           availableSlots.push(slot);
+//         }
+//       }
+
+//       results.push({
+//         date: dateStr,
+//         availableSlots,
+//         bookedSlots,
+//       });
+//     }
+//   }
+
+//   return results;
+// };
+
 const getCalenderAvailabilityFromDB = async (month: any, year: any, user: any) => {
-let rule;
+  let rule;
   const {  userEmail } = user;
   const userData = await User.findOne({ email: userEmail });
-  // console.log('user', userData);
 
   if(userData?.role==='superAdmin'){
       throw new AppError(httpStatus.BAD_REQUEST, 'Not Allowed for super admin');
   }else if(userData?.role==='admin' || userData?.role==='client'){
-    console.log('userData', userData)
-    console.log('client')
      const  result = await CallAvailability.findOne({ subscriberId: userData?.subscriberId });
-    console.log('result', result)
-
        rule = result
+       console.log('rule for admin or client', rule);
   }else{
       rule = await CallAvailability.findOne({ subscriberId: userData?._id });
   }
-  // payload.subscriberId = userData?._id ?? new mongoose.Types.ObjectId();
-  // console.log('Service: Calendar Availability');
-  // console.log(rule,'rule');
 
   if (!rule) throw new Error('No availability rule found.');
-
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate(); // e.g. 31 for July
-    // console.log('daysInMonth', daysInMonth);
-
   const results: any[] = [];
+    console.log('daysInMonth monirrrrrrrrrrrrrrrrrrrr', daysInMonth);
+
+// Get today's date in UTC (set hours, minutes, seconds, ms to 0)
+  const today = new Date();
+  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    console.log('todayUTC', todayUTC);
 
   for (let day = 1; day <= daysInMonth; day++) {
-      //  console.log('<<<<<<<Start>>>>>>>>', );
 
-      // console.log('day', day);
-
-
-    
     const currentDate = new Date(Date.UTC(year, month, day)); // Create date in UTC
-              // console.log('currentDate', currentDate);
-
+        // Only include today or future dates
+    if (currentDate < todayUTC) continue;
+    
     const dayOfWeek = currentDate.getUTCDay(); // Get day of week in UTC (0 = Sun ... 6 = Sat)
-          // console.log('dayOfWeek', dayOfWeek);
-          // console.log('rule.daysOfWeek.includes(dayOfWeek)', rule.daysOfWeek.includes(dayOfWeek));
     if (rule.daysOfWeek.includes(dayOfWeek)) {
-            // console.log('currentDate.toISOString().split', currentDate.toISOString().split('T')[0]);
-
       const dateStr = currentDate.toISOString().split('T')[0];
-          // console.log('dateStr', dateStr);
-
       const appointments = await CallBooking.find({ date: dateStr });
-          // console.log('appointments', appointments);
-
       const availableSlots = [];
       const bookedSlots = [];
-
       for (const slot of rule.timeSlots) {
-          // console.log('rule.timeSlots', rule.timeSlots);
-          // console.log('slot', slot);
         const isBooked = appointments.find(
           a => a.start === slot.start && a.end === slot.end
         );
-      //  console.log('isBooked', isBooked);
         if (isBooked) {
+          console.log('Booked slot:musa', slot);
           bookedSlots.push(slot);
-                //  console.log('bookedSlots', bookedSlots);
 
         } else {
           availableSlots.push(slot);
-                //  console.log('availableSlots', availableSlots);
-
         }
-
       }
-
-        //  console.log('dateStr', dateStr);
-        //   console.log('availableSlots', availableSlots);
-        //   console.log('bookedSlots', bookedSlots);
 
       results.push({
         date: dateStr,
@@ -197,11 +219,10 @@ let rule;
         bookedSlots,
       });
     }
-  
-  
-        //  console.log('<<<<<<<end>>>>>>>>', );
-
   }
+
+console.log('results=musa', results);
+
 
   return results;
 };

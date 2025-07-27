@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   '/create-call-booking',
-    auth(USER_ROLE.superAdmin, USER_ROLE.client),
+  auth(USER_ROLE.superAdmin, USER_ROLE.client),
   validateRequest(createCallBookingValidationSchema),
   CallBookingControllers.createCallBooking,
 );

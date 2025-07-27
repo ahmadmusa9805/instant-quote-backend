@@ -3,7 +3,7 @@ import { Model, Types } from 'mongoose';
 
 export type TExtendSize = {
   name: string;
-    subscriberId: Types.ObjectId;
+  subscriberId: Types.ObjectId;
   squareMeterSize: string;
   price: number;
   info: string;
