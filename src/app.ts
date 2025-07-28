@@ -6,12 +6,12 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import notFound from './app/middlewares/notFound.js';
-import router from './app/routes';
+import router from './app/routes/index.js';
 import { createServer } from 'http';
 import helmet from 'helmet';
-import config from './app/config';
-import globalErrorHandler from './app/middlewares/globalErrorhandler';
-import { uploadFileS3 } from './app/utils/UploaderS3';
+// import config from './app/config';
+import globalErrorHandler from './app/middlewares/globalErrorhandler.js';
+// import { uploadFileS3 } from './app/utils/UploaderS3.js';
 const app: Application = express();
 const httpServer = createServer(app);
 
