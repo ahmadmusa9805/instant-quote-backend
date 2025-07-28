@@ -313,24 +313,25 @@ const getAllQuotesByUserFromDB = async (query: Record<string, unknown>, userId: 
 //   const result = await Quote.find({isDeleted: false});
 //   return result;
 // };
-const getAllQuotesElementsFromDB = async () => {
+const getAllQuotesElementsFromDB = async (query: Record<string, unknown>) => {
+      // console.log(query,'Fetching all quote elements from the database...');
+      const { subscriberId } = query;
   try {
-    // Import all the required modules
 
-
-    // Query all collections in parallel
+  if (!subscriberId) {
+        // Query all collections in parallel
     const [properties, propertyParts, refurbishmentTypes, refurbishmentSizes, extendSizes, finishLevels, bathrooms, windows, startTimes, services, designIdeas] = await Promise.all([
-      Property.find({ isDeleted: false }),
-      PropertyPart.find({ isDeleted: false }),
-      RefurbishmentType.find({ isDeleted: false }),
-      RefurbishmentSize.find({ isDeleted: false }),
-      ExtendSize.find({ isDeleted: false }),
-      FinishLevel.find({ isDeleted: false }),
-      Bathroom.find({ isDeleted: false }),
-      Window.find({ isDeleted: false }),
-      StartTime.find({ isDeleted: false }),
-      Service.find({ isDeleted: false }),
-      DesignIdea.find({ isDeleted: false })
+      Property.find(),
+      PropertyPart.find(),
+      RefurbishmentType.find(),
+      RefurbishmentSize.find(),
+      ExtendSize.find(),
+      FinishLevel.find(),
+      Bathroom.find(),
+      Window.find(),
+      StartTime.find(),
+      Service.find(),
+      DesignIdea.find()
     ]);
 
     // Aggregate all results into a single object or array
@@ -347,6 +348,43 @@ const getAllQuotesElementsFromDB = async () => {
       services,
       designIdeas
     };
+  } else {
+        // Query all collections in parallel
+    const [properties, propertyParts, refurbishmentTypes, refurbishmentSizes, extendSizes, finishLevels, bathrooms, windows, startTimes, services, designIdeas] = await Promise.all([
+      Property.find({ subscriberId: query.subscriberId }),
+      PropertyPart.find({ subscriberId: query.subscriberId }),
+      RefurbishmentType.find({ subscriberId: query.subscriberId }),
+      RefurbishmentSize.find({ subscriberId: query.subscriberId }),
+      ExtendSize.find({ subscriberId: query.subscriberId }),
+      FinishLevel.find({ subscriberId: query.subscriberId }),
+      Bathroom.find({ subscriberId: query.subscriberId }),
+      Window.find({ subscriberId: query.subscriberId }),
+      StartTime.find({ subscriberId: query.subscriberId }),
+      Service.find({ subscriberId: query.subscriberId }),
+      DesignIdea.find({ subscriberId: query.subscriberId })
+    ]);
+
+    // Aggregate all results into a single object or array
+    return {
+      properties,
+      propertyParts,
+      refurbishmentTypes,
+      refurbishmentSizes,
+      extendSizes,
+      finishLevels,
+      bathrooms,
+      windows,
+      startTimes,
+      services,
+      designIdeas
+    };
+  }
+    console.log(query.subscriberId,'Fetching all quote elements from the database...');
+
+    // Import all the required modules
+
+
+
   } catch (error) {
     console.error('Error fetching data from database:', error);
     throw new Error('Failed to fetch data from database');

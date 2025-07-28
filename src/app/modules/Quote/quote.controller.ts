@@ -65,7 +65,8 @@ const getAllQuotesByUser = catchAsync(async (req, res) => {
 });
 const getAllQuotesElements = catchAsync(async (req, res) => {
 
-  const result = await QuoteServices.getAllQuotesElementsFromDB();
+  const result = await QuoteServices.getAllQuotesElementsFromDB(req.query);
+    console.log(result,'result...');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
