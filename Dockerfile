@@ -20,6 +20,9 @@ FROM node:22
 
 WORKDIR /app
 
+# Copy package.json is required for npm to run
+COPY --from=builder /app/package.json ./
+
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
