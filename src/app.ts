@@ -5,7 +5,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
-import notFound from './app/middlewares/notFound';
+import notFound from './app/middlewares/notFound.js';
 import router from './app/routes';
 import { createServer } from 'http';
 import helmet from 'helmet';
