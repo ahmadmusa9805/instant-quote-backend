@@ -1,4 +1,4 @@
-import config from '../config';
+import config from '../config/index.js';
 import { USER_ROLE } from '../modules/User/user.constant';
 import { User } from '../modules/User/user.model';
 
